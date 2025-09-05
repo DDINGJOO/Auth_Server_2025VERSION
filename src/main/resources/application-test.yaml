@@ -1,11 +1,11 @@
 server:
-  port: 8090
+  port: 30123
 
 spring:
   datasource:
     url: jdbc:mariadb://${DATABASE_HOST}:${DATABASE_PORT}/${DATABASE_NAME}?useSSL=false&serverTimezone=UTC
-    username: root
-    password: pass123#
+    username: ${DATABASE_USER_NAME}
+    password: ${DATABASE_PASSWORD}#
     driver-class-name: org.mariadb.jdbc.Driver
 
 
@@ -37,7 +37,9 @@ spring:
 
 regex:
   email: '^[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\.[A-Za-z]{2,}$'
-  password: '^(?=.{8,}$)(?=.*[A-Za-z])(?=.*\d)(?=.*[!@#$%^&*()_+\-=\[\]{};\'":\\|,.<>\/?`~]).+$'
+  password: '^(?=.*[A-Za-z])(?=.*\d).{8,}$'
+
+
 
 
 

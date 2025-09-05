@@ -33,4 +33,7 @@ public class Suspend {
 
     @Column(name="suspender")
     private String suspenderUserId;
+
+    @Column(name="version")
+    private int version;
 }

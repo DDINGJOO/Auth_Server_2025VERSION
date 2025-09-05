@@ -2,8 +2,6 @@ package com.teambiund.bander.auth_server.controller;
 
 import com.teambiund.bander.auth_server.service.ReadAndPost.Regist.PasswordChangeService;
 import lombok.RequiredArgsConstructor;
-import org.apache.coyote.Response;
-import org.apache.kafka.common.protocol.types.Field;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;

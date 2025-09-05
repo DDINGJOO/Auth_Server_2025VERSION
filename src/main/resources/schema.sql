@@ -40,5 +40,16 @@ CREATE TABLE IF NOT EXISTS withdraw(
     version int null ,
     withdraw_reason varchar(100) null
 
-)
+);
+
+CREATE TABLE IF NOT EXISTS suspend(
+    user_id varchar(255) not null  primary key ,
+    suspend_at DATETIME(6) not null ,
+    version int null,
+                                  suspend_until DATE not null,
+                                  suspender varchar(255),
+    reason varchar(100) null
+
+
+);
 

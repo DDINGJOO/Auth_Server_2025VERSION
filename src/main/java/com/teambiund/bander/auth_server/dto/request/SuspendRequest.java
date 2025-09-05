@@ -13,5 +13,6 @@ import java.time.LocalDate;
 public class SuspendRequest {
     private String suspendReason;
     private String suspenderUserId;
+    private String suspendedUserId;
     private LocalDate suspendUntil;
 }
