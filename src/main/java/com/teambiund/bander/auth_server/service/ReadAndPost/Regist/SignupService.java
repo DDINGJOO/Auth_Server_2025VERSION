@@ -10,8 +10,9 @@ import com.teambiund.bander.auth_server.exceptions.CustomException;
 import com.teambiund.bander.auth_server.exceptions.ErrorCode.ErrorCode;
 import com.teambiund.bander.auth_server.repository.AuthRepository;
 import com.teambiund.bander.auth_server.repository.UserRoleRepository;
-import com.teambiund.bander.auth_server.util.BCryptUtil;
+import com.teambiund.bander.auth_server.util.password_encoder.BCryptUtil;
 import com.teambiund.bander.auth_server.util.key_gerneratre.KeyProvider;
+import com.teambiund.bander.auth_server.util.password_encoder.PasswordEncoder;
 import com.teambiund.bander.auth_server.util.vailidator.Validator;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -27,6 +28,7 @@ public class SignupService {
     private final UserRoleRepository userRoleRepository;
     private final Validator validator;
     private final KeyProvider keyProvider;
+    private final PasswordEncoder passwordEncoder;
 
     public void signup(String email, String password, String passConfirm) throws CustomException {
         validator(email, password, passConfirm);
@@ -39,7 +41,7 @@ public class SignupService {
         Auth auth = Auth.builder()
                 .id(keyProvider.generateKey())
                 .email(email)
-                .password(BCryptUtil.hash(password))
+                .password( passwordEncoder.encode(password))
                 .provider(Provider.SYSTEM)
                 .createdAt(LocalDateTime.now())
                 .status(Status.UNCONFIRMED)
