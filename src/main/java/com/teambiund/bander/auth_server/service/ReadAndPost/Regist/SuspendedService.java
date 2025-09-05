@@ -22,6 +22,17 @@ public class SuspendedService {
     private SuspendRepository suspendRepository;
     private AuthRepository authRepository;
 
+    public void release(String userId) throws CustomException {
+        Auth suspended = authRepository.findById(userId).orElseThrow(
+                () -> new CustomException(ErrorCode.USER_NOT_FOUND)
+        );
+        if (suspended.getStatus().equals(Status.ACTIVE))
+            throw new CustomException(ErrorCode.USER_NOT_SUSPENDED);
+        suspended.setStatus(Status.ACTIVE);
+        authRepository.save(suspended);
+        suspendRepository.deleteById(suspended.getId());
+    }
+
     public void suspend(String userId, String suspendReason, String suspenderUserId) throws CustomException {
         Auth suspended = authRepository.findById(userId).orElseThrow(
                 () ->  new CustomException(ErrorCode.USER_NOT_FOUND)

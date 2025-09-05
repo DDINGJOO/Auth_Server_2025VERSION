@@ -5,10 +5,7 @@ import com.teambiund.bander.auth_server.dto.request.SuspendRequest;
 import com.teambiund.bander.auth_server.service.ReadAndPost.Regist.SuspendedService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 @RequestMapping("/api/admin/auth/suspend")
 @RestController
@@ -16,9 +13,15 @@ import org.springframework.web.bind.annotation.RestController;
 public class SuspendController {
     private final SuspendedService suspendedService;
 
-    @PostMapping("/suspend")
+    @PostMapping("")
     public ResponseEntity<Boolean> suspend(@RequestBody SuspendRequest req) throws Exception {
         suspendedService.suspend( req.getSuspendedUserId(), req.getSuspendReason(), req.getSuspenderUserId());
+        return ResponseEntity.ok(true);
+    }
+
+    @GetMapping("/release")
+    public ResponseEntity<Boolean> unsuspend(@RequestParam String userId) throws Exception {
+        suspendedService.release(userId);
         return ResponseEntity.ok(true);
     }
 }

@@ -19,7 +19,8 @@ public enum ErrorCode {
     USER_NOT_FOUND("USER_NOT_FOUND", "User not found" , HttpStatus.NOT_FOUND ),
     WITHDRAW_NOT_FOUND("WITHDRAW_NOT_FOUND", "Withdraw not found" , HttpStatus.NOT_FOUND ),
     NOT_ADMIN("NOT_ADMIN", "Not admin" , HttpStatus.FORBIDDEN),
-    USER_ALREADY_BLOCKED("USER_ALREADY_BLOCKED", "User already blocked" , HttpStatus.BAD_REQUEST ),;
+    USER_ALREADY_BLOCKED("USER_ALREADY_BLOCKED", "User already blocked", HttpStatus.BAD_REQUEST),
+    USER_NOT_SUSPENDED("USER_NOT_SUSPENDED", "User not suspended", HttpStatus.BAD_REQUEST);
 
 
 

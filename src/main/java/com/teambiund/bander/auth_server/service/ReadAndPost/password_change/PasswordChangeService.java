@@ -1,11 +1,10 @@
-package com.teambiund.bander.auth_server.service.ReadAndPost.Regist;
+package com.teambiund.bander.auth_server.service.ReadAndPost.password_change;
 
 import com.teambiund.bander.auth_server.entity.Auth;
 import com.teambiund.bander.auth_server.entity.History;
 import com.teambiund.bander.auth_server.exceptions.CustomException;
 import com.teambiund.bander.auth_server.repository.AuthRepository;
 import com.teambiund.bander.auth_server.repository.HistoryRepository;
-import com.teambiund.bander.auth_server.util.password_encoder.BCryptUtil;
 import com.teambiund.bander.auth_server.util.key_gerneratre.KeyProvider;
 import com.teambiund.bander.auth_server.util.password_encoder.PasswordEncoder;
 import com.teambiund.bander.auth_server.util.vailidator.Validator;

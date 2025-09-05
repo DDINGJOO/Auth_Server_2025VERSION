@@ -1,6 +1,6 @@
 package com.teambiund.bander.auth_server.controller;
 
-import com.teambiund.bander.auth_server.service.ReadAndPost.Regist.PasswordChangeService;
+import com.teambiund.bander.auth_server.service.ReadAndPost.password_change.PasswordChangeService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.PostMapping;

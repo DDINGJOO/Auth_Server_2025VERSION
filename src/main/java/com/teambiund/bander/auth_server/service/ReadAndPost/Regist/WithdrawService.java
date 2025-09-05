@@ -33,6 +33,7 @@ public class WithdrawService {
                         .build()
         );
         auth.setStatus(Status.DELETED);
+        auth.setDeletedAt(LocalDateTime.now());
         authRepository.save(auth);
     }
 

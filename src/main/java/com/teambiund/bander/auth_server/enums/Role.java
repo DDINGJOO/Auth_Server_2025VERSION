@@ -5,3 +5,4 @@ public enum Role
     USER, ADMIN, GUEST, PLACE_OWNER
 
 }
+
