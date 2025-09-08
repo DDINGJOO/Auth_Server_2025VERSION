@@ -2,7 +2,7 @@ package com.teambiund.bander.auth_server.controller;
 
 
 import com.teambiund.bander.auth_server.dto.request.SuspendRequest;
-import com.teambiund.bander.auth_server.service.ReadAndPost.Regist.SuspendedService;
+import com.teambiund.bander.auth_server.service.signup.SuspendedService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;

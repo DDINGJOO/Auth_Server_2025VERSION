@@ -1,4 +1,4 @@
-package com.teambiund.bander.auth_server.service.ReadAndPost.Regist;
+package com.teambiund.bander.auth_server.service.signup;
 
 
 import com.teambiund.bander.auth_server.entity.Withdraw;
