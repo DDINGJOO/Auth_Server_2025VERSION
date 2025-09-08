@@ -1,11 +1,11 @@
-package com.teambiund.bander.auth_server.service.ReadAndPost.Regist;
+package com.teambiund.bander.auth_server.service.Auth.signup;
 
 import com.teambiund.bander.auth_server.entity.Auth;
 import com.teambiund.bander.auth_server.enums.Status;
 import com.teambiund.bander.auth_server.exceptions.CustomException;
 import com.teambiund.bander.auth_server.exceptions.ErrorCode.ErrorCode;
 import com.teambiund.bander.auth_server.repository.AuthRepository;
-import com.teambiund.bander.auth_server.service.ReadAndPost.password_change.PasswordChangeService;
+import com.teambiund.bander.auth_server.service.password_change.PasswordChangeService;
 import com.teambiund.bander.auth_server.util.password_encoder.BCryptUtil;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;

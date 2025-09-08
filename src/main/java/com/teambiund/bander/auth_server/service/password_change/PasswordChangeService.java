@@ -1,8 +1,9 @@
-package com.teambiund.bander.auth_server.service.ReadAndPost.password_change;
+package com.teambiund.bander.auth_server.service.password_change;
 
 import com.teambiund.bander.auth_server.entity.Auth;
 import com.teambiund.bander.auth_server.entity.History;
 import com.teambiund.bander.auth_server.exceptions.CustomException;
+import com.teambiund.bander.auth_server.exceptions.ErrorCode.ErrorCode;
 import com.teambiund.bander.auth_server.repository.AuthRepository;
 import com.teambiund.bander.auth_server.repository.HistoryRepository;
 import com.teambiund.bander.auth_server.util.key_gerneratre.KeyProvider;
@@ -26,8 +27,8 @@ public class PasswordChangeService
     private final PasswordEncoder passwordEncoder;
 
     public void changePassword(String email, String newPassword, String passConfirm) throws CustomException {
-        Auth auth = authRepository.findByEmail(email).orElseThrow(()
-                -> new RuntimeException("User not found"));
+        Auth auth = authRepository.findByEmail(email).orElseThrow(
+                () -> new CustomException(ErrorCode.USER_NOT_FOUND));
         validator.passwordValid(newPassword);
         validator.passConfirmValid(newPassword,passConfirm);
         changePassword(auth, newPassword);

@@ -2,7 +2,7 @@ package com.teambiund.bander.auth_server.controller;
 
 import com.teambiund.bander.auth_server.dto.request.SignupRequest;
 import com.teambiund.bander.auth_server.exceptions.CustomException;
-import com.teambiund.bander.auth_server.service.ReadAndPost.Regist.SignupService;
+import com.teambiund.bander.auth_server.service.signup.SignupService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.PostMapping;

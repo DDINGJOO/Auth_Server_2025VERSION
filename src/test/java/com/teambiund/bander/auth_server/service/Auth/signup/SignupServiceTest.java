@@ -1,4 +1,4 @@
-package com.teambiund.bander.auth_server.service.ReadAndPost.Regist;
+package com.teambiund.bander.auth_server.service.Auth.signup;
 
 import com.teambiund.bander.auth_server.AuthServerApplication;
 import com.teambiund.bander.auth_server.dto.request.SignupRequest;
@@ -7,15 +7,16 @@ import com.teambiund.bander.auth_server.enums.Status;
 import com.teambiund.bander.auth_server.exceptions.CustomException;
 import com.teambiund.bander.auth_server.exceptions.ErrorCode.ErrorCode;
 import com.teambiund.bander.auth_server.repository.AuthRepository;
+import com.teambiund.bander.auth_server.service.signup.SignupService;
 import com.teambiund.bander.auth_server.util.password_encoder.BCryptUtil;
-import org.aspectj.lang.annotation.After;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 
-import static org.junit.jupiter.api.Assertions.*;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 
 

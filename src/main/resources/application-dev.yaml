@@ -2,6 +2,22 @@ server:
   port: 8090
 
 spring:
+
+
+  kafka:
+    bootstrap-servers: ${KAFKA_URL}
+    consumer:
+
+      group-id: auth-consumer-group
+      auto-offset-reset: earliest
+      key-deserializer: org.apache.kafka.common.serialization.StringDeserializer
+      value-deserializer: org.apache.kafka.common.serialization.StringDeserializer
+    listener:
+      ack-mode: record
+
+
+
+
   datasource:
     url: jdbc:mariadb://${DATABASE_HOST}:${DATABASE_PORT}/${DATABASE_NAME}?useSSL=false&serverTimezone=UTC
     username: ${DATABASE_USER_NAME}
@@ -19,16 +35,15 @@ spring:
         format_sql: true
         dialect: org.hibernate.dialect.MariaDBDialect
 
-
-
-
-
   data:
     redis:
       repositories:
         enabled: false
       host: ${REDIS_HOST}
       port: ${REDIS_PORT}
+
+
+
   sql:
     init:
       mode: always
