@@ -14,6 +14,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDateTime;
+import java.util.List;
 
 @Service
 @RequiredArgsConstructor
@@ -27,24 +28,28 @@ public class PasswordChangeService
     private final PasswordEncoder passwordEncoder;
 
     public void changePassword(String email, String newPassword, String passConfirm) throws CustomException {
-        Auth auth = authRepository.findByEmail(email).orElseThrow(
+        Auth auth = authRepository.findByEmailWithHistory(email).orElseThrow(
                 () -> new CustomException(ErrorCode.USER_NOT_FOUND));
         validator.passwordValid(newPassword);
         validator.passConfirmValid(newPassword,passConfirm);
+
         changePassword(auth, newPassword);
 
     }
 
     private void changePassword(Auth auth, String newPassword) {
         auth.setPassword(passwordEncoder.encode(newPassword));
-        authRepository.save(auth);
-
-        historyRepository.save(History.builder()
+        List<History> histories = auth.getHistory();
+        histories.add(History.builder()
+                .user(auth)
                 .id(keyProvider.generateKey())
                 .afterColumnValue(auth.getPassword())
                 .updatedColumn("password")
                 .updatedAt(LocalDateTime.now())
                 .build());
+        auth.setHistory(histories);
+        authRepository.save(auth);
+
 
     }
 }
