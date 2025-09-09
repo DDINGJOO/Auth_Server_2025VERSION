@@ -27,18 +27,13 @@ public class Consent {
     private LocalDateTime agreementAt;
 
     @Column(name = "version")
-    @Version
-    private int version;
-
-    @Column(name = "is_requirement")
-    private boolean isRequirement;
-
+    private String version;
 
     @Column(name = "consent_type")
     @Enumerated(EnumType.STRING)
     private ConsentType consentType;
 
     @Column(name = "consent_url")
-    private String consentUrl;
+    private String consentUrl; // url 관련 테이블도 따로 만들어야 하나.,.?
 
 }

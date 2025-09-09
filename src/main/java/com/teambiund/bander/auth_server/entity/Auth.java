@@ -43,6 +43,10 @@ public class Auth
     @Nullable
     private String password;
 
+    @Column(name = "phone_number")
+    @Nullable
+    private String phoneNumber;
+
     @Version
     @Column(name = "version")
     private int version; // 낙관적 락 버전 정보

@@ -1,11 +1,13 @@
 package com.teambiund.bander.auth_server.util.vailidator.impl;
 
+import com.teambiund.bander.auth_server.enums.ConsentType;
 import com.teambiund.bander.auth_server.exceptions.CustomException;
 import com.teambiund.bander.auth_server.exceptions.ErrorCode.ErrorCode;
 import com.teambiund.bander.auth_server.util.vailidator.Validator;
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.context.annotation.Bean;
 import org.springframework.stereotype.Component;
+
+import java.util.List;
 
 
 @Component
@@ -44,5 +46,14 @@ public class ValidatorImpl implements Validator {
         {
             throw new CustomException(ErrorCode.PASSWORD_AND_PASSWORD_CONFIRM_NOT_CONFIRMED);
         }
+    }
+
+    @Override
+    public void requiredValid(List<ConsentType> value) throws CustomException {
+        if (value == null || value.isEmpty() || !value.contains(ConsentType.PERSONAL_INFO)) {
+            throw new CustomException(ErrorCode.REQUIRED_CONSENT_NOT_PROVIDED);
+        }
+
+
     }
 }

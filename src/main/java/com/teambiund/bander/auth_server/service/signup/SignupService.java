@@ -26,7 +26,7 @@ public class SignupService {
     private final KeyProvider keyProvider;
     private final PasswordEncoder passwordEncoder;
 
-    public void signup(String email, String password, String passConfirm) throws CustomException {
+    public Auth signup(String email, String password, String passConfirm) throws CustomException {
         validator(email, password, passConfirm);
         if (authRepository.findByEmail(email).isPresent()) {
             throw new CustomException(ErrorCode.EMAIL_ALREADY_EXISTS);
@@ -44,6 +44,7 @@ public class SignupService {
                 .build();
 
         authRepository.save(auth);
+        return auth;
     }
 
     // validator
