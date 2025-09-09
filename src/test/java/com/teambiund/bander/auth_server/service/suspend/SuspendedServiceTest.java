@@ -95,4 +95,25 @@ public class SuspendedServiceTest {
     }
 
 
+    @Test
+    @DisplayName("유저 정지 해제 서비스")
+    public void releaseUserService() throws CustomException {
+
+        //given
+        Auth suspended = authRepository.findById("suspendedUserId").orElseThrow();
+        suspended.setStatus(Status.BLOCKED);
+        authRepository.save(suspended);
+        suspendRepository.flush();
+        assertThat(suspended.getStatus()).isEqualTo(Status.BLOCKED);
+
+        //when
+        suspendedService.release(suspended.getId());
+        suspendRepository.flush();
+        Auth released = authRepository.findById("suspendedUserId").orElseThrow();
+
+        //then
+        assertThat(released.getStatus()).isEqualTo(Status.ACTIVE);
+    }
+
+
 }

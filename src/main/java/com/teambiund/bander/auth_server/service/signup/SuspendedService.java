@@ -8,6 +8,7 @@ import com.teambiund.bander.auth_server.exceptions.CustomException;
 import com.teambiund.bander.auth_server.exceptions.ErrorCode.ErrorCode;
 import com.teambiund.bander.auth_server.repository.AuthRepository;
 import com.teambiund.bander.auth_server.repository.SuspendRepository;
+import com.teambiund.bander.auth_server.util.key_gerneratre.KeyProvider;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -23,6 +24,7 @@ public class SuspendedService {
 
     private final SuspendRepository suspendRepository;
     private final AuthRepository authRepository;
+    private final KeyProvider keyProvider;
 
     public void release(String userId) throws CustomException {
         Auth suspended = authRepository.findById(userId).orElseThrow(
@@ -32,7 +34,6 @@ public class SuspendedService {
             throw new CustomException(ErrorCode.USER_NOT_SUSPENDED);
         suspended.setStatus(Status.ACTIVE);
         authRepository.save(suspended);
-        suspendRepository.deleteById(suspended.getId());
     }
 
     public void suspend(String userId, String suspendReason, String suspenderUserId, Long suspendDate) throws CustomException {
@@ -54,6 +55,7 @@ public class SuspendedService {
 
         suspendRepository.save(
                 Suspend.builder()
+                        .id(keyProvider.generateKey())
                         .reason(suspendReason)
                         .suspendAt(LocalDateTime.now())
                         .suspendUntil(LocalDate.now().plusDays(suspendDate))
