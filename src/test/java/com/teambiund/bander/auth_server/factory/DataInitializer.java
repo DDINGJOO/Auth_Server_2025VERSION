@@ -18,6 +18,7 @@ import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
 @SpringBootTest(classes = com.teambiund.bander.auth_server.AuthServerApplication.class)
+
 public class DataInitializer {
 
     static final int BULK_INSERT_SIZE = 200;

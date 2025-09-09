@@ -31,6 +31,9 @@ CREATE TABLE IF NOT EXISTS history (
 ) ENGINE = InnoDB
   DEFAULT CHARSET = utf8mb4
   COLLATE = utf8mb4_general_ci;
+
+
+
 CREATE TABLE IF NOT EXISTS withdraw(
     id  varchar(255) not null  primary key ,
     withdraw_at DATETIME(6) not null ,
@@ -46,7 +49,21 @@ CREATE TABLE IF NOT EXISTS suspend(
                                   suspend_until DATE not null,
                                   suspender varchar(255),
     reason varchar(100) null
-
-
 );
+
+
+drop table if exists consent;
+CREATE TABLE IF NOT EXISTS consent
+(
+    id             varchar(255)                        not null primary key,
+    user_id        varchar(255)                        not null,
+    agreement_at   DATETIME(6)                         not null,
+    versions       int                                 null,
+    consent_type   ENUM ('PERSONAL_INFO', 'MARKETING') not null,
+    consent_url    varchar(255)                        not null,
+    is_requirement tinyint                             not null,
+    CONSTRAINT fk_consent_id FOREIGN KEY (user_id) REFERENCES auth (id)
+) ENGINE = InnoDB
+  DEFAULT CHARSET = utf8mb4
+  COLLATE = utf8mb4_general_ci;
 
