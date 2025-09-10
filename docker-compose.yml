@@ -1,0 +1,51 @@
+version: "3.7"
+services:
+  nginx:
+    image: nginx:latest
+    ports:
+      - "80:80"
+    volumes:
+      - ./nginx/default.conf:/etc/nginx/conf.d/default.conf
+    networks:
+      - auth-network
+    depends_on:
+      - auth-server
+
+
+  mariadb:
+    image: mariadb:latest
+    env_file:
+      - .env
+    ports:
+      - "4000:3306"
+    networks:
+      - auth-network
+    volumes:
+      - db-data:/var/lib/mysql
+
+
+
+  auth-server:
+    image: auth-server:latest
+    env_file:
+      - .env
+    ports:
+      - "9000:8080"
+    deploy:
+      replicas: 3
+    networks:
+      - auth-network
+    depends_on:
+      - mariadb
+
+
+networks:
+  auth-network:
+    driver: bridge
+    name: auth-network
+volumes:
+  db-data:
+    driver: local
+    name: db-data
+
+

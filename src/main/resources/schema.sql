@@ -1,4 +1,6 @@
 -- Drop existing tables for clean dev initialization (order matters due to FKs)
+create database if not exists auth;
+use auth;
 DROP TABLE IF EXISTS history;
 DROP TABLE IF EXISTS auth;
 
