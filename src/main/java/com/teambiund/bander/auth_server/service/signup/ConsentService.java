@@ -108,8 +108,6 @@ public class ConsentService {
             auth.getConsent().addAll(pendingAdd);
         }
 
-        // 사용자 엔티티 저장 (연관관계 최신화)
-        authRepository.save(auth);
     }
 
 

@@ -14,7 +14,6 @@ import com.teambiund.bander.auth_server.repository.AuthRepository;
 import com.teambiund.bander.auth_server.repository.ConsentRepository;
 import com.teambiund.bander.auth_server.service.impl.SignupClientService;
 import com.teambiund.bander.auth_server.service.signup.ConsentService;
-import com.teambiund.bander.auth_server.service.signup.SignupService;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
@@ -26,6 +25,7 @@ import org.springframework.transaction.annotation.Transactional;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.UUID;
 
 import static org.junit.jupiter.api.Assertions.*;
 
@@ -35,8 +35,7 @@ public class ConsentServiceTest {
     private ConsentService consentService;
     @Autowired
     private ConsentRepository consentRepository;
-    @Autowired
-    private SignupService signupService;
+
     @Autowired
     private SignupClientService signupClientService;
     @Autowired
@@ -45,43 +44,42 @@ public class ConsentServiceTest {
 
     @BeforeEach
     void setUp() {
-        Auth auth = authRepository.save(
-                Auth.builder()
-                        .id("test")
-                        .password("test")
-                        .email("test@test.com")
-                        .status(Status.ACTIVE)
-                        .userRole(Role.USER)
-                        .build()
-        );
+        // 1) Auth를 생성하고 저장 후 반환된 managed 인스턴스를 사용
+        Auth auth = Auth.builder()
+                .id("test")   // 고유 id 사용 권장
+                .password("test")
+                .email("test@" + UUID.randomUUID() + ".com") // 테스트 격리 위해 이메일도 유니크 권장
+                .status(Status.ACTIVE)
+                .userRole(Role.USER)
+                .build();
+        auth = authRepository.saveAndFlush(auth); // DB에 반영된 managed 인스턴스
 
+        // 2) Consent를 생성할 때는 위의 managed auth를 참조
         List<Consent> consents = new ArrayList<>();
-        consents.add(
-                Consent.builder()
-                        .id("1")
-                        .consentUrl("www.url.comn")
-                        .consentType(ConsentType.PERSONAL_INFO)
-                        .version("1.0")
-                        .user(auth)
-                        .agreementAt(LocalDateTime.now())
-                        .build()
-        );
+        consents.add(Consent.builder()
+                .id(UUID.randomUUID().toString())
+                .consentUrl("www.url.comn")
+                .consentType(ConsentType.PERSONAL_INFO)
+                .version("1.0")
+                .user(auth)
+                .agreementAt(LocalDateTime.now())
+                .build());
 
         consents.add(Consent.builder()
-                .id("2")
+                .id(UUID.randomUUID().toString())
                 .consentUrl("www.url.com")
                 .consentType(ConsentType.MARKETING)
-                .user(auth)
                 .version("1.0")
+                .user(auth)
                 .agreementAt(LocalDateTime.now())
-                .build()
-        );
+                .build());
 
-        authRepository.save(auth);
-        authRepository.flush();
+
         consentRepository.saveAll(consents);
         consentRepository.flush();
+
     }
+
 
     @AfterEach
     void tearDown() {
@@ -199,7 +197,6 @@ public class ConsentServiceTest {
         List<Consent> consents = consentRepository.findByUserId("test");
         List<ConsentType> consentTypes = consents.stream().map(Consent::getConsentType).toList();
         assertTrue(consentTypes.contains(ConsentType.PERSONAL_INFO));
-
     }
 
 

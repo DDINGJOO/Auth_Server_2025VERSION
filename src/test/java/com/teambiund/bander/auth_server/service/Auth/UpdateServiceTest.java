@@ -19,7 +19,6 @@ import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDateTime;
 import java.util.List;
@@ -78,7 +77,6 @@ class UpdateServiceTest {
 
     @Test
     @DisplayName("PasswordChangeService : 비밀번호 변경 서비스 (정상 비밀번호 ")
-    @Transactional
     void passwordChange_case1() throws CustomException {
 
         Auth auth = authRepository.findByEmail("test@example.com").orElseThrow(
@@ -90,11 +88,11 @@ class UpdateServiceTest {
         updateService.changePassword(auth.getEmail(), newPassword, newPassword);
 
 
-        auth = authRepository.findById(auth.getId()).orElseThrow(
+        auth = authRepository.findByEmailWithHistory(auth.getEmail()).orElseThrow(
                 () -> new CustomException(ErrorCode.USER_NOT_FOUND)
         );
         List<History> histories = auth.getHistory();
-        assertEquals(histories.size(), 1);
+        assertEquals(1, histories.size());
         assertEquals(histories.get(0).getAfterColumnValue(), auth.getPassword());
         assertTrue(encoder.matches(newPassword, auth.getPassword()));
     }
