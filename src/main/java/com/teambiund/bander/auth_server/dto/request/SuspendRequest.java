@@ -2,8 +2,6 @@ package com.teambiund.bander.auth_server.dto.request;
 
 import lombok.*;
 
-import java.time.LocalDate;
-
 @Data
 @Getter
 @Setter
@@ -14,5 +12,5 @@ public class SuspendRequest {
     private String suspendReason;
     private String suspenderUserId;
     private String suspendedUserId;
-    private LocalDate suspendUntil;
+    private long suspendDay;
 }

@@ -2,14 +2,12 @@ package com.teambiund.bander.auth_server.service.signup;
 
 
 import com.teambiund.bander.auth_server.entity.Auth;
-import com.teambiund.bander.auth_server.entity.UserRole;
 import com.teambiund.bander.auth_server.enums.Provider;
 import com.teambiund.bander.auth_server.enums.Role;
 import com.teambiund.bander.auth_server.enums.Status;
 import com.teambiund.bander.auth_server.exceptions.CustomException;
 import com.teambiund.bander.auth_server.exceptions.ErrorCode.ErrorCode;
 import com.teambiund.bander.auth_server.repository.AuthRepository;
-import com.teambiund.bander.auth_server.repository.UserRoleRepository;
 import com.teambiund.bander.auth_server.util.key_gerneratre.KeyProvider;
 import com.teambiund.bander.auth_server.util.password_encoder.PasswordEncoder;
 import com.teambiund.bander.auth_server.util.vailidator.Validator;
@@ -24,18 +22,17 @@ import java.time.LocalDateTime;
 @RequiredArgsConstructor
 public class SignupService {
     private final AuthRepository authRepository;
-    private final UserRoleRepository userRoleRepository;
     private final Validator validator;
     private final KeyProvider keyProvider;
     private final PasswordEncoder passwordEncoder;
+    private final ConsentService consentService;
 
-    public void signup(String email, String password, String passConfirm) throws CustomException {
+    public Auth signup(String email, String password, String passConfirm) throws CustomException {
         validator(email, password, passConfirm);
         if (authRepository.findByEmail(email).isPresent()) {
             throw new CustomException(ErrorCode.EMAIL_ALREADY_EXISTS);
         }
 
-        UserRole role = userRoleRepository.findByRole(Role.GUEST);
 
         Auth auth = Auth.builder()
                 .id(keyProvider.generateKey())
@@ -44,10 +41,11 @@ public class SignupService {
                 .provider(Provider.SYSTEM)
                 .createdAt(LocalDateTime.now())
                 .status(Status.UNCONFIRMED)
-                .userRole(role)
+                .userRole(Role.GUEST)
                 .build();
 
         authRepository.save(auth);
+        return auth;
     }
 
     // validator

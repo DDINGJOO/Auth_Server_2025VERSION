@@ -2,6 +2,7 @@ package com.teambiund.bander.auth_server.entity;
 
 
 import com.teambiund.bander.auth_server.enums.Provider;
+import com.teambiund.bander.auth_server.enums.Role;
 import com.teambiund.bander.auth_server.enums.Status;
 import jakarta.annotation.Nullable;
 import jakarta.persistence.*;
@@ -42,6 +43,10 @@ public class Auth
     @Nullable
     private String password;
 
+    @Column(name = "phone_number")
+    @Nullable
+    private String phoneNumber;
+
     @Version
     @Column(name = "version")
     private int version; // 낙관적 락 버전 정보
@@ -56,12 +61,20 @@ public class Auth
     @Column(name = "deleted_at")
     private LocalDateTime deletedAt;
 
-    @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "user_role_id", referencedColumnName = "role", foreignKey = @ForeignKey(name = "fk_auth_user_role"))
-    private UserRole userRole;
+
+    @Enumerated(EnumType.STRING)
+    @Column(name = "user_role")
+    private Role userRole;
 
 
-    @OneToMany(fetch = FetchType.LAZY)
+    @OneToMany(mappedBy = "user", fetch = FetchType.LAZY, cascade = CascadeType.ALL, orphanRemoval = true)
     private List<History> history = new ArrayList<>();
+
+    @OneToMany(mappedBy = "user", fetch = FetchType.LAZY, cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<Consent> consent = new ArrayList<>();
+
+
+
+
 
 }

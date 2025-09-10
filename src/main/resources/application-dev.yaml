@@ -48,11 +48,11 @@ spring:
     init:
       mode: always
       schema-locations: classpath:schema.sql
-      data-locations: classpath:data.sql
-
 regex:
   email: '^[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\.[A-Za-z]{2,}$'
   password: '^(?=.*[A-Za-z])(?=.*\d).{8,}$'
+
+
 
 
 

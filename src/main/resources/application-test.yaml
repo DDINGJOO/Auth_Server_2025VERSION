@@ -3,37 +3,29 @@ server:
 
 spring:
   datasource:
-    url: jdbc:mariadb://${DATABASE_HOST}:${DATABASE_PORT}/${DATABASE_NAME}?useSSL=false&serverTimezone=UTC
-    username: ${DATABASE_USER_NAME}
-    password: ${DATABASE_PASSWORD}#
-    driver-class-name: org.mariadb.jdbc.Driver
-
+    url: jdbc:h2:mem:testdb;MODE=MySQL;DB_CLOSE_DELAY=-1;DB_CLOSE_ON_EXIT=FALSE
+    username: sa
+    password:
+    driver-class-name: org.h2.Driver
 
   jpa:
-    show-sql: true
+    show-sql: false
     hibernate:
-      ddl-auto: none
-
+      ddl-auto: create-drop
     properties:
       hibernate:
         format_sql: true
-        dialect: org.hibernate.dialect.MariaDBDialect
-
-
-
-
+        dialect: org.hibernate.dialect.H2Dialect
 
   data:
     redis:
       repositories:
         enabled: false
-      host: ${REDIS_HOST}
-      port: ${REDIS_PORT}
+      host: localhost
+      port: 6379
   sql:
     init:
-      mode: always
-      schema-locations: classpath:schema.sql
-      data-locations: classpath:data.sql
+      mode: never
 
 regex:
   email: '^[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\.[A-Za-z]{2,}$'

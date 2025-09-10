@@ -5,7 +5,6 @@ import jakarta.persistence.Entity;
 import jakarta.persistence.Id;
 import jakarta.persistence.Table;
 import lombok.*;
-import org.springframework.stereotype.Service;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
@@ -19,6 +18,9 @@ import java.time.LocalDateTime;
 @Builder
 public class Suspend {
     @Id
+    @Column(name = "id")
+    private String id;
+
     @Column(name = "user_id")
     private String suspendedUserId;
 

@@ -15,7 +15,7 @@ public class SuspendController {
 
     @PostMapping("")
     public ResponseEntity<Boolean> suspend(@RequestBody SuspendRequest req) throws Exception {
-        suspendedService.suspend( req.getSuspendedUserId(), req.getSuspendReason(), req.getSuspenderUserId());
+        suspendedService.suspend(req.getSuspendedUserId(), req.getSuspendReason(), req.getSuspenderUserId(), req.getSuspendDay());
         return ResponseEntity.ok(true);
     }
 
