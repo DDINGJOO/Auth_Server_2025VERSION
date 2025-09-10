@@ -40,7 +40,7 @@ class UpdateServiceTest {
     @Autowired
     private HistoryRepository historyRepository;
 
-    private PasswordEncoder encoder = new BCryptUtil();
+    private final PasswordEncoder encoder = new BCryptUtil();
 
     @BeforeEach
     void setUp() {
@@ -93,7 +93,7 @@ class UpdateServiceTest {
         );
         List<History> histories = auth.getHistory();
         assertEquals(1, histories.size());
-        assertEquals(histories.get(0).getAfterColumnValue(), auth.getPassword());
+        assertEquals(histories.getFirst().getAfterColumnValue(), auth.getPassword());
         assertTrue(encoder.matches(newPassword, auth.getPassword()));
     }
 }

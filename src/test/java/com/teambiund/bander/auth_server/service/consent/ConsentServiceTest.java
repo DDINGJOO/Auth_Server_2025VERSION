@@ -151,7 +151,7 @@ public class ConsentServiceTest {
         assertEquals(consents.getFirst().getUser().getEmail(), auth.getEmail());
         assertEquals(ConsentType.PERSONAL_INFO, consents.getFirst().getConsentType());
         //마켓팅 삭제
-        assertFalse(ConsentType.MARKETING.equals(consents.getFirst().getConsentType()));
+        assertNotEquals(ConsentType.MARKETING, consents.getFirst().getConsentType());
     }
 
     @Test
@@ -183,7 +183,7 @@ public class ConsentServiceTest {
 
     @Test
     @DisplayName("동의 수정 테스트 : 필수 동의 항목을 동의하지 않음으로 변환")
-    void updateConsentChangeTrue_case2() throws CustomException {
+    void updateConsentChangeTrue_case2() {
         List<ConsentRequest> reqCon2 = new ArrayList<>();
         ConsentRequest consentRequest2 = new ConsentRequest();
         consentRequest2.setConsent(ConsentType.PERSONAL_INFO);
