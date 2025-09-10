@@ -14,6 +14,6 @@ public class CleanupService {
 
 
     public void deleteWithdrawUserAfterThreeYears() {
-        authRepository.deleteByDeletedAtAfter(LocalDateTime.now().plusYears(3));
+        authRepository.deleteByDeletedAtBefore((LocalDateTime.now()));
     }
 }

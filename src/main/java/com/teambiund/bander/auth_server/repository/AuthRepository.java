@@ -17,7 +17,6 @@ public interface AuthRepository extends JpaRepository<Auth, String>
     Optional<Auth> findByEmail(String email);
 
 
-    void deleteByDeletedAtAfter(LocalDateTime localDateTime);
 
 
     //using Test
@@ -29,4 +28,5 @@ public interface AuthRepository extends JpaRepository<Auth, String>
     @Query("select a from Auth a left join fetch a.consent c where a.email = :email")
     Optional<Auth> findByEmailWithConsent(String email);
 
+    void deleteByDeletedAtBefore(LocalDateTime deletedAtBefore);
 }
