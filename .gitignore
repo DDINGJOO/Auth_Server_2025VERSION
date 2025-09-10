@@ -6,6 +6,8 @@ build/
 !**/src/test/**/build/
 .env
 /nginx
+
+
 ### STS ###
 .apt_generated
 .classpath
