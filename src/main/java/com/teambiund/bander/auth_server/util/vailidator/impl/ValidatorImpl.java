@@ -53,7 +53,5 @@ public class ValidatorImpl implements Validator {
         if (value == null || value.isEmpty() || !value.contains(ConsentType.PERSONAL_INFO)) {
             throw new CustomException(ErrorCode.REQUIRED_CONSENT_NOT_PROVIDED);
         }
-
-
     }
 }

@@ -27,6 +27,8 @@ public class ConsentService {
     private final KeyProvider keyProvider;
     private final Validator validator;
 
+    private static final List<ConsentType> requiredList = List.of(ConsentType.PERSONAL_INFO);
+
 
     public void saveConsent(Auth auth, List<ConsentRequest> requests) throws CustomException {
 
@@ -84,6 +86,9 @@ public class ConsentService {
             } else {
                 // consented = false 이면, 기존에 동의가 있어도 삭제
                 if (authConsentMap.containsKey(type)) {
+                    if (isChackRequired(type)) {
+                        throw new CustomException(ErrorCode.REQUIRED_CONSENT_NOT_PROVIDED);
+                    }
                     pendingDelete.add(authConsentMap.get(type));
                     authConsentMap.remove(type);
                 }
@@ -107,5 +112,9 @@ public class ConsentService {
         authRepository.save(auth);
     }
 
+
+    private boolean isChackRequired(ConsentType type) {
+        return requiredList.contains(type);
+    }
 
 }

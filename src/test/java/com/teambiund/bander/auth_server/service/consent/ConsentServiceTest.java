@@ -27,7 +27,7 @@ import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.*;
 
 @SpringBootTest(classes = com.teambiund.bander.auth_server.AuthServerApplication.class)
 public class ConsentServiceTest {
@@ -55,16 +55,27 @@ public class ConsentServiceTest {
                         .build()
         );
 
-        List<Consent> consents = List.of(
+        List<Consent> consents = new ArrayList<>();
+        consents.add(
                 Consent.builder()
                         .id("1")
                         .consentUrl("www.url.comn")
                         .consentType(ConsentType.PERSONAL_INFO)
                         .version("1.0")
+                        .user(auth)
                         .agreementAt(LocalDateTime.now())
                         .build()
         );
 
+        consents.add(Consent.builder()
+                .id("2")
+                .consentUrl("www.url.com")
+                .consentType(ConsentType.MARKETING)
+                .user(auth)
+                .version("1.0")
+                .agreementAt(LocalDateTime.now())
+                .build()
+        );
 
         authRepository.save(auth);
         authRepository.flush();
@@ -112,29 +123,92 @@ public class ConsentServiceTest {
         assertEquals(1, consents.size());
         assertEquals(consents.getFirst().getUser().getId(), auth.getId());
         assertEquals(consents.getFirst().getUser().getEmail(), auth.getEmail());
-
+        assertEquals(ConsentType.PERSONAL_INFO, consents.getFirst().getConsentType());
 
     }
 
     @Test
     @DisplayName("동의 수정 테스트 : 동의 했던 항목을 동의하지 않음 으로 변환(필수 동의X")
-    void updateConsentChangeFalse() {
+    void updateConsentChangeFalse() throws CustomException {
+
+        //given
+        List<ConsentRequest> reqCon2 = new ArrayList<>();
+        ConsentRequest consentRequest2 = new ConsentRequest();
+        consentRequest2.setConsent(ConsentType.MARKETING);
+        consentRequest2.setConsentUrl("www.url.com");
+        consentRequest2.setConsented(false);
+        reqCon2.add(consentRequest2);
+
+
+        //when
+        consentService.changeConsent("test", reqCon2);
+
+        //then
+        Auth auth = authRepository.findById("test").orElseThrow(
+                () -> new CustomException(ErrorCode.USER_NOT_FOUND)
+        );
+        List<Consent> consents = consentRepository.findByUserId(auth.getId());
+        assertEquals(1, consents.size());
+        assertEquals(consents.getFirst().getUser().getId(), auth.getId());
+        assertEquals(consents.getFirst().getUser().getEmail(), auth.getEmail());
+        assertEquals(ConsentType.PERSONAL_INFO, consents.getFirst().getConsentType());
+        //마켓팅 삭제
+        assertFalse(ConsentType.MARKETING.equals(consents.getFirst().getConsentType()));
     }
 
     @Test
     @DisplayName("동의 수정 테스트 : 동의하지 않은 항목을 동의함으로 변환 ")
-    void updateConsentChangeTrue() {
+    void updateConsentChangeTrue() throws CustomException {
+        //given
+        List<ConsentRequest> reqCon2 = new ArrayList<>();
+        ConsentRequest consentRequest2 = new ConsentRequest();
+        consentRequest2.setConsent(ConsentType.MARKETING);
+        consentRequest2.setConsentUrl("www.url.com");
+        consentRequest2.setConsented(true);
+        reqCon2.add(consentRequest2);
+
+        //when
+        consentService.changeConsent("test", reqCon2);
+
+        //then
+        Auth auth = authRepository.findById("test").orElseThrow(
+                () -> new CustomException(ErrorCode.USER_NOT_FOUND)
+        );
+        List<Consent> consents = consentRepository.findByUserId(auth.getId());
+        assertEquals(2, consents.size());
+        assertEquals(consents.getFirst().getUser().getId(), auth.getId());
+        assertEquals(consents.getFirst().getUser().getEmail(), auth.getEmail());
+        assertEquals(ConsentType.PERSONAL_INFO, consents.getFirst().getConsentType());
+        assertEquals(ConsentType.MARKETING, consents.get(1).getConsentType());
     }
 
 
     @Test
     @DisplayName("동의 수정 테스트 : 필수 동의 항목을 동의하지 않음으로 변환")
-    void updateConsentChangeTrue_case2() {
+    void updateConsentChangeTrue_case2() throws CustomException {
+        List<ConsentRequest> reqCon2 = new ArrayList<>();
+        ConsentRequest consentRequest2 = new ConsentRequest();
+        consentRequest2.setConsent(ConsentType.PERSONAL_INFO);
+        consentRequest2.setConsentUrl("www.url.com");
+        consentRequest2.setConsented(false);
+        reqCon2.add(consentRequest2);
+
+        //when
+        assertThrows(CustomException.class, () -> consentService.changeConsent("test", reqCon2));
+
+        List<Consent> consents = consentRepository.findByUserId("test");
+        List<ConsentType> consentTypes = consents.stream().map(Consent::getConsentType).toList();
+        assertTrue(consentTypes.contains(ConsentType.PERSONAL_INFO));
+
     }
 
 
     @Test
     @DisplayName("회원 기록 3년 이후 회원 기록이 삭제 되었을때 같이 삭제 ")
     void deleteUserRecord() {
+
+        authRepository.deleteById("test");
+        List<Consent> consents = consentRepository.findByUserId("test");
+        assertEquals(0, consents.size());
     }
 }
