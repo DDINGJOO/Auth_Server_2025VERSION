@@ -1,4 +1,4 @@
-package com.teambiund.bander.auth_server.service;
+package com.teambiund.bander.auth_server.service.update;
 
 import com.teambiund.bander.auth_server.dto.request.HistoryRequest;
 import com.teambiund.bander.auth_server.repository.HistoryRepository;
