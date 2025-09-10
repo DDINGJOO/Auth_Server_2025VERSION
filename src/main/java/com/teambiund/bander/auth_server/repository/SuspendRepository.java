@@ -11,4 +11,6 @@ import java.util.List;
 public interface SuspendRepository  extends JpaRepository<Suspend, String> {
 
     List<Suspend> findAllBySuspendUntilIsBefore(LocalDate suspendUntilBefore);
+
+    List<Suspend> findAllBySuspendedUserId(String suspendedUserId);
 }

@@ -15,6 +15,7 @@ import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 
@@ -64,6 +65,7 @@ public class SuspendedServiceTest {
 
     @Test
     @DisplayName("유저 정지 Test")
+    @Transactional
     public void suspendUserService() throws CustomException {
         Auth suspended = authRepository.findById("suspendedUserId").orElseThrow();
         Auth suspender = authRepository.findById("suspenderId").orElseThrow();
@@ -72,10 +74,11 @@ public class SuspendedServiceTest {
         suspendRepository.flush();
 
 
-        Suspend suspend = suspendRepository.findById(suspended.getId()).orElseThrow();
+        List<Suspend> suspends = suspendRepository.findAllBySuspendedUserId(suspended.getId());
+        Suspend suspend = suspends.get(0);
         assertThat(suspend.getReason()).isEqualTo("규칙위반");
         assertThat(suspend.getSuspenderUserId()).isEqualTo(suspender.getId());
-        assertThat(suspend.getSuspendUntil()).isEqualTo(suspend.getSuspendAt().plusDays(7));
+        assertThat(suspend.getSuspendUntil()).isEqualTo(suspend.getSuspendAt().plusDays(7).toLocalDate());
         assertThat(suspend.getSuspendedUserId()).isEqualTo(suspended.getId());
         Auth suspendedAfter = authRepository.findById("suspendedUserId").orElseThrow();
         assertThat(suspendedAfter.getStatus()).isEqualTo(Status.BLOCKED);
