@@ -4,6 +4,8 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.stereotype.Component;
 
+import java.time.Duration;
+
 @Component
 @RequiredArgsConstructor
 public class RedisUtil {
@@ -15,23 +17,19 @@ public class RedisUtil {
 
     public String generateCode(String userId) {
         StringBuilder code = new StringBuilder();
-
-
         while (code.length() < CODE_LENGTH) {
             code.append((int) (Math.random() * 10));
         }
-
-
-        redisTemplate.opsForValue().set(CODE_PREFIX + code, userId, CODE_EXPIRE_TIME);
+        redisTemplate.opsForValue().set(CODE_PREFIX + code.toString(), userId, Duration.ofSeconds(CODE_EXPIRE_TIME));
         return code.toString();
     }
 
+
     public String checkCode(String code) {
-        String redisCode = redisTemplate.opsForValue().get(CODE_PREFIX + code);
-        if (redisCode == null) {
+        String userId = redisTemplate.opsForValue().get(CODE_PREFIX + code);
+        if (userId == null) {
             return null;
         }
-        String userId = redisTemplate.opsForValue().get(CODE_PREFIX + code);
         redisTemplate.delete(CODE_PREFIX + code);
         return userId;
     }
