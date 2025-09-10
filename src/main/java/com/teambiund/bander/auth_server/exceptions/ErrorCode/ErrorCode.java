@@ -23,6 +23,7 @@ public enum ErrorCode {
     USER_NOT_SUSPENDED("USER_NOT_SUSPENDED", "User not suspended", HttpStatus.BAD_REQUEST),
     REQUIRED_CONSENT_NOT_PROVIDED("REQUIRED_CONSENT_NOT_PROVIDED", "Required consent not provided", HttpStatus.BAD_REQUEST),
     CONSENT_NOT_FOUND("CONSENT_NOT_FOUND", "Consent not found", HttpStatus.NOT_FOUND),
+    INVALID_CODE("INVALID_CODE", "Invalid code", HttpStatus.BAD_REQUEST),
     ;
 
 

@@ -22,15 +22,17 @@ public class RedisUtil {
         }
 
 
-        redisTemplate.opsForValue().set(CODE_PREFIX + userId, code.toString(), CODE_EXPIRE_TIME);
+        redisTemplate.opsForValue().set(CODE_PREFIX + code, userId, CODE_EXPIRE_TIME);
         return code.toString();
     }
 
-    public boolean checkCode(String email, String code) {
-        String redisCode = redisTemplate.opsForValue().get(CODE_PREFIX + email);
+    public String checkCode(String code) {
+        String redisCode = redisTemplate.opsForValue().get(CODE_PREFIX + code);
         if (redisCode == null) {
-            return false;
+            return null;
         }
-        return redisCode.equals(code) ? redisTemplate.delete(CODE_PREFIX + email) : false;
+        String userId = redisTemplate.opsForValue().get(CODE_PREFIX + code);
+        redisTemplate.delete(CODE_PREFIX + code);
+        return userId;
     }
 }
