@@ -2,12 +2,9 @@ server:
   port: 8080
 
 spring:
-
-
   kafka:
     bootstrap-servers: ${KAFKA_URL}
     consumer:
-
       group-id: auth-consumer-group
       auto-offset-reset: earliest
       key-deserializer: org.apache.kafka.common.serialization.StringDeserializer
@@ -15,21 +12,16 @@ spring:
     listener:
       ack-mode: record
 
-
-
-
   datasource:
     url: jdbc:mariadb://${DATABASE_HOST}:${DATABASE_PORT}/${DATABASE_NAME}?useSSL=false&serverTimezone=UTC
     username: ${DATABASE_USER_NAME}
     password: ${DATABASE_PASSWORD}
     driver-class-name: org.mariadb.jdbc.Driver
 
-
   jpa:
-    show-sql: true
+    show-sql: false
     hibernate:
       ddl-auto: none
-
     properties:
       hibernate:
         format_sql: true
@@ -42,19 +34,10 @@ spring:
       host: ${REDIS_HOST}
       port: ${REDIS_PORT}
 
-
-
   sql:
     init:
       mode: never
+
 regex:
   email: '^[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\.[A-Za-z]{2,}$'
   password: '^(?=.*[A-Za-z])(?=.*\d).{8,}$'
-
-
-
-
-
-
-
-

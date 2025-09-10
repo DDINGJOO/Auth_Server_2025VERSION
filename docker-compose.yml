@@ -11,8 +11,6 @@ services:
       - ./nginx/conf:/etc/nginx/conf.d
       - ./nginx/logs:/var/log/nginx
 
-
-
     depends_on:
       - auth-server-1
       - auth-server-2
@@ -21,7 +19,7 @@ services:
       - auth-network
 
   mariadb:
-    container_name: mariadb_auth
+    container_name: mariadbAuth
     image: mariadb:latest
     env_file:
       - .env.prod
@@ -38,16 +36,6 @@ services:
       timeout: 10s
       retries: 5
 
-  init-db-wait:
-    image: busybox:stable
-    container_name: init-db-wait
-    command: [ "sh", "-c", "echo 'waiting for mariadb init...' && sleep 10" ]
-    depends_on:
-      - mariadb
-    networks:
-      - auth-network
-    # 종료되면 컨테이너 상태는 EXIT; auth-server는 이 서비스의 종료 이후 시작 대기(아래 depends_on 참조)
-    restart: "no"
 
 
   # auth-server 인스턴스들을 개별 서비스로 정의 (Compose는 deploy.replicas를 적용하지 않으므로 이렇게 복수 서비스로 표현)
@@ -58,16 +46,11 @@ services:
       dockerfile: Dockerfile
     env_file:
       - .env.prod
-    environment:
-      - SPRING_PROFILES_ACTIVE=prod
     container_name: auth-server-1
-    ports:
-      - "9001:8080" # 호스트 포트 맵핑(개발용). 필요 없으면 제거하세요.
     networks:
       - auth-network
     depends_on:
       - mariadb
-      - init-db-wait
 
     healthcheck:
       test: [ "CMD", "curl", "-f", "http://localhost:8080/health" ]
@@ -81,17 +64,12 @@ services:
       context: .
       dockerfile: Dockerfile
     env_file:
-      - .env
-    environment:
-      - SPRING_PROFILES_ACTIVE=prod
+      - .env.prod
     container_name: auth-server-2
-    ports:
-      - "9002:8080"
     networks:
       - auth-network
     depends_on:
       - mariadb
-      - init-db-wait
 
     healthcheck:
       test: [ "CMD", "curl", "-f", "http://localhost:8080/health" ]
@@ -105,17 +83,12 @@ services:
       context: .
       dockerfile: Dockerfile
     env_file:
-      - .env
-    environment:
-      - SPRING_PROFILES_ACTIVE=dev
+      - .env.prod
     container_name: auth-server-3
-    ports:
-      - "9003:8080"
     networks:
       - auth-network
     depends_on:
       - mariadb
-      - init-db-wait
 
     healthcheck:
       test: [ "CMD", "curl", "-f", "http://localhost:8080/health" ]

@@ -12,7 +12,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 @RequiredArgsConstructor
 @Controller
 @Slf4j
-@RequestMapping("/health")
+@RequestMapping("/api/auth/schedule")
 public class ScheduleController {
     private final CleanupService cleanupService;
     private final SuspendRelease suspendRelease;
