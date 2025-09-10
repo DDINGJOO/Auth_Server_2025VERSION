@@ -24,6 +24,13 @@ public class UpdateService
     private final Validator validator;
     private final PasswordEncoder passwordEncoder;
 
+    public void EmailConfirm(String userId) throws CustomException {
+        Auth auth = authRepository.findById(userId).orElseThrow(
+                () -> new CustomException(ErrorCode.USER_NOT_FOUND));
+        auth.setStatus(Status.ACTIVE);
+        authRepository.save(auth);
+    }
+
     public void updateEmail(String userId, String newEmail) throws CustomException {
         Auth auth = authRepository.findById(userId).orElseThrow(
                 () -> new CustomException(ErrorCode.USER_NOT_FOUND));
