@@ -2,6 +2,7 @@ package com.teambiund.bander.auth_server.service.update;
 
 import com.teambiund.bander.auth_server.dto.request.HistoryRequest;
 import com.teambiund.bander.auth_server.entity.Auth;
+import com.teambiund.bander.auth_server.enums.Role;
 import com.teambiund.bander.auth_server.enums.Status;
 import com.teambiund.bander.auth_server.exceptions.CustomException;
 import com.teambiund.bander.auth_server.exceptions.ErrorCode.ErrorCode;
@@ -28,6 +29,7 @@ public class UpdateService
         Auth auth = authRepository.findById(userId).orElseThrow(
                 () -> new CustomException(ErrorCode.USER_NOT_FOUND));
         auth.setStatus(Status.ACTIVE);
+        auth.setUserRole(Role.USER);
         authRepository.save(auth);
     }
 
