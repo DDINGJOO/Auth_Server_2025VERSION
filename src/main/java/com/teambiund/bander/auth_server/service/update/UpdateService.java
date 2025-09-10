@@ -1,11 +1,12 @@
-package com.teambiund.bander.auth_server.service.password_change;
+package com.teambiund.bander.auth_server.service.update;
 
+import com.teambiund.bander.auth_server.dto.request.HistoryRequest;
 import com.teambiund.bander.auth_server.entity.Auth;
-import com.teambiund.bander.auth_server.entity.History;
+import com.teambiund.bander.auth_server.enums.Status;
 import com.teambiund.bander.auth_server.exceptions.CustomException;
 import com.teambiund.bander.auth_server.exceptions.ErrorCode.ErrorCode;
 import com.teambiund.bander.auth_server.repository.AuthRepository;
-import com.teambiund.bander.auth_server.repository.HistoryRepository;
+import com.teambiund.bander.auth_server.service.HistoryService;
 import com.teambiund.bander.auth_server.util.key_gerneratre.KeyProvider;
 import com.teambiund.bander.auth_server.util.password_encoder.PasswordEncoder;
 import com.teambiund.bander.auth_server.util.vailidator.Validator;
@@ -13,19 +14,25 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.time.LocalDateTime;
-import java.util.List;
-
 @Service
 @RequiredArgsConstructor
 @Transactional
-public class PasswordChangeService
+public class UpdateService
 {
     private final AuthRepository authRepository;
-    private final HistoryRepository historyRepository;
+    private final HistoryService historyService;
     private final KeyProvider keyProvider;
     private final Validator validator;
     private final PasswordEncoder passwordEncoder;
+
+    public void updateEmail(String userId, String newEmail) throws CustomException {
+        Auth auth = authRepository.findById(userId).orElseThrow(
+                () -> new CustomException(ErrorCode.USER_NOT_FOUND));
+        validator.emailValid(newEmail);
+        changeEmail(auth, newEmail);
+        authRepository.save(auth);
+        changeEmailHistory(auth);
+    }
 
     public void changePassword(String email, String newPassword, String passConfirm) throws CustomException {
         Auth auth = authRepository.findByEmailWithHistory(email).orElseThrow(
@@ -39,17 +46,27 @@ public class PasswordChangeService
 
     private void changePassword(Auth auth, String newPassword) {
         auth.setPassword(passwordEncoder.encode(newPassword));
-        List<History> histories = auth.getHistory();
-        histories.add(History.builder()
-                .user(auth)
-                .id(keyProvider.generateKey())
-                .afterColumnValue(auth.getPassword())
-                .updatedColumn("password")
-                .updatedAt(LocalDateTime.now())
-                .build());
-        auth.setHistory(histories);
         authRepository.save(auth);
+        historyService.createHistory(HistoryRequest.builder()
+                .auth(auth)
+                .afterValue(auth.getPassword())
+                .beforeValue(null)
+                .updatedColumn("password")
+                .build());
+    }
 
+    private void changeEmailHistory(Auth auth) {
+        historyService.createHistory(HistoryRequest.builder()
+                .auth(auth)
+                .afterValue(auth.getEmail())
+                .beforeValue(null)
+                .updatedColumn("email")
+                .build());
+    }
 
+    private Auth changeEmail(Auth auth, String newEmail) {
+        auth.setEmail(newEmail);
+        auth.setStatus(Status.UNCONFIRMED);
+        return auth;
     }
 }

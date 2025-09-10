@@ -7,7 +7,7 @@ import com.teambiund.bander.auth_server.exceptions.CustomException;
 import com.teambiund.bander.auth_server.exceptions.ErrorCode.ErrorCode;
 import com.teambiund.bander.auth_server.repository.AuthRepository;
 import com.teambiund.bander.auth_server.repository.HistoryRepository;
-import com.teambiund.bander.auth_server.service.password_change.PasswordChangeService;
+import com.teambiund.bander.auth_server.service.update.UpdateService;
 import com.teambiund.bander.auth_server.util.key_gerneratre.KeyProvider;
 import com.teambiund.bander.auth_server.util.password_encoder.BCryptUtil;
 import com.teambiund.bander.auth_server.util.password_encoder.PasswordEncoder;
@@ -30,9 +30,9 @@ import static org.junit.jupiter.api.Assertions.*;
 @SpringBootTest(classes = com.teambiund.bander.auth_server.AuthServerApplication.class)
 @RequiredArgsConstructor
 @Log4j2
-class PasswordChangeServiceTest {
+class UpdateServiceTest {
     @Autowired
-    private PasswordChangeService passwordChangeService;
+    private UpdateService updateService;
     @Autowired
     private AuthRepository authRepository;
     @Autowired
@@ -71,7 +71,7 @@ class PasswordChangeServiceTest {
                 () -> new CustomException(ErrorCode.USER_NOT_FOUND)
         );
         String newPassword = "hos";
-        assertThrows(CustomException.class, () -> passwordChangeService.changePassword(auth.getEmail(),
+        assertThrows(CustomException.class, () -> updateService.changePassword(auth.getEmail(),
                 newPassword, newPassword));
 
     }
@@ -87,7 +87,7 @@ class PasswordChangeServiceTest {
         String newPassword = "hoss1001";
 
 
-        passwordChangeService.changePassword(auth.getEmail(), newPassword, newPassword);
+        updateService.changePassword(auth.getEmail(), newPassword, newPassword);
 
 
         auth = authRepository.findById(auth.getId()).orElseThrow(

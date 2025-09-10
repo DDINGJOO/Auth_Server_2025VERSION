@@ -6,10 +6,10 @@ import com.teambiund.bander.auth_server.dto.request.SignupRequest;
 import com.teambiund.bander.auth_server.entity.Auth;
 import com.teambiund.bander.auth_server.exceptions.CustomException;
 import com.teambiund.bander.auth_server.service.SignupClientInterface;
-import com.teambiund.bander.auth_server.service.password_change.PasswordChangeService;
 import com.teambiund.bander.auth_server.service.signup.ConsentService;
 import com.teambiund.bander.auth_server.service.signup.SignupService;
 import com.teambiund.bander.auth_server.service.signup.WithdrawService;
+import com.teambiund.bander.auth_server.service.update.UpdateService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -21,7 +21,7 @@ import java.util.List;
 @RequiredArgsConstructor
 public class SignupClientService implements SignupClientInterface {
     private final SignupService signupService;
-    private final PasswordChangeService passwordChangeService;
+    private final UpdateService updateService;
     private final WithdrawService withdrawService;
     private final ConsentService consentService;
 
@@ -35,7 +35,7 @@ public class SignupClientService implements SignupClientInterface {
     @Override
     @Transactional
     public void passwordChange(String email, String newPassword, String newPasswordConfirm) throws CustomException {
-        passwordChangeService.changePassword(email, newPassword, newPasswordConfirm);
+        updateService.changePassword(email, newPassword, newPasswordConfirm);
 
     }
 

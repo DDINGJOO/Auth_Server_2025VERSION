@@ -1,51 +1,134 @@
+# docker-compose.yml — Compose 방식(비-Swarm)으로 다중 auth-server 인스턴스 정의
 version: "3.7"
+
 services:
   nginx:
-    image: nginx:latest
+    image: nginx:alpine
+    container_name: nginx
     ports:
       - "80:80"
     volumes:
-      - ./nginx/default.conf:/etc/nginx/conf.d/default.conf
+      - ./nginx/conf:/etc/nginx/conf.d
+      - ./nginx/logs:/var/log/nginx
+
+
+
+    depends_on:
+      - auth-server-1
+      - auth-server-2
+      - auth-server-3
     networks:
       - auth-network
-    depends_on:
-      - auth-server
-
 
   mariadb:
+    container_name: mariadb_auth
     image: mariadb:latest
     env_file:
-      - .env
+      - .env.prod
     ports:
       - "4000:3306"
     networks:
       - auth-network
     volumes:
       - db-data:/var/lib/mysql
+      - ./src/main/resources/schema.sql:/docker-entrypoint-initdb.d/schema.sql:ro
+    healthcheck:
+      test: [ "CMD", "mysqladmin", "ping", "-h", "localhost" ]
+      interval: 30s
+      timeout: 10s
+      retries: 5
+
+  init-db-wait:
+    image: busybox:stable
+    container_name: init-db-wait
+    command: [ "sh", "-c", "echo 'waiting for mariadb init...' && sleep 10" ]
+    depends_on:
+      - mariadb
+    networks:
+      - auth-network
+    # 종료되면 컨테이너 상태는 EXIT; auth-server는 이 서비스의 종료 이후 시작 대기(아래 depends_on 참조)
+    restart: "no"
 
 
-
-  auth-server:
-    image: auth-server:latest
+  # auth-server 인스턴스들을 개별 서비스로 정의 (Compose는 deploy.replicas를 적용하지 않으므로 이렇게 복수 서비스로 표현)
+  auth-server-1:
+    image: auth-server:1.0
+    build:
+      context: .
+      dockerfile: Dockerfile
     env_file:
-      - .env
+      - .env.prod
+    environment:
+      - SPRING_PROFILES_ACTIVE=prod
+    container_name: auth-server-1
     ports:
-      - "9000:8080"
-    deploy:
-      replicas: 3
+      - "9001:8080" # 호스트 포트 맵핑(개발용). 필요 없으면 제거하세요.
     networks:
       - auth-network
     depends_on:
       - mariadb
+      - init-db-wait
 
+    healthcheck:
+      test: [ "CMD", "curl", "-f", "http://localhost:8080/health" ]
+      interval: 15s
+      timeout: 5s
+      retries: 3
+
+  auth-server-2:
+    image: auth-server:1.0
+    build:
+      context: .
+      dockerfile: Dockerfile
+    env_file:
+      - .env
+    environment:
+      - SPRING_PROFILES_ACTIVE=prod
+    container_name: auth-server-2
+    ports:
+      - "9002:8080"
+    networks:
+      - auth-network
+    depends_on:
+      - mariadb
+      - init-db-wait
+
+    healthcheck:
+      test: [ "CMD", "curl", "-f", "http://localhost:8080/health" ]
+      interval: 15s
+      timeout: 5s
+      retries: 3
+
+  auth-server-3:
+    image: auth-server:1.0
+    build:
+      context: .
+      dockerfile: Dockerfile
+    env_file:
+      - .env
+    environment:
+      - SPRING_PROFILES_ACTIVE=dev
+    container_name: auth-server-3
+    ports:
+      - "9003:8080"
+    networks:
+      - auth-network
+    depends_on:
+      - mariadb
+      - init-db-wait
+
+    healthcheck:
+      test: [ "CMD", "curl", "-f", "http://localhost:8080/health" ]
+      interval: 15s
+      timeout: 5s
+      retries: 3
 
 networks:
   auth-network:
     driver: bridge
     name: auth-network
+
 volumes:
   db-data:
     driver: local
     name: db-data
-
-

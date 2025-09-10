@@ -1,6 +1,6 @@
 package com.teambiund.bander.auth_server.controller;
 
-import com.teambiund.bander.auth_server.service.password_change.PasswordChangeService;
+import com.teambiund.bander.auth_server.service.update.UpdateService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -12,11 +12,11 @@ import org.springframework.web.bind.annotation.RestController;
 @RequiredArgsConstructor
 public class PasswordChangeController
 {
-    private final PasswordChangeService passwordChangeService;
+    private final UpdateService updateService;
 
     @PostMapping("/changePassword")
     public ResponseEntity<Boolean> changePassword(String email, String newPassword, String passConfirm) throws Exception {
-        passwordChangeService.changePassword(email, newPassword, passConfirm);
+        updateService.changePassword(email, newPassword, passConfirm);
         return ResponseEntity.ok(true);
     }
 }
