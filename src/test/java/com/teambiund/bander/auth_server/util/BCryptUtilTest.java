@@ -1,11 +1,11 @@
 package com.teambiund.bander.auth_server.util;
 
 import com.teambiund.bander.auth_server.util.password_encoder.BCryptUtil;
-import com.teambiund.bander.auth_server.util.password_encoder.PasswordEncoder;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 
-import static org.junit.jupiter.api.Assertions.*;
+import static org.junit.jupiter.api.Assertions.assertNotEquals;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 class BCryptUtilTest {
     private final BCryptUtil passwordEncoder = new BCryptUtil();
