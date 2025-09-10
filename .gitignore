@@ -6,7 +6,7 @@ build/
 !**/src/test/**/build/
 .env
 .env.prod
-/nginx
+/nginx/logs
 
 
 ### STS ###
