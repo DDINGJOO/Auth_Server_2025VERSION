@@ -70,4 +70,10 @@ public class RedisUtilTest {
         assertNull(redisUtil.checkCode(code), "이미 사용된 코드는 null 이어야 합니다");
     }
 
+    @Test
+    @DisplayName("잘못된 코드 입력시 null 반환 ")
+    public void checkCode_wrongCodeTest() {
+        assertNull(redisUtil.checkCode("wrongCode"), "잘못된 코드 입력시 null 반환");
+    }
+
 }
