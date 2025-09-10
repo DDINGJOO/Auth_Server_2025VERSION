@@ -25,6 +25,7 @@ public class SignupService {
     private final Validator validator;
     private final KeyProvider keyProvider;
     private final PasswordEncoder passwordEncoder;
+    private final ConsentService consentService;
 
     public Auth signup(String email, String password, String passConfirm) throws CustomException {
         validator(email, password, passConfirm);

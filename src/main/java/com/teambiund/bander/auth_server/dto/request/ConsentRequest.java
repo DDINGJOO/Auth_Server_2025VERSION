@@ -4,13 +4,15 @@ package com.teambiund.bander.auth_server.dto.request;
 import com.teambiund.bander.auth_server.enums.ConsentType;
 import lombok.Data;
 import lombok.Getter;
+import lombok.NoArgsConstructor;
 import lombok.Setter;
 
 @Data
 @Getter
 @Setter
+@NoArgsConstructor
 public class ConsentRequest {
-    private final ConsentType consent;
-    private final String consentUrl;
-    private final boolean consented;
+    private ConsentType consent;
+    private String consentUrl;
+    private boolean consented;
 }

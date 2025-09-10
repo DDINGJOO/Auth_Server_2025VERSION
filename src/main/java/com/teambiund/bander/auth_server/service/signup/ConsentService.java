@@ -41,8 +41,6 @@ public class ConsentService {
                     .consentUrl(request.getConsentUrl())
                     .build());
         }
-        auth.getConsent().addAll(consents);
-        authRepository.save(auth);
         consentRepository.saveAll(consents);
     }
 
