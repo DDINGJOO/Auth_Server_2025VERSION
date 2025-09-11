@@ -12,7 +12,6 @@ import com.teambiund.bander.auth_server.util.key_gerneratre.KeyProvider;
 import com.teambiund.bander.auth_server.util.vailidator.Validator;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDateTime;
 import java.util.ArrayList;
@@ -27,12 +26,10 @@ public class ConsentService {
     private final KeyProvider keyProvider;
     private final Validator validator;
 
-    private static final List<ConsentType> requiredList = List.of(ConsentType.PERSONAL_INFO);
 
 
     public void saveConsent(Auth auth, List<ConsentRequest> requests) throws CustomException {
-
-        validator.requiredValid(requests.stream().map(ConsentRequest::getConsent).toList());
+        validator.requiredValid(requests.stream().map(ConsentRequest::getConsent).collect(Collectors.toList()));
         List<Consent> consents = new ArrayList<>();
         for (ConsentRequest request : requests) {
             consents.add(Consent.builder()
@@ -47,8 +44,12 @@ public class ConsentService {
     }
 
 
-    @Transactional
+
     public void changeConsent(String userId, List<ConsentRequest> req) throws CustomException {
+        if (!validator.validateConsentList(req)) {
+            throw new CustomException(ErrorCode.CONSENT_NOT_VALID);
+        }
+
         // 사용자 엔티티 조회 (연관된 Consent 컬렉션을 강제로 로드할 필요 없이 엔티티만 확보)
         Auth auth = authRepository.findById(userId).orElseThrow(
                 () -> new CustomException(ErrorCode.USER_NOT_FOUND)
@@ -86,9 +87,6 @@ public class ConsentService {
             } else {
                 // consented = false 이면, 기존에 동의가 있어도 삭제
                 if (authConsentMap.containsKey(type)) {
-                    if (isChackRequired(type)) {
-                        throw new CustomException(ErrorCode.REQUIRED_CONSENT_NOT_PROVIDED);
-                    }
                     pendingDelete.add(authConsentMap.get(type));
                     authConsentMap.remove(type);
                 }
@@ -98,21 +96,16 @@ public class ConsentService {
         // DB 반영: 삭제 먼저 처리
         if (!pendingDelete.isEmpty()) {
             // auth의 컬렉션에서 제거 (연관관계 정리)
-            auth.getConsent().removeAll(pendingDelete);
             consentRepository.deleteAll(pendingDelete);
+            consentRepository.flush();
         }
 
         // 추가 처리
         if (!pendingAdd.isEmpty()) {
             consentRepository.saveAll(pendingAdd);
-            auth.getConsent().addAll(pendingAdd);
+            consentRepository.flush();
         }
 
-    }
-
-
-    private boolean isChackRequired(ConsentType type) {
-        return requiredList.contains(type);
     }
 
 }

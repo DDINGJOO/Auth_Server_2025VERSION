@@ -24,6 +24,8 @@ public enum ErrorCode {
     REQUIRED_CONSENT_NOT_PROVIDED("REQUIRED_CONSENT_NOT_PROVIDED", "Required consent not provided", HttpStatus.BAD_REQUEST),
     CONSENT_NOT_FOUND("CONSENT_NOT_FOUND", "Consent not found", HttpStatus.NOT_FOUND),
     INVALID_CODE("INVALID_CODE", "Invalid code", HttpStatus.BAD_REQUEST),
+    INVALID_USER("INVALID_USER", "Invalid user", HttpStatus.BAD_REQUEST),
+    CONSENT_NOT_VALID("CONSENT_NOT_VALID", "Consent not valid", HttpStatus.BAD_REQUEST),
     ;
 
 
