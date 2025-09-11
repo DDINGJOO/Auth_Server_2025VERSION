@@ -40,7 +40,7 @@ services:
 
   # auth-server 인스턴스들을 개별 서비스로 정의 (Compose는 deploy.replicas를 적용하지 않으므로 이렇게 복수 서비스로 표현)
   auth-server-1:
-    image: auth-server:1.0
+    image: ddingsh9/auth-server:1.1
     build:
       context: .
       dockerfile: Dockerfile
@@ -59,7 +59,7 @@ services:
       retries: 3
 
   auth-server-2:
-    image: auth-server:1.0
+    image: ddingsh9/auth-server:1.1
     build:
       context: .
       dockerfile: Dockerfile
@@ -78,7 +78,7 @@ services:
       retries: 3
 
   auth-server-3:
-    image: auth-server:1.0
+    image: ddingsh9/auth-server:1.1
     build:
       context: .
       dockerfile: Dockerfile
