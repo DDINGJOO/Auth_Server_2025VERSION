@@ -39,17 +39,21 @@ public class Auth
     @Enumerated(EnumType.STRING)
     private Status status;
 
+
     @Column(name = "password")
     @Nullable
     private String password;
+
 
     @Column(name = "phone_number")
     @Nullable
     private String phoneNumber;
 
+
     @Version
     @Column(name = "version")
     private int version; // 낙관적 락 버전 정보
+
 
     @Column(name = "created_at")
     private LocalDateTime createdAt;
@@ -57,6 +61,7 @@ public class Auth
 
     @Column(name = "updated_at")
     private LocalDateTime updatedAt;
+
 
     @Column(name = "deleted_at")
     private LocalDateTime deletedAt;
@@ -70,11 +75,7 @@ public class Auth
     @OneToMany(mappedBy = "user", fetch = FetchType.LAZY, cascade = CascadeType.ALL, orphanRemoval = true)
     private List<History> history = new ArrayList<>();
 
+
     @OneToMany(mappedBy = "user", fetch = FetchType.LAZY, cascade = CascadeType.ALL, orphanRemoval = true)
     private List<Consent> consent = new ArrayList<>();
-
-
-
-
-
 }

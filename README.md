@@ -31,7 +31,8 @@
 ---
 
 ### ERD
-![erd.png](images/erd.png)
+
+![erd.png](images/erd2.png)
 ---
 
 ### Test 결과 
@@ -65,6 +66,4 @@
 
 ---
 
-### 락 구현 ( JDBC 기반 , 낙관적락 기반 )
-
-- 사실... 이런거 좀 힙해ㅔ 보여서;;; ㅋㅋㅋ 
+### 락 구현 JDBC 기반
