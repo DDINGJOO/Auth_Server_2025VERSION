@@ -27,11 +27,14 @@ public class AuthController {
         return ResponseEntity.ok(authService.getAuth(userId));
     }
 
-    @PutMapping("/email-confirm")
-    public ResponseEntity<Boolean> emailConfirm(@RequestParam String code) throws CustomException {
-        String userId = redisUtil.checkCode(code);
-        if (userId == null) {
+    @PutMapping("/email-confirm") // userId from gateWay
+    public ResponseEntity<Boolean> emailConfirm(@RequestParam String code, @RequestParam String userId) throws CustomException {
+        String userIdByCode = redisUtil.checkCode(code);
+        if (userIdByCode == null) {
             throw new CustomException(ErrorCode.INVALID_CODE);
+        }
+        if (!userId.equals(userIdByCode)) {
+            throw new CustomException(ErrorCode.INVALID_USER);
         }
         updateService.EmailConfirm(userId);
         return ResponseEntity.ok(true);

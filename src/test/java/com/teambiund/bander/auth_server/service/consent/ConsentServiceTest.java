@@ -145,6 +145,8 @@ public class ConsentServiceTest {
         Auth auth = authRepository.findById("test").orElseThrow(
                 () -> new CustomException(ErrorCode.USER_NOT_FOUND)
         );
+
+
         List<Consent> consents = consentRepository.findByUserId(auth.getId());
         assertEquals(1, consents.size());
         assertEquals(consents.getFirst().getUser().getId(), auth.getId());
@@ -183,6 +185,7 @@ public class ConsentServiceTest {
 
     @Test
     @DisplayName("동의 수정 테스트 : 필수 동의 항목을 동의하지 않음으로 변환")
+    @Transactional
     void updateConsentChangeTrue_case2() {
         List<ConsentRequest> reqCon2 = new ArrayList<>();
         ConsentRequest consentRequest2 = new ConsentRequest();

@@ -1,5 +1,6 @@
 package com.teambiund.bander.auth_server.util.vailidator.impl;
 
+import com.teambiund.bander.auth_server.dto.request.ConsentRequest;
 import com.teambiund.bander.auth_server.enums.ConsentType;
 import com.teambiund.bander.auth_server.exceptions.CustomException;
 import com.teambiund.bander.auth_server.exceptions.ErrorCode.ErrorCode;
@@ -7,7 +8,10 @@ import com.teambiund.bander.auth_server.util.vailidator.Validator;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
+
 
 
 @Component
@@ -21,6 +25,8 @@ public class ValidatorImpl implements Validator {
 
     @Value("${regex.password:}")
     private String passwordRegex = DEFAULT_PASSWORD_REGEX; // fallback when not injected
+
+    private static final List<ConsentType> requiredList = List.of(ConsentType.PERSONAL_INFO);
 
     // No-arg constructor keeps defaults for plain instantiation in unit tests
 
@@ -53,5 +59,26 @@ public class ValidatorImpl implements Validator {
         if (value == null || value.isEmpty() || !value.contains(ConsentType.PERSONAL_INFO)) {
             throw new CustomException(ErrorCode.REQUIRED_CONSENT_NOT_PROVIDED);
         }
+    }
+
+    @Override
+    public boolean validateConsentList(List<ConsentRequest> reqs) {
+        Map<ConsentType, Boolean> reqMap = new HashMap<>();
+        for (ConsentRequest req : reqs) {
+            if (reqMap.containsKey(req.getConsent())) {
+                return false;
+            }
+            reqMap.put(req.getConsent(), req.isConsented());
+        }
+
+        //requiredList 를 키로 갖는 벨류가 false면 false 리턴
+        for (ConsentType type : requiredList) {
+            if (reqMap.containsKey(type)) {
+                if (!reqMap.get(type)) {
+                    return false;
+                }
+            }
+        }
+        return true;
     }
 }
