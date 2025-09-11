@@ -3,6 +3,7 @@ package com.teambiund.bander.auth_server.service.scheduled;
 
 import com.teambiund.bander.auth_server.repository.AuthRepository;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import net.javacrumbs.shedlock.spring.annotation.SchedulerLock;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
@@ -10,6 +11,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDateTime;
 
+@Slf4j
 @Service
 @RequiredArgsConstructor
 public class CleanupService {
@@ -20,6 +22,7 @@ public class CleanupService {
     @SchedulerLock(name = "deleteWithdrawUserAfterThreeYears", lockAtMostFor = "10m", lockAtLeastFor = "1m")
     @Transactional
     public void deleteWithdrawUserAfterThreeYears() {
+        log.info("스케쥴 권한 휙득 탈퇴 유저 정리르 시작합니다. ");
         authRepository.deleteByDeletedAtBefore((LocalDateTime.now()));
     }
 }
