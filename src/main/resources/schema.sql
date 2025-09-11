@@ -65,3 +65,17 @@ CREATE TABLE IF NOT EXISTS consent
   DEFAULT CHARSET = utf8mb4
   COLLATE = utf8mb4_general_ci;
 
+
+-- auth.shedlock definition
+
+CREATE TABLE IF NOT EXISTS shedlock
+(
+    `name`       varchar(64)  NOT NULL,
+    `lock_until` timestamp(3) NOT NULL,
+    `locked_at`  timestamp(3) NOT NULL,
+    `locked_by`  varchar(255) NOT NULL,
+    PRIMARY KEY (`name`)
+) ENGINE = InnoDB
+  DEFAULT CHARSET = utf8mb4
+  COLLATE = utf8mb4_0900_ai_ci;
+
