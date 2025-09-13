@@ -94,4 +94,21 @@ class ValidatorImplTest {
         }
     }
 
+    @Test
+    @DisplayName("핸드폰 번호 확인 정규식 11자미만 문자열 ")
+    void phoneNumberValid_case1() throws CustomException {
+        assertThrows(CustomException.class, () -> validator.validatePhoneNumber("1234567890"));
+    }
+
+    @Test
+    @DisplayName("핸드폰 번호 확인 정규식 11자 이상 문자열 ")
+    void phoneNumberValid_case2() throws CustomException {
+        assertThrows(CustomException.class, () -> validator.validatePhoneNumber("12345678901"));
+    }
+
+    @Test
+    @DisplayName("핸드폰 번호 확인 정규식 010으로 시작하지 않는 문자열 ")
+    void phoneNumberValid_case3() throws CustomException {
+        assertThrows(CustomException.class, () -> validator.validatePhoneNumber("0108208996"));
+    }
 }

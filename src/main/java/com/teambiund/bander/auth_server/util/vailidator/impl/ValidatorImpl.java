@@ -20,12 +20,15 @@ public class ValidatorImpl implements Validator {
     private static final String DEFAULT_EMAIL_REGEX = "^[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\\.[A-Za-z]{2,}$";
     private static final String DEFAULT_PASSWORD_REGEX = "^(?=.{8,}$)(?=.*[A-Za-z])(?=.*\\d)(?=.*[!@#$%^&*()_\\+\\-=\\[\\]{};':\"\\\\|,.<>\\/?`~]).+$";
 
+    private static final String PHONE_NUMBER_REGEX = "^[0-9]{11}$";
+
     @Value("${regex.email:}")
     private String emailRegex = DEFAULT_EMAIL_REGEX; // fallback when not injected
 
     @Value("${regex.password:}")
     private String passwordRegex = DEFAULT_PASSWORD_REGEX; // fallback when not injected
 
+    private final String phoneNumberRegex = PHONE_NUMBER_REGEX;
     private static final List<ConsentType> requiredList = List.of(ConsentType.PERSONAL_INFO);
 
     // No-arg constructor keeps defaults for plain instantiation in unit tests
@@ -37,6 +40,7 @@ public class ValidatorImpl implements Validator {
             throw new CustomException(ErrorCode.EMAIL_REGEX_NOT_MATCH);
         }
     }
+
 
     @Override
     public void passwordValid(String password) throws CustomException{
@@ -78,6 +82,15 @@ public class ValidatorImpl implements Validator {
                     return false;
                 }
             }
+        }
+        return true;
+    }
+
+    @Override
+    public boolean validatePhoneNumber(String phoneNumber) throws CustomException {
+        String pattern = (phoneNumberRegex == null || phoneNumberRegex.isEmpty()) ? PHONE_NUMBER_REGEX : phoneNumberRegex;
+        if (phoneNumber == null || !phoneNumber.matches(pattern) || !phoneNumber.startsWith("010")) {
+            throw new CustomException(ErrorCode.PHONE_NUMBER_REGEX_NOT_MATCH);
         }
         return true;
     }

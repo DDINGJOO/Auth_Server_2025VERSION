@@ -3,10 +3,12 @@ package com.teambiund.bander.auth_server.service.Auth;
 import com.teambiund.bander.auth_server.entity.Auth;
 import com.teambiund.bander.auth_server.entity.History;
 import com.teambiund.bander.auth_server.enums.Status;
+import com.teambiund.bander.auth_server.event.events.PhoneNumberUpdateRequest;
 import com.teambiund.bander.auth_server.exceptions.CustomException;
 import com.teambiund.bander.auth_server.exceptions.ErrorCode.ErrorCode;
 import com.teambiund.bander.auth_server.repository.AuthRepository;
 import com.teambiund.bander.auth_server.repository.HistoryRepository;
+import com.teambiund.bander.auth_server.service.update.PhoneNumberUpdateService;
 import com.teambiund.bander.auth_server.service.update.UpdateService;
 import com.teambiund.bander.auth_server.util.key_gerneratre.KeyProvider;
 import com.teambiund.bander.auth_server.util.password_encoder.BCryptUtil;
@@ -36,6 +38,8 @@ class UpdateServiceTest {
     private AuthRepository authRepository;
     @Autowired
     private KeyProvider keyProvider;
+    @Autowired
+    private PhoneNumberUpdateService phoneNumberUpdateService;
 
     @Autowired
     private HistoryRepository historyRepository;
@@ -46,7 +50,7 @@ class UpdateServiceTest {
     void setUp() {
         authRepository.save(
                 Auth.builder()
-                        .id(keyProvider.generateKey())
+                        .id("123")
                         .email("test@example.com")
                         .password(encoder.encode("password"))
                         .status(Status.UNCONFIRMED)
@@ -96,4 +100,29 @@ class UpdateServiceTest {
         assertEquals(histories.getFirst().getAfterColumnValue(), auth.getPassword());
         assertTrue(encoder.matches(newPassword, auth.getPassword()));
     }
+
+    @Test
+    @DisplayName("Phone Number Update Service : 핸드폰 번호 변경 서비스 테스트 (비정상 핸드폰 번호 )")
+    void phoneNumberChange_case1() throws CustomException {
+        Auth auth = authRepository.findById("123").orElseThrow(
+                () -> new CustomException(ErrorCode.USER_NOT_FOUND)
+        );
+
+        String phoneNumber = "123478901";
+        PhoneNumberUpdateRequest req = new PhoneNumberUpdateRequest(auth.getId(), phoneNumber);
+        assertThrows(CustomException.class, () -> phoneNumberUpdateService.updatePhoneNumber(req));
+    }
+
+    @Test
+    @DisplayName("Phone Number Update Service : 핸드폰 번호 변경 서비스 테스트 (정상 핸드폰 번호 )")
+    void phoneNumberChange_case2() throws CustomException {
+        Auth auth = authRepository.findById("123").orElseThrow(
+                () -> new CustomException(ErrorCode.USER_NOT_FOUND)
+        );
+        String phoneNumber = "01082089961";
+        PhoneNumberUpdateRequest req = new PhoneNumberUpdateRequest(auth.getId(), phoneNumber);
+
+        phoneNumberUpdateService.updatePhoneNumber(req);
+    }
+
 }

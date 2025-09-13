@@ -7,7 +7,6 @@ import com.teambiund.bander.auth_server.enums.Status;
 import com.teambiund.bander.auth_server.exceptions.CustomException;
 import com.teambiund.bander.auth_server.exceptions.ErrorCode.ErrorCode;
 import com.teambiund.bander.auth_server.repository.AuthRepository;
-import com.teambiund.bander.auth_server.util.key_gerneratre.KeyProvider;
 import com.teambiund.bander.auth_server.util.password_encoder.PasswordEncoder;
 import com.teambiund.bander.auth_server.util.vailidator.Validator;
 import lombok.RequiredArgsConstructor;
@@ -21,7 +20,6 @@ public class UpdateService
 {
     private final AuthRepository authRepository;
     private final HistoryService historyService;
-    private final KeyProvider keyProvider;
     private final Validator validator;
     private final PasswordEncoder passwordEncoder;
 

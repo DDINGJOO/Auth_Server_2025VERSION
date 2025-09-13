@@ -16,4 +16,7 @@ public interface Validator
 
     boolean
     validateConsentList(List<ConsentRequest> value) throws CustomException;
+
+    boolean
+    validatePhoneNumber(String phoneNumber) throws CustomException;
 }
