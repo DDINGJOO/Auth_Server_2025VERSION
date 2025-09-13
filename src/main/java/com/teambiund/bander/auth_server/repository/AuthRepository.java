@@ -18,7 +18,6 @@ public interface AuthRepository extends JpaRepository<Auth, String>
 
 
 
-
     //using Test
     @Query("select a from Auth a left join fetch a.history h where a.email = :email")
     Optional<Auth> findByEmailWithHistory(@Param("email") String email);

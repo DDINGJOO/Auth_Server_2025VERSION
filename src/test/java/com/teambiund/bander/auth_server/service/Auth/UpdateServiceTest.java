@@ -7,6 +7,7 @@ import com.teambiund.bander.auth_server.exceptions.CustomException;
 import com.teambiund.bander.auth_server.exceptions.ErrorCode.ErrorCode;
 import com.teambiund.bander.auth_server.repository.AuthRepository;
 import com.teambiund.bander.auth_server.repository.HistoryRepository;
+import com.teambiund.bander.auth_server.service.update.PhoneNumberUpdateService;
 import com.teambiund.bander.auth_server.service.update.UpdateService;
 import com.teambiund.bander.auth_server.util.key_gerneratre.KeyProvider;
 import com.teambiund.bander.auth_server.util.password_encoder.BCryptUtil;
@@ -36,6 +37,8 @@ class UpdateServiceTest {
     private AuthRepository authRepository;
     @Autowired
     private KeyProvider keyProvider;
+    @Autowired
+    private PhoneNumberUpdateService phoneNumberUpdateService;
 
     @Autowired
     private HistoryRepository historyRepository;
