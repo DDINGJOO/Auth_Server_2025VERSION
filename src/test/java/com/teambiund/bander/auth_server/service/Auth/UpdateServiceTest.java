@@ -50,7 +50,7 @@ class UpdateServiceTest {
     void setUp() {
         authRepository.save(
                 Auth.builder()
-                        .id(keyProvider.generateKey())
+                        .id("123")
                         .email("test@example.com")
                         .password(encoder.encode("password"))
                         .status(Status.UNCONFIRMED)
@@ -104,10 +104,11 @@ class UpdateServiceTest {
     @Test
     @DisplayName("Phone Number Update Service : 핸드폰 번호 변경 서비스 테스트 (비정상 핸드폰 번호 )")
     void phoneNumberChange_case1() throws CustomException {
-        Auth auth = authRepository.findByEmail("test@example.com").orElseThrow(
+        Auth auth = authRepository.findById("123").orElseThrow(
                 () -> new CustomException(ErrorCode.USER_NOT_FOUND)
         );
-        String phoneNumber = "12345678901";
+
+        String phoneNumber = "123478901";
         PhoneNumberUpdateRequest req = new PhoneNumberUpdateRequest(auth.getId(), phoneNumber);
         assertThrows(CustomException.class, () -> phoneNumberUpdateService.updatePhoneNumber(req));
     }
@@ -115,11 +116,12 @@ class UpdateServiceTest {
     @Test
     @DisplayName("Phone Number Update Service : 핸드폰 번호 변경 서비스 테스트 (정상 핸드폰 번호 )")
     void phoneNumberChange_case2() throws CustomException {
-        Auth auth = authRepository.findByEmail("test@example.com").orElseThrow(
+        Auth auth = authRepository.findById("123").orElseThrow(
                 () -> new CustomException(ErrorCode.USER_NOT_FOUND)
         );
         String phoneNumber = "01082089961";
         PhoneNumberUpdateRequest req = new PhoneNumberUpdateRequest(auth.getId(), phoneNumber);
+
         phoneNumberUpdateService.updatePhoneNumber(req);
     }
 

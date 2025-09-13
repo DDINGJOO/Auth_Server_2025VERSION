@@ -11,8 +11,8 @@ import org.springframework.stereotype.Service;
 @NoArgsConstructor
 @AllArgsConstructor
 public class PhoneNumberUpdateRequest {
-    private String phoneNumber;
     private String userId;
+    private String phoneNumber;
 
 
 }
