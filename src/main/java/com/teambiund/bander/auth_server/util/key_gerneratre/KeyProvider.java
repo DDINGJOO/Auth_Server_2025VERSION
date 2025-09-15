@@ -7,4 +7,6 @@ import org.springframework.stereotype.Component;
 public interface KeyProvider {
 
     String generateKey();
+
+    Long generateLongKey();
 }

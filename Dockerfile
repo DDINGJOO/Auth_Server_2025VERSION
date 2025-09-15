@@ -7,6 +7,7 @@ COPY gradle ./gradle
 COPY build.gradle settings.gradle ./
 COPY src ./src
 
+
 # 권한 부여 및 빌드 (테스트 생략)
 RUN chmod +x ./gradlew && ./gradlew clean bootJar
 
