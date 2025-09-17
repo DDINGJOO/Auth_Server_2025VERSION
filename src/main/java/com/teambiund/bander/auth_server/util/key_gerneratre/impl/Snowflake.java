@@ -5,7 +5,6 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Primary;
 import org.springframework.stereotype.Component;
 
-import java.lang.reflect.Method;
 import java.util.concurrent.ThreadLocalRandom;
 
 /**
@@ -91,5 +90,10 @@ public class Snowflake  implements KeyProvider {
     @Override
     public String generateKey() {
         return String.valueOf(nextId());
+    }
+
+    @Override
+    public Long generateLongKey() {
+        return nextId();
     }
 }
