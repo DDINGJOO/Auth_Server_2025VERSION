@@ -5,9 +5,12 @@ import com.teambiund.bander.auth_server.repository.HistoryRepository;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
-import org.springframework.boot.test.mock.mockito.MockBean;
+import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
+import org.springframework.context.annotation.Bean;
+import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Import;
+import org.springframework.context.annotation.Primary;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -19,22 +22,24 @@ import static org.springframework.test.web.servlet.request.MockMvcRequestBuilder
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
-@WebMvcTest(controllers = ApiRequestCountAspectTest.TestController.class)
-@Import(ApiRequestCountAspect.class)
+@SpringBootTest
+@AutoConfigureMockMvc
+@Import(ApiRequestCountAspectTest.TestConfig.class)
 class ApiRequestCountAspectTest {
 
     @Autowired
     private MockMvc mockMvc;
 
-    @MockBean
+    @Autowired
     private ApiRequestStat apiRequestStat; // AOP가 이 빈을 주입받아 호출함
 
-    // 애플리케이션의 다른 서비스/리포지토리 의존성으로 인한 컨텍스트 로드 실패를 막기 위해 모킹
-    @MockBean
+    // 더 이상 @MockBean을 사용하지 않고 테스트용 빈을 TestConfig에서 제공
+    @Autowired
     private HistoryRepository historyRepository;
 
-    @MockBean
+    @Autowired
     private AuthRepository authRepository;
+
 
     @Test
     @DisplayName("일반 API 호출 시 AOP가 사용량 증가를 기록한다")
@@ -66,6 +71,44 @@ class ApiRequestCountAspectTest {
         @GetMapping("/hello")
         public String hello() {
             return "ok";
+        }
+    }
+
+    @Configuration
+    static class TestConfig {
+        @Bean
+        @Primary
+        ApiRequestStat apiRequestStat() {
+            return mock(ApiRequestStat.class);
+        }
+
+        @Bean
+        HistoryRepository historyRepository() {
+            return mock(HistoryRepository.class);
+        }
+
+        @Bean
+        AuthRepository authRepository() {
+            return mock(AuthRepository.class);
+        }
+
+        // 헬스체크 엔드포인트를 테스트 컨텍스트에 추가하여 /health 요청이 200을 반환하도록 함
+        @RestController
+        static class HealthController {
+            @GetMapping("/health")
+            public String health() {
+                return "ok";
+            }
+        }
+
+        // 테스트용 컨트롤러를 TestConfig 내부에 두어 Spring 컨텍스트에 등록되도록 함
+        @RestController
+        @RequestMapping("/test")
+        static class TestController {
+            @GetMapping("/hello")
+            public String hello() {
+                return "ok";
+            }
         }
     }
 }

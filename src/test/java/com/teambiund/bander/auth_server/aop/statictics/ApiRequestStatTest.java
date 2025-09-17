@@ -37,4 +37,6 @@ class ApiRequestStatTest {
         // then
         verify(valueOps).setBit(eq(expectedKey), eq(42L), eq(true));
     }
+
+    
 }
