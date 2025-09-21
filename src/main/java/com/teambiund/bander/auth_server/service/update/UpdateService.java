@@ -23,6 +23,8 @@ public class UpdateService
     private final Validator validator;
     private final PasswordEncoder passwordEncoder;
 
+
+    // 2025-09-21 기존 로직 백업 용
     public void EmailConfirm(String userId) throws CustomException {
         Auth auth = authRepository.findById(userId).orElseThrow(
                 () -> new CustomException(ErrorCode.USER_NOT_FOUND));

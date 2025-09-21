@@ -26,7 +26,9 @@ public enum ErrorCode {
     INVALID_CODE("INVALID_CODE", "Invalid code", HttpStatus.BAD_REQUEST),
     INVALID_USER("INVALID_USER", "Invalid user", HttpStatus.BAD_REQUEST),
     CONSENT_NOT_VALID("CONSENT_NOT_VALID", "Consent not valid", HttpStatus.BAD_REQUEST),
-    PHONE_NUMBER_REGEX_NOT_MATCH("PHONE_NUMBER_REGEX_NOT_MATCH", "Phone number regex not match", HttpStatus.BAD_REQUEST);
+    PHONE_NUMBER_REGEX_NOT_MATCH("PHONE_NUMBER_REGEX_NOT_MATCH", "Phone number regex not match", HttpStatus.BAD_REQUEST),
+    CAN_NOT_RESEND_EMAIl("CAN_NOT_RESEND_EMAIL", "Can not resend email", HttpStatus.BAD_REQUEST),
+    ;
 
 
     private final String errCode;

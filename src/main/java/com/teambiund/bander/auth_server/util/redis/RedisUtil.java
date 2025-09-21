@@ -15,6 +15,7 @@ public class RedisUtil {
     private final int CODE_LENGTH = 6;
     private final int CODE_EXPIRE_TIME = 60 * 5;
 
+
     public String generateCode(String userId) {
         StringBuilder code = new StringBuilder();
         while (code.length() < CODE_LENGTH) {

@@ -16,7 +16,7 @@ spring:
 
 
   datasource:
-    url: jdbc:mariadb://${DATABASE_HOST}:${DATABASE_PORT}/${DATABASE_NAME}?useSSL=false&serverTimezone=UTC
+    url: jdbc:mariadb://${DATABASE_HOST}:${DATABASE_PORT}/${DATABASE_NAME}?useSSL=false&serverTimezone=seoul
     username: ${DATABASE_USER_NAME}
     password: ${DATABASE_PASSWORD}
     driver-class-name: org.mariadb.jdbc.Driver
@@ -50,7 +50,12 @@ regex:
 
 
 
-
+email:
+  code:
+    prefix: 'email'
+    length: 6
+    expire:
+      time: 360
 
 
 
