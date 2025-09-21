@@ -1,0 +1,36 @@
+package com.teambiund.bander.auth_server.service.update.impl;
+
+import com.teambiund.bander.auth_server.service.update.EmailConfirm;
+import com.teambiund.bander.auth_server.util.generate_code.EmailCodeGenerator;
+import lombok.RequiredArgsConstructor;
+import org.springframework.stereotype.Service;
+
+
+@Service
+@RequiredArgsConstructor
+public class EmailConfirmImpl implements EmailConfirm {
+
+    public final EmailCodeGenerator emailCodeGenerator;
+
+
+    //TODO : KAFKA EVENT PUBLISHING
+    @Override
+    public boolean confirmEmail(String code, String email) {
+        return emailCodeGenerator.checkCode(code, email);
+    }
+
+    @Override
+    public Boolean resendEmail(String email) {
+        if (emailCodeGenerator.resendEmail(email)) {
+            generateCode(email);
+            return true;
+        } else {
+            return false;
+        }
+    }
+
+    @Override
+    public void generateCode(String email) {
+        String code = emailCodeGenerator.generateCode(email);
+    }
+}
