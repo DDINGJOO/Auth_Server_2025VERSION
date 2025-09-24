@@ -96,7 +96,7 @@ public class ConsentServiceTest {
         List<ConsentRequest> reqCon = new ArrayList<>();
         ConsentRequest consentRequest = new ConsentRequest();
         consentRequest.setConsent(ConsentType.PERSONAL_INFO);
-        consentRequest.setConsentUrl("www.url.com");
+        consentRequest.setVersion("www.url.com");
         consentRequest.setConsented(true);
         reqCon.add(consentRequest);
 
@@ -133,7 +133,7 @@ public class ConsentServiceTest {
         List<ConsentRequest> reqCon2 = new ArrayList<>();
         ConsentRequest consentRequest2 = new ConsentRequest();
         consentRequest2.setConsent(ConsentType.MARKETING);
-        consentRequest2.setConsentUrl("www.url.com");
+        consentRequest2.setVersion("www.url.com");
         consentRequest2.setConsented(false);
         reqCon2.add(consentRequest2);
 
@@ -163,7 +163,7 @@ public class ConsentServiceTest {
         List<ConsentRequest> reqCon2 = new ArrayList<>();
         ConsentRequest consentRequest2 = new ConsentRequest();
         consentRequest2.setConsent(ConsentType.MARKETING);
-        consentRequest2.setConsentUrl("www.url.com");
+        consentRequest2.setVersion("www.url.com");
         consentRequest2.setConsented(true);
         reqCon2.add(consentRequest2);
 
@@ -190,7 +190,7 @@ public class ConsentServiceTest {
         List<ConsentRequest> reqCon2 = new ArrayList<>();
         ConsentRequest consentRequest2 = new ConsentRequest();
         consentRequest2.setConsent(ConsentType.PERSONAL_INFO);
-        consentRequest2.setConsentUrl("www.url.com");
+        consentRequest2.setVersion("www.url.com");
         consentRequest2.setConsented(false);
         reqCon2.add(consentRequest2);
 

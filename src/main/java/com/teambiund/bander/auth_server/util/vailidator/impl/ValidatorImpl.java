@@ -8,9 +8,7 @@ import com.teambiund.bander.auth_server.util.vailidator.Validator;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 
 
 
@@ -34,7 +32,7 @@ public class ValidatorImpl implements Validator {
     // No-arg constructor keeps defaults for plain instantiation in unit tests
 
     @Override
-    public void emailValid(String email) throws CustomException {
+    public void emailValid(String email) {
         String pattern = (emailRegex == null || emailRegex.isEmpty()) ? DEFAULT_EMAIL_REGEX : emailRegex;
         if (email == null || !email.matches(pattern)) {
             throw new CustomException(ErrorCode.EMAIL_REGEX_NOT_MATCH);
@@ -43,7 +41,7 @@ public class ValidatorImpl implements Validator {
 
 
     @Override
-    public void passwordValid(String password) throws CustomException{
+    public void passwordValid(String password) {
         String pattern = (passwordRegex == null || passwordRegex.isEmpty()) ? DEFAULT_PASSWORD_REGEX : passwordRegex;
         if (password == null || !password.matches(pattern)) {
             throw new CustomException(ErrorCode.PASSWORD_REGEX_NOT_MATCH);
@@ -67,29 +65,20 @@ public class ValidatorImpl implements Validator {
 
     @Override
     public boolean validateConsentList(List<ConsentRequest> reqs) {
-        Map<ConsentType, Boolean> reqMap = new HashMap<>();
-        for (ConsentRequest req : reqs) {
-            if (reqMap.containsKey(req.getConsent())) {
-                return false;
-            }
-            reqMap.put(req.getConsent(), req.isConsented());
-        }
-
-        //requiredList 를 키로 갖는 벨류가 false면 false 리턴
-        for (ConsentType type : requiredList) {
-            if (reqMap.containsKey(type)) {
-                if (!reqMap.get(type)) {
-                    return false;
+        reqs.forEach(req -> {
+            if (req.getConsent().equals(ConsentType.PERSONAL_INFO)) {
+                if (!req.isConsented()) {
+                    throw new CustomException(ErrorCode.PERSONAL_INFO_NOT_PROVIDED);
                 }
             }
-        }
+        });
         return true;
     }
 
+
     @Override
     public boolean validatePhoneNumber(String phoneNumber) throws CustomException {
-        String pattern = (phoneNumberRegex == null || phoneNumberRegex.isEmpty()) ? PHONE_NUMBER_REGEX : phoneNumberRegex;
-        if (phoneNumber == null || !phoneNumber.matches(pattern) || !phoneNumber.startsWith("010")) {
+        if (phoneNumber == null || !phoneNumber.matches(phoneNumberRegex) || !phoneNumber.startsWith("010")) {
             throw new CustomException(ErrorCode.PHONE_NUMBER_REGEX_NOT_MATCH);
         }
         return true;

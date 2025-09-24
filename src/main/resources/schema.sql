@@ -20,10 +20,10 @@ CREATE TABLE IF NOT EXISTS auth (
 -- auth 생성 후 history 생성 (컬럼 타입/길이 일치, 엔진 InnoDB)
 CREATE TABLE IF NOT EXISTS history (
                                        id                VARCHAR(255) NOT NULL PRIMARY KEY,
-                                       afterColumnValue VARCHAR(255) NOT NULL,
-                                       beforeColumnValue VARCHAR(255) NULL,
+                                       after_column_value  VARCHAR(255) NOT NULL,
+                                       before_column_value VARCHAR(255) NULL,
                                        updated_at        DATETIME(6)  NULL,
-                                       updatedColumn    VARCHAR(255) NOT NULL,
+                                       updated_column      VARCHAR(255) NOT NULL,
                                        version           INT          NULL,
                                        user_id          VARCHAR(255) NOT NULL,
                                        CONSTRAINT fk_history_user FOREIGN KEY (user_id) REFERENCES auth (id)

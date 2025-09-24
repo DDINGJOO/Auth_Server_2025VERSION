@@ -1,36 +1,68 @@
 server:
-  port: 30123
-
+  port: 123123
 spring:
+  kafka:
+    bootstrap-servers: ${KAFKA_URL1},${KAFKA_URL2},${KAFKA_URL3}
+    producer:
+      retries: 3
+      batch-size: 16384
+      buffer-memory: 33554432
+      key-serializer: org.apache.kafka.common.serialization.StringSerializer
+      value-serializer: org.springframework.kafka.support.serializer.JsonSerializer
+
+    consumer:
+      group-id: auth-consumer-group
+      auto-offset-reset: earliest
+      key-deserializer: org.apache.kafka.common.serialization.StringDeserializer
+      value-deserializer: org.springframework.kafka.support.serializer.JsonDeserializer
+
+    listener:
+      ack-mode: record
+
+
+
+
   datasource:
-    url: jdbc:h2:mem:testdb;MODE=MySQL;DB_CLOSE_DELAY=-1;DB_CLOSE_ON_EXIT=FALSE
-    username: sa
-    password:
-    driver-class-name: org.h2.Driver
+    url: jdbc:mariadb://${DATABASE_HOST}:${DATABASE_PORT}/${DATABASE_NAME}?useSSL=false&serverTimezone=seoul
+    username: ${DATABASE_USER_NAME}
+    password: ${DATABASE_PASSWORD}
+    driver-class-name: org.mariadb.jdbc.Driver
+
 
   jpa:
-    show-sql: false
+    show-sql: true
     hibernate:
-      ddl-auto: create-drop
+      ddl-auto: none
+
     properties:
       hibernate:
         format_sql: true
-        dialect: org.hibernate.dialect.H2Dialect
+        dialect: org.hibernate.dialect.MariaDBDialect
 
   data:
     redis:
       repositories:
         enabled: false
-      host: localhost
-      port: 6379
+      host: ${REDIS_HOST}
+      port: ${REDIS_PORT}
+
+
+
   sql:
     init:
       mode: never
-
 regex:
   email: '^[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\.[A-Za-z]{2,}$'
   password: '^(?=.*[A-Za-z])(?=.*\d).{8,}$'
 
+
+
+email:
+  code:
+    prefix: 'email'
+    length: 6
+    expire:
+      time: 360
 
 
 

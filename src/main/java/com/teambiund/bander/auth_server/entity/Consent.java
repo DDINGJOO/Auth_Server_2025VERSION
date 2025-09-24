@@ -26,8 +26,6 @@ public class Consent {
     @Column(name = "agreement_at")
     private LocalDateTime agreementAt;
 
-    @Column(name = "version")
-    private String version;
 
     @Column(name = "consent_type")
     @Enumerated(EnumType.STRING)

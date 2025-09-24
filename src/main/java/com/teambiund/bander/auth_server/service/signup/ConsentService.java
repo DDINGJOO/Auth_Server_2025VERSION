@@ -29,26 +29,28 @@ public class ConsentService {
 
 
     public void saveConsent(Auth auth, List<ConsentRequest> requests) throws CustomException {
-        validator.requiredValid(requests.stream().map(ConsentRequest::getConsent).collect(Collectors.toList()));
-        List<Consent> consents = new ArrayList<>();
-        for (ConsentRequest request : requests) {
-            consents.add(Consent.builder()
+        validator.validateConsentList(requests);
+        List<ConsentRequest> consents = requests.stream().filter(
+                ConsentRequest::isConsented).toList();
+
+
+        List<Consent> consentList = new ArrayList<>();
+        for (ConsentRequest request : consents) {
+            consentList.add(Consent.builder()
                     .id(keyProvider.generateKey())
                     .agreementAt(LocalDateTime.now())
                     .consentType(request.getConsent())
                     .user(auth)
-                    .consentUrl(request.getConsentUrl())
+                    .consentUrl(request.getVersion())
                     .build());
         }
-        consentRepository.saveAll(consents);
+        consentRepository.saveAll(consentList);
     }
 
 
 
     public void changeConsent(String userId, List<ConsentRequest> req) throws CustomException {
-        if (!validator.validateConsentList(req)) {
-            throw new CustomException(ErrorCode.CONSENT_NOT_VALID);
-        }
+        validator.validateConsentList(req);
 
         // 사용자 엔티티 조회 (연관된 Consent 컬렉션을 강제로 로드할 필요 없이 엔티티만 확보)
         Auth auth = authRepository.findById(userId).orElseThrow(
@@ -75,7 +77,7 @@ public class ConsentService {
                 if (!authConsentMap.containsKey(type)) {
                     Consent newConsent = Consent.builder()
                             .id(keyProvider.generateKey())
-                            .consentUrl(r.getConsentUrl())
+                            .consentUrl(r.getVersion())
                             .consentType(type)
                             .agreementAt(LocalDateTime.now())
                             .user(auth)

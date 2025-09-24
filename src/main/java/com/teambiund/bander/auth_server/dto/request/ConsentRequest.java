@@ -13,6 +13,6 @@ import lombok.Setter;
 @NoArgsConstructor
 public class ConsentRequest {
     private ConsentType consent;
-    private String consentUrl;
+    private String version;
     private boolean consented;
 }
