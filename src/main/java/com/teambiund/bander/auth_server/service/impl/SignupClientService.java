@@ -4,7 +4,6 @@ package com.teambiund.bander.auth_server.service.impl;
 import com.teambiund.bander.auth_server.dto.request.ConsentRequest;
 import com.teambiund.bander.auth_server.dto.request.SignupRequest;
 import com.teambiund.bander.auth_server.entity.Auth;
-import com.teambiund.bander.auth_server.event.publish.EmailConfirmRequestEventPub;
 import com.teambiund.bander.auth_server.exceptions.CustomException;
 import com.teambiund.bander.auth_server.service.SignupClientInterface;
 import com.teambiund.bander.auth_server.service.signup.ConsentService;
@@ -25,15 +24,12 @@ public class SignupClientService implements SignupClientInterface {
     private final UpdateService updateService;
     private final WithdrawService withdrawService;
     private final ConsentService consentService;
-    private final EmailConfirmRequestEventPub emailConfirmRequestEventPub;
 
     @Override
     @Transactional
     public void signup(SignupRequest request) throws CustomException {
         Auth auth = signupService.signup(request.getEmail(), request.getPassword(), request.getPasswordConfirm());
         consentService.saveConsent(auth, request.getConsentReqs());
-        emailConfirmRequestEventPub.emailConfirmReq(auth.getEmail());
-
 
     }
 

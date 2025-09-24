@@ -13,12 +13,7 @@ public class EmailConfirmRequestEventPub {
 
     private final String TOPIC = "email-confirm-request";
 
-    public void emailConfirmReq(String email) {
-        String code = redisUtil.generateCode(email);
-        EmailConfirmRequest req = EmailConfirmRequest.builder()
-                .email(email)
-                .code(code)
-                .build();
+    public void emailConfirmReq(EmailConfirmRequest req) {
         eventPublisher.publish(TOPIC, req);
     }
 }
