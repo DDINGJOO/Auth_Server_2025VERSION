@@ -67,7 +67,7 @@ public class ValidatorImpl implements Validator {
     public boolean validateConsentList(List<ConsentRequest> reqs) {
         reqs.forEach(req -> {
             if (req.getConsent().equals(ConsentType.PERSONAL_INFO)) {
-                if (req.isConsented() == false) {
+                if (!req.isConsented()) {
                     throw new CustomException(ErrorCode.PERSONAL_INFO_NOT_PROVIDED);
                 }
             }
@@ -75,10 +75,10 @@ public class ValidatorImpl implements Validator {
         return true;
     }
 
+
     @Override
     public boolean validatePhoneNumber(String phoneNumber) throws CustomException {
-        String pattern = (phoneNumberRegex == null || phoneNumberRegex.isEmpty()) ? PHONE_NUMBER_REGEX : phoneNumberRegex;
-        if (phoneNumber == null || !phoneNumber.matches(pattern) || !phoneNumber.startsWith("010")) {
+        if (phoneNumber == null || !phoneNumber.matches(phoneNumberRegex) || !phoneNumber.startsWith("010")) {
             throw new CustomException(ErrorCode.PHONE_NUMBER_REGEX_NOT_MATCH);
         }
         return true;
