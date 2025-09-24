@@ -14,6 +14,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
+import java.util.UUID;
 
 @Service
 @RequiredArgsConstructor
@@ -46,9 +47,10 @@ public class LoginServiceImpl implements LoginService {
             }
         }
 
+        String deviceId = UUID.randomUUID().toString().substring(0, 4);
 
-        String accessToken = tokenProvider.generateAccessToken(auth.getId(), auth.getUserRole());
-        String refreshToken = tokenProvider.generateRefreshToken(auth.getId(), auth.getUserRole());
+        String accessToken = tokenProvider.generateAccessToken(auth.getId(), auth.getUserRole(), deviceId);
+        String refreshToken = tokenProvider.generateRefreshToken(auth.getId(), auth.getUserRole(), deviceId);
 
 
         var response = new LoginResponse();
