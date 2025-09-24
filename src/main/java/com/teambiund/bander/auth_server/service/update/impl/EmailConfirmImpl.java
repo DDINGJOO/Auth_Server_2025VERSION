@@ -1,5 +1,7 @@
 package com.teambiund.bander.auth_server.service.update.impl;
 
+import com.teambiund.bander.auth_server.event.events.EmailConfirmRequest;
+import com.teambiund.bander.auth_server.event.publish.EmailConfirmRequestEventPub;
 import com.teambiund.bander.auth_server.service.update.EmailConfirm;
 import com.teambiund.bander.auth_server.util.generate_code.EmailCodeGenerator;
 import lombok.RequiredArgsConstructor;
@@ -11,6 +13,7 @@ import org.springframework.stereotype.Service;
 public class EmailConfirmImpl implements EmailConfirm {
 
     public final EmailCodeGenerator emailCodeGenerator;
+    public final EmailConfirmRequestEventPub emailConfirmRequestEventPub;
 
 
     //TODO : KAFKA EVENT PUBLISHING
@@ -32,5 +35,6 @@ public class EmailConfirmImpl implements EmailConfirm {
     @Override
     public void generateCode(String email) {
         String code = emailCodeGenerator.generateCode(email);
+        emailConfirmRequestEventPub.emailConfirmReq(new EmailConfirmRequest(email, code));
     }
 }
