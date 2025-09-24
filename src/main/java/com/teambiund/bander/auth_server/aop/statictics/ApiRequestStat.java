@@ -17,7 +17,7 @@ public class ApiRequestStat {
 
     public void increment(String apiName) {
         String key = apiName + "-" + LocalDate.now();
-        Long offset = keyProvider.generateLongKey();
+        Long offset = keyProvider.generateLongKey() % 10000L;
         redisTemplate.opsForValue().setBit(key, offset, true);
     }
 

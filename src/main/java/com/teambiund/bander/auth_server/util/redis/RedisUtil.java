@@ -16,22 +16,22 @@ public class RedisUtil {
     private final int CODE_EXPIRE_TIME = 60 * 5;
 
 
-    public String generateCode(String userId) {
+    public String generateCode(String email) {
         StringBuilder code = new StringBuilder();
         while (code.length() < CODE_LENGTH) {
             code.append((int) (Math.random() * 10));
         }
-        redisTemplate.opsForValue().set(CODE_PREFIX + code.toString(), userId, Duration.ofSeconds(CODE_EXPIRE_TIME));
+        redisTemplate.opsForValue().set(CODE_PREFIX + code.toString(), email, Duration.ofSeconds(CODE_EXPIRE_TIME));
         return code.toString();
     }
 
 
     public String checkCode(String code) {
-        String userId = redisTemplate.opsForValue().get(CODE_PREFIX + code);
-        if (userId == null) {
+        String email = redisTemplate.opsForValue().get(CODE_PREFIX + code);
+        if (email == null) {
             return null;
         }
         redisTemplate.delete(CODE_PREFIX + code);
-        return userId;
+        return email;
     }
 }

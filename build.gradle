@@ -33,6 +33,7 @@ dependencies {
 
     implementation 'net.javacrumbs.shedlock:shedlock-spring:5.14.0'
     implementation 'net.javacrumbs.shedlock:shedlock-provider-jdbc-template:5.14.0'
+    implementation 'org.springframework.boot:spring-boot-starter-actuator'
     testImplementation 'org.springframework.boot:spring-boot-starter-test'
     testImplementation 'org.springframework.kafka:spring-kafka-test'
     testImplementation 'org.springframework.security:spring-security-test'
