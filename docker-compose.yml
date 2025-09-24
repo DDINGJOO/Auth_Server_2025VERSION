@@ -6,7 +6,7 @@ services:
     image: nginx:alpine
     container_name: nginx-auth
     ports:
-      - "9000:80"
+      - "9010:80"
     volumes:
       - ./nginx/conf:/etc/nginx/conf.d
       - ./nginx/logs:/var/log/nginx
