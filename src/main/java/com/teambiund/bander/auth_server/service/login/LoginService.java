@@ -1,5 +1,7 @@
 package com.teambiund.bander.auth_server.service.login;
 
+import com.teambiund.bander.auth_server.dto.response.LoginResponse;
+
 public interface LoginService {
-    void login(String email, String password);
+    LoginResponse login(String email, String password);
 }

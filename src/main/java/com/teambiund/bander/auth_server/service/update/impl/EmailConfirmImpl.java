@@ -3,7 +3,7 @@ package com.teambiund.bander.auth_server.service.update.impl;
 import com.teambiund.bander.auth_server.event.events.EmailConfirmRequest;
 import com.teambiund.bander.auth_server.event.publish.EmailConfirmRequestEventPub;
 import com.teambiund.bander.auth_server.service.update.EmailConfirm;
-import com.teambiund.bander.auth_server.util.generate_code.EmailCodeGenerator;
+import com.teambiund.bander.auth_server.util.generator.generate_code.EmailCodeGenerator;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 

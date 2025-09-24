@@ -10,7 +10,7 @@ import com.teambiund.bander.auth_server.repository.AuthRepository;
 import com.teambiund.bander.auth_server.repository.HistoryRepository;
 import com.teambiund.bander.auth_server.service.update.PhoneNumberUpdateService;
 import com.teambiund.bander.auth_server.service.update.UpdateService;
-import com.teambiund.bander.auth_server.util.key_gerneratre.KeyProvider;
+import com.teambiund.bander.auth_server.util.generator.key_gerneratre.KeyProvider;
 import com.teambiund.bander.auth_server.util.password_encoder.BCryptUtil;
 import com.teambiund.bander.auth_server.util.password_encoder.PasswordEncoder;
 import lombok.RequiredArgsConstructor;

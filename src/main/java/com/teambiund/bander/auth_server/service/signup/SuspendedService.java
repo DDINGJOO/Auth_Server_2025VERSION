@@ -8,7 +8,7 @@ import com.teambiund.bander.auth_server.exceptions.CustomException;
 import com.teambiund.bander.auth_server.exceptions.ErrorCode.ErrorCode;
 import com.teambiund.bander.auth_server.repository.AuthRepository;
 import com.teambiund.bander.auth_server.repository.SuspendRepository;
-import com.teambiund.bander.auth_server.util.key_gerneratre.KeyProvider;
+import com.teambiund.bander.auth_server.util.generator.key_gerneratre.KeyProvider;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
