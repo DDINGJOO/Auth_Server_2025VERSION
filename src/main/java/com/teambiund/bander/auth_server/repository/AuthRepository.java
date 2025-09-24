@@ -16,15 +16,13 @@ public interface AuthRepository extends JpaRepository<Auth, String>
 
     Optional<Auth> findByEmail(String email);
 
-
-
     //using Test
     @Query("select a from Auth a left join fetch a.history h where a.email = :email")
     Optional<Auth> findByEmailWithHistory(@Param("email") String email);
 
-
     @Query("select a from Auth a left join fetch a.consent c where a.email = :email")
     Optional<Auth> findByEmailWithConsent(String email);
+
 
     void deleteByDeletedAtBefore(LocalDateTime deletedAtBefore);
 }

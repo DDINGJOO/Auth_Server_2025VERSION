@@ -8,7 +8,7 @@ import com.teambiund.bander.auth_server.util.key_gerneratre.KeyProvider;
 import com.teambiund.bander.auth_server.util.key_gerneratre.impl.Snowflake;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
-import org.springframework.data.redis.core.RedisTemplate;
+import org.springframework.data.redis.core.StringRedisTemplate;
 
 @Configuration
 public class GenerateKeyConfig {
@@ -19,9 +19,8 @@ public class GenerateKeyConfig {
     }
 
     @Bean
-    public EmailConfirm emailConfirm() {
-        return new EmailConfirmImpl(new EmailCodeGenerator(
-                new RedisTemplate<String, String>()
-        ));
+    public EmailConfirm emailConfirm(StringRedisTemplate stringRedisTemplate
+    ) {
+        return new EmailConfirmImpl(new EmailCodeGenerator(stringRedisTemplate));
     }
 }

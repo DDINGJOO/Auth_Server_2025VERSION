@@ -13,6 +13,4 @@ import org.springframework.stereotype.Service;
 public class PhoneNumberUpdateRequest {
     private String userId;
     private String phoneNumber;
-
-
 }
