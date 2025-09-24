@@ -18,7 +18,8 @@ public class SignupController
     private final SignupService signupStoreService;
     @PostMapping("/signup")
     public ResponseEntity<Boolean> signup(@RequestBody SignupRequest req) throws CustomException {
-        signupStoreService.signup(req.getEmail(), req.getPassword(), req.getPasswordConfirm());
+
+        signupStoreService.signup(req.getEmail(), req.getPassword(), req.getPasswordConfirm(), req.getConsentReqs());
         return ResponseEntity.ok(true);
     }
 }

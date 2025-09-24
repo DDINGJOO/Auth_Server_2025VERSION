@@ -29,6 +29,7 @@ public enum ErrorCode {
     PHONE_NUMBER_REGEX_NOT_MATCH("PHONE_NUMBER_REGEX_NOT_MATCH", "Phone number regex not match", HttpStatus.BAD_REQUEST),
     CAN_NOT_RESEND_EMAIl("CAN_NOT_RESEND_EMAIL", "Can not resend email", HttpStatus.BAD_REQUEST),
     ALREADY_GENERATE_CODE("ALREADY_GENERATE_CODE", "Already generate code", HttpStatus.BAD_REQUEST),
+    MARKETING_CONSENT_NOT_PROVIDED("MARKETING_CONSENT_NOT_PROVIDED", "Marketing consent not provided", HttpStatus.BAD_REQUEST), PERSONAL_INFO_NOT_PROVIDED("PERSONAL_INFO_NOT_PROVIDED", "Personal info not provided", HttpStatus.BAD_REQUEST)
     ;
 
 

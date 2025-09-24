@@ -37,7 +37,7 @@ public class ConsentService {
                     .agreementAt(LocalDateTime.now())
                     .consentType(request.getConsent())
                     .user(auth)
-                    .consentUrl(request.getConsentUrl())
+                    .consentUrl(request.getVersion())
                     .build());
         }
         consentRepository.saveAll(consents);
@@ -75,7 +75,7 @@ public class ConsentService {
                 if (!authConsentMap.containsKey(type)) {
                     Consent newConsent = Consent.builder()
                             .id(keyProvider.generateKey())
-                            .consentUrl(r.getConsentUrl())
+                            .consentUrl(r.getVersion())
                             .consentType(type)
                             .agreementAt(LocalDateTime.now())
                             .user(auth)
