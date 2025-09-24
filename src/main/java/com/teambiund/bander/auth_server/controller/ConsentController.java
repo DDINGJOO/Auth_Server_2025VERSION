@@ -6,9 +6,7 @@ import com.teambiund.bander.auth_server.exceptions.CustomException;
 import com.teambiund.bander.auth_server.service.signup.ConsentService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.PutMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 
@@ -18,8 +16,8 @@ import java.util.List;
 public class ConsentController {
     private final ConsentService consentService;
 
-    @PutMapping
-    public ResponseEntity<Boolean> consent(String userId, List<ConsentRequest> requests) throws CustomException {
+    @PutMapping("/{userId}")
+    public ResponseEntity<Boolean> consent(@RequestParam(name = "userId") String userId, @RequestBody List<ConsentRequest> requests) throws CustomException {
         consentService.changeConsent(userId, requests);
         return ResponseEntity.ok(true);
     }

@@ -30,12 +30,12 @@ public class History
     @Column(name = "updated_at")
     private LocalDateTime updatedAt;
 
-    @Column(name = "updatedColumn")
+    @Column(name = "updated_column")
     private String updatedColumn;
 
-    @Column(name = "beforeColumnValue")
+    @Column(name = "before_column_value")
     private String beforeColumnValue;
 
-    @Column(name = "afterColumnValue")
+    @Column(name = "after_column_value")
     private String afterColumnValue;
 }

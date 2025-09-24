@@ -15,6 +15,7 @@ import java.util.List;
 @Service
 public class SignupServiceImpl implements SignupService {
     private final SignupStoreService signupStoreService;
+    private final ConsentService consentService;
     private final CreateProfileRequestEventPub publishEvent;
     private final Validator validator;
 
@@ -26,6 +27,7 @@ public class SignupServiceImpl implements SignupService {
                 auth.getId(),
                 auth.getProvider().toString()
         ));
+        consentService.saveConsent(auth, consentReqs);
         return auth;
     }
 
