@@ -1,0 +1,72 @@
+package com.teambiund.bander.auth_server.service.signup;
+
+
+import com.teambiund.bander.auth_server.entity.Auth;
+import com.teambiund.bander.auth_server.enums.Provider;
+import com.teambiund.bander.auth_server.enums.Role;
+import com.teambiund.bander.auth_server.enums.Status;
+import com.teambiund.bander.auth_server.exceptions.CustomException;
+import com.teambiund.bander.auth_server.exceptions.ErrorCode.ErrorCode;
+import com.teambiund.bander.auth_server.repository.AuthRepository;
+import com.teambiund.bander.auth_server.util.key_gerneratre.KeyProvider;
+import com.teambiund.bander.auth_server.util.password_encoder.PasswordEncoder;
+import com.teambiund.bander.auth_server.util.vailidator.Validator;
+import lombok.RequiredArgsConstructor;
+import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
+
+import java.time.LocalDateTime;
+
+@Service
+@Transactional
+@RequiredArgsConstructor
+public class SignupStoreService {
+    private final AuthRepository authRepository;
+    private final Validator validator;
+    private final KeyProvider keyProvider;
+    private final PasswordEncoder passwordEncoder;
+
+    public Auth signup(String email, String password, String passConfirm) throws CustomException {
+        validator(email, password, passConfirm);
+        if (authRepository.findByEmail(email).isPresent()) {
+            throw new CustomException(ErrorCode.EMAIL_ALREADY_EXISTS);
+        }
+
+        Auth auth = Auth.builder()
+                .id(keyProvider.generateKey())
+                .email(email)
+                .password(passwordEncoder.encode(password))
+                .provider(Provider.SYSTEM)
+                .createdAt(LocalDateTime.now())
+                .status(Status.ACTIVE)
+                .userRole(Role.USER)
+                .build();
+
+        authRepository.save(auth);
+        return auth;
+    }
+
+    public Auth signupFromOtherProvider(String email, Provider provider) {
+        if (authRepository.findByEmail(email).isPresent()) {
+            throw new CustomException(ErrorCode.EMAIL_ALREADY_EXISTS);
+        }
+
+        Auth auth = Auth.builder()
+                .id(keyProvider.generateKey())
+                .email(email)
+                .provider(provider)
+                .createdAt(LocalDateTime.now())
+                .status(Status.ACTIVE)
+                .userRole(Role.USER)
+                .build();
+        authRepository.save(auth);
+        return auth;
+    }
+
+    // validator
+    private void validator(String email, String password, String passConfirm) throws CustomException {
+        validator.emailValid(email);
+        validator.passwordValid(password);
+        validator.passConfirmValid(password, passConfirm);
+    }
+}

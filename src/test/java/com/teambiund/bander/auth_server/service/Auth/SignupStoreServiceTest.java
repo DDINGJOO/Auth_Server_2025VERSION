@@ -7,7 +7,7 @@ import com.teambiund.bander.auth_server.enums.Status;
 import com.teambiund.bander.auth_server.exceptions.CustomException;
 import com.teambiund.bander.auth_server.exceptions.ErrorCode.ErrorCode;
 import com.teambiund.bander.auth_server.repository.AuthRepository;
-import com.teambiund.bander.auth_server.service.signup.SignupService;
+import com.teambiund.bander.auth_server.service.signup.SignupStoreService;
 import com.teambiund.bander.auth_server.util.password_encoder.BCryptUtil;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.DisplayName;
@@ -23,12 +23,11 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 @SpringBootTest(
         classes = AuthServerApplication.class
 )
-
-class SignupServiceTest {
+class SignupStoreServiceTest {
 
 
     @Autowired
-    private SignupService signupService;
+    private SignupStoreService signupStoreService;
     @Autowired
     private AuthRepository authRepository;
     @Autowired
@@ -48,7 +47,7 @@ class SignupServiceTest {
         req.setPasswordConfirm("hoss1001!");
 
 
-        signupService.signup(req.getEmail(), req.getPassword(), req.getPasswordConfirm());
+        signupStoreService.signup(req.getEmail(), req.getPassword(), req.getPasswordConfirm());
         Auth  auth = authRepository.findByEmail(req.getEmail()).orElseThrow(()-> new CustomException(ErrorCode.USER_NOT_FOUND));
         assertEquals(req.getEmail(), auth.getEmail());
         assertTrue(encoder.matches(req.getPassword(), auth.getPassword()));
