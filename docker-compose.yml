@@ -17,6 +17,7 @@ services:
       - auth-server-3
     networks:
       - auth-network
+      - infra-network
 
   mariadb:
     container_name: mariadb-auth
@@ -40,7 +41,7 @@ services:
 
   # auth-server 인스턴스들을 개별 서비스로 정의 (Compose는 deploy.replicas를 적용하지 않으므로 이렇게 복수 서비스로 표현)
   auth-server-1:
-    image: ddingsh9/auth-server:1.1
+    image: ddingsh9/auth-server:1.2
     build:
       context: .
       dockerfile: Dockerfile
@@ -49,6 +50,7 @@ services:
     container_name: auth-server-1
     networks:
       - auth-network
+      - infra-network
     depends_on:
       - mariadb
 
@@ -59,7 +61,7 @@ services:
       retries: 3
 
   auth-server-2:
-    image: ddingsh9/auth-server:1.1
+    image: ddingsh9/auth-server:1.2
     build:
       context: .
       dockerfile: Dockerfile
@@ -68,6 +70,7 @@ services:
     container_name: auth-server-2
     networks:
       - auth-network
+      - infra-network
     depends_on:
       - mariadb
 
@@ -78,7 +81,7 @@ services:
       retries: 3
 
   auth-server-3:
-    image: ddingsh9/auth-server:1.1
+    image: ddingsh9/auth-server:1.2
     build:
       context: .
       dockerfile: Dockerfile
@@ -87,6 +90,7 @@ services:
     container_name: auth-server-3
     networks:
       - auth-network
+      - infra-network
     depends_on:
       - mariadb
 
@@ -113,6 +117,9 @@ networks:
   auth-network:
     driver: bridge
     name: auth-network
+  infra-network:
+    external: true
+    name: infra-network
 
 volumes:
   db-data:
