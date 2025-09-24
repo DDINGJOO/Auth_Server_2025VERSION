@@ -17,7 +17,6 @@ services:
       - auth-server-3
     networks:
       - auth-network
-      - infra-network
 
   mariadb:
     container_name: mariadb-auth
