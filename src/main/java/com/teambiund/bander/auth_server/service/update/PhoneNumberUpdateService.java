@@ -21,7 +21,7 @@ public class PhoneNumberUpdateService {
     private final Validator validator;
     private final PasswordEncoder passwordEncoder;
 
-    public void updatePhoneNumber(PhoneNumberUpdateRequest req) throws CustomException {
+    public void updatePhoneNumber(PhoneNumberUpdateRequest req) {
         validator.validatePhoneNumber(req.getPhoneNumber());
         Auth auth = authRepository.findById(req.getUserId()).orElseThrow(
                 () -> new CustomException(ErrorCode.USER_NOT_FOUND)
