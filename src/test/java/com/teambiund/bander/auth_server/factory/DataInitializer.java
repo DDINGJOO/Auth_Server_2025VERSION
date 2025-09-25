@@ -3,8 +3,8 @@ package com.teambiund.bander.auth_server.factory;
 
 import com.teambiund.bander.auth_server.entity.Auth;
 import com.teambiund.bander.auth_server.enums.Status;
-import com.teambiund.bander.auth_server.util.key_gerneratre.KeyProvider;
-import com.teambiund.bander.auth_server.util.key_gerneratre.impl.Snowflake;
+import com.teambiund.bander.auth_server.util.generator.key_gerneratre.KeyProvider;
+import com.teambiund.bander.auth_server.util.generator.key_gerneratre.impl.Snowflake;
 import jakarta.persistence.EntityManager;
 import jakarta.persistence.PersistenceContext;
 import org.junit.jupiter.api.Test;

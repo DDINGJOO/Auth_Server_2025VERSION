@@ -1,5 +1,6 @@
 package com.teambiund.bander.auth_server.util.key_gerneratre.impl;
 
+import com.teambiund.bander.auth_server.util.generator.key_gerneratre.impl.Snowflake;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 

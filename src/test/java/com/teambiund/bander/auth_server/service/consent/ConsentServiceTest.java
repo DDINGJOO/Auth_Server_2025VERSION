@@ -60,7 +60,6 @@ public class ConsentServiceTest {
                 .id(UUID.randomUUID().toString())
                 .consentUrl("www.url.comn")
                 .consentType(ConsentType.PERSONAL_INFO)
-                .version("1.0")
                 .user(auth)
                 .agreementAt(LocalDateTime.now())
                 .build());
@@ -69,7 +68,6 @@ public class ConsentServiceTest {
                 .id(UUID.randomUUID().toString())
                 .consentUrl("www.url.com")
                 .consentType(ConsentType.MARKETING)
-                .version("1.0")
                 .user(auth)
                 .agreementAt(LocalDateTime.now())
                 .build());

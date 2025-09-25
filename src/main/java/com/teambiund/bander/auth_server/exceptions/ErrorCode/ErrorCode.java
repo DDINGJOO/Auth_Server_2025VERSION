@@ -31,7 +31,14 @@ public enum ErrorCode {
     ALREADY_GENERATE_CODE("ALREADY_GENERATE_CODE", "Already generate code", HttpStatus.BAD_REQUEST),
     MARKETING_CONSENT_NOT_PROVIDED("MARKETING_CONSENT_NOT_PROVIDED", "Marketing consent not provided", HttpStatus.BAD_REQUEST), PERSONAL_INFO_NOT_PROVIDED("PERSONAL_INFO_NOT_PROVIDED", "Personal info not provided", HttpStatus.BAD_REQUEST),
     PASSWORD_MISMATCH("PASSWORD_MISMATCH", "Password mismatch", HttpStatus.BAD_REQUEST),
+    USER_IS_SLEEPING("USER_IS_SLEEPING", "User is sleeping", HttpStatus.BAD_REQUEST),
+    USER_IS_BLOCKED("USER_IS_BLOCKED", "User is blocked", HttpStatus.BAD_REQUEST),
+    USER_IS_DELETED("USER_IS_DELETED", "User is deleted", HttpStatus.BAD_REQUEST),
+    USER_IS_SUSPENDED("USER_IS_SUSPENDED", "User is suspended", HttpStatus.BAD_REQUEST),
+    INVALID_DEVICE_ID("INVALID_DEVICE_ID", "Invalid device id", HttpStatus.BAD_REQUEST),
+    EXPIRED_TOKEN("EXPIRED_TOKEN", "Expired token", HttpStatus.BAD_REQUEST),
     ;
+
 
 
     private final String errCode;

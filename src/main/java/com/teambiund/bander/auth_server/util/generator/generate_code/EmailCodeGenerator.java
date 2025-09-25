@@ -1,4 +1,4 @@
-package com.teambiund.bander.auth_server.util.generate_code;
+package com.teambiund.bander.auth_server.util.generator.generate_code;
 
 
 import com.teambiund.bander.auth_server.exceptions.CustomException;

@@ -5,9 +5,9 @@ import com.teambiund.bander.auth_server.event.publish.EmailConfirmRequestEventPu
 import com.teambiund.bander.auth_server.event.publish.EventPublisher;
 import com.teambiund.bander.auth_server.service.update.EmailConfirm;
 import com.teambiund.bander.auth_server.service.update.impl.EmailConfirmImpl;
-import com.teambiund.bander.auth_server.util.generate_code.EmailCodeGenerator;
-import com.teambiund.bander.auth_server.util.key_gerneratre.KeyProvider;
-import com.teambiund.bander.auth_server.util.key_gerneratre.impl.Snowflake;
+import com.teambiund.bander.auth_server.util.generator.generate_code.EmailCodeGenerator;
+import com.teambiund.bander.auth_server.util.generator.key_gerneratre.KeyProvider;
+import com.teambiund.bander.auth_server.util.generator.key_gerneratre.impl.Snowflake;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.data.redis.core.StringRedisTemplate;

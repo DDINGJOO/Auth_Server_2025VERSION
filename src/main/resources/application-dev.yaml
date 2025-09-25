@@ -63,7 +63,11 @@ email:
     length: 6
     expire:
       time: 360
-
+security:
+  jwt:
+    secret: ${JWT_SECRET}
+    access-token-expire-time: ${JWT_ACCESS_TOKEN_EXPIRE_TIME}
+    refresh-token-expire-time: ${JWT_REFRESH_TOKEN_EXPIRE_TIME}
 
 
 
