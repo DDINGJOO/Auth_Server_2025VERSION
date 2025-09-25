@@ -15,7 +15,7 @@ import org.springframework.web.bind.annotation.RestController;
 public class LonginController {
     private final LoginService loginService;
 
-    @PostMapping("/login")
+    @PostMapping("")
     public LoginResponse login(@RequestBody LoginRequest loginRequest) {
         return loginService.login(loginRequest.getEmail(), loginRequest.getPassword());
     }

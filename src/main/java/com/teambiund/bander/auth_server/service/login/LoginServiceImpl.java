@@ -8,6 +8,7 @@ import com.teambiund.bander.auth_server.exceptions.CustomException;
 import com.teambiund.bander.auth_server.exceptions.ErrorCode.ErrorCode;
 import com.teambiund.bander.auth_server.repository.AuthRepository;
 import com.teambiund.bander.auth_server.repository.LoginStatusRepository;
+import com.teambiund.bander.auth_server.util.generator.key_gerneratre.KeyProvider;
 import com.teambiund.bander.auth_server.util.generator.token.TokenUtil;
 import com.teambiund.bander.auth_server.util.password_encoder.PasswordEncoder;
 import lombok.RequiredArgsConstructor;
@@ -21,9 +22,9 @@ import java.util.UUID;
 public class LoginServiceImpl implements LoginService {
     private final LoginStatusRepository loginStatusRepository;
     private final AuthRepository authRepository;
+    private final KeyProvider keyProvider;
     private final PasswordEncoder passwordEncoder;
     private final TokenUtil tokenUtil;
-    private final TokenStoreService tokenStoreService;
 
     @Override
     public LoginResponse login(String email, String password) {
@@ -78,16 +79,17 @@ public class LoginServiceImpl implements LoginService {
         String deviceId = UUID.randomUUID().toString().substring(0, 4);
         String accessToken = tokenUtil.generateAccessToken(auth.getId(), auth.getUserRole(), deviceId);
         String refreshToken = tokenUtil.generateRefreshToken(auth.getId(), auth.getUserRole(), deviceId);
-        tokenStoreService.TokenStored(accessToken);
 
         var response = new LoginResponse();
         response.setAccessToken(accessToken);
         response.setRefreshToken(refreshToken);
+        response.setDeviceId(deviceId);
 
 
         loginStatusRepository.save(
                 LoginStatus.builder()
-                        .auth(auth)
+                        .id(keyProvider.generateKey())
+                        .userId(auth.getId())
                         .lastLogin(LocalDateTime.now())
                         .build()
         );
