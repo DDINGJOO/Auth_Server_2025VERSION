@@ -1,6 +1,7 @@
 package com.teambiund.bander.auth_server.controller;
 
 import com.teambiund.bander.auth_server.dto.request.LoginRequest;
+import com.teambiund.bander.auth_server.dto.request.TokenRefreshRequest;
 import com.teambiund.bander.auth_server.dto.response.LoginResponse;
 import com.teambiund.bander.auth_server.service.login.LoginService;
 import lombok.RequiredArgsConstructor;
@@ -21,7 +22,7 @@ public class LonginController {
     }
 
     @PostMapping("/refreshToken")
-    public LoginResponse refreshToken(@RequestBody LoginRequest loginRequest) {
-        return loginService.refreshToken(loginRequest.getEmail(), loginRequest.getPassword());
+    public LoginResponse refreshToken(@RequestBody TokenRefreshRequest request) {
+        return loginService.refreshToken(request.getRefreshToken(), request.getDeviceId());
     }
 }
