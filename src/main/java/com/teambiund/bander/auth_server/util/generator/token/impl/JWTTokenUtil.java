@@ -1,7 +1,7 @@
-package com.teambiund.bander.auth_server.util.generator.token_generator.impl;
+package com.teambiund.bander.auth_server.util.generator.token.impl;
 
 import com.teambiund.bander.auth_server.enums.Role;
-import com.teambiund.bander.auth_server.util.generator.token_generator.TokenProvider;
+import com.teambiund.bander.auth_server.util.generator.token.TokenUtil;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 
@@ -17,13 +17,16 @@ import java.util.UUID;
 
 
 @Component
-public class JWTTokenProvider implements TokenProvider {
+public class JWTTokenUtil implements TokenUtil {
 
-    // Access token validity: 15 minutes
-    private static final Duration ACCESS_TOKEN_TTL = Duration.ofMinutes(15);
-    // Refresh token validity: 14 days
-    private static final Duration REFRESH_TOKEN_TTL = Duration.ofDays(14);
-    @Value("${security.jwt.secret:change-me-please}")
+
+    @Value("${security.jwt.access-token-expire-time}")
+    private Long accessTokenTTL;
+    @Value("${security.jwt.refresh-token-expire-time}")
+    private Long refreshTokenTTL;
+
+
+    @Value("${security.jwt.secret}")
     private String jwtSecret;
 
     private static String base64UrlEncode(byte[] bytes) {
@@ -150,12 +153,12 @@ public class JWTTokenProvider implements TokenProvider {
 
     @Override
     public String generateAccessToken(String userId, Role role, String deviceId) {
-        return buildToken(userId, role, ACCESS_TOKEN_TTL, deviceId);
+        return buildToken(userId, role, Duration.ofMinutes(accessTokenTTL), deviceId);
     }
 
     @Override
     public String generateRefreshToken(String userId, Role role, String deviceId) {
-        return buildToken(userId, role, REFRESH_TOKEN_TTL, deviceId);
+        return buildToken(userId, role, Duration.ofMinutes(refreshTokenTTL), deviceId);
     }
 
     // ---------------------- Decode & Validate ----------------------
@@ -169,7 +172,7 @@ public class JWTTokenProvider implements TokenProvider {
             Map<String, Object> payload = parsePayload(parts[1]);
             Object expObj = payload.get("exp");
             if (expObj instanceof Number) {
-                long exp = ((Number) expObj).longValue();
+                long exp = ((Number) expObj).longValue() + 30;
                 long now = Instant.now().getEpochSecond();
                 return now < exp;
             }
@@ -198,11 +201,24 @@ public class JWTTokenProvider implements TokenProvider {
         }
     }
 
+
     @Override
     public String extractDeviceId(String token) {
         Map<String, Object> payload = safePayload(token);
         Object deviceId = payload.get("deviceId");
         return deviceId != null ? deviceId.toString() : null;
+    }
+
+    @Override
+    public long extractExpiration(String token) {
+        Map<String, Object> payload = safePayload(token);
+        Object expObj = payload.get("exp");
+        if (expObj instanceof Number) {
+            long exp = ((Number) expObj).longValue();
+            long now = Instant.now().getEpochSecond();
+            return (exp - now);
+        }
+        return 0;
     }
 
     private Map<String, Object> safePayload(String token) {
@@ -281,5 +297,6 @@ public class JWTTokenProvider implements TokenProvider {
     private String generateDeviceId() {
         return UUID.randomUUID().toString().substring(0, 4);
     }
+
 }
 

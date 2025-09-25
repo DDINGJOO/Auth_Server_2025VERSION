@@ -1,4 +1,4 @@
-package com.teambiund.bander.auth_server.util.generator.token_generator.impl;
+package com.teambiund.bander.auth_server.util.generator.token.impl;
 
 import com.teambiund.bander.auth_server.enums.Role;
 import org.junit.jupiter.api.BeforeEach;
@@ -9,15 +9,15 @@ import java.lang.reflect.Field;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
-class JWTTokenProviderTest {
+public class JWTTokenUtilTest {
 
-    private JWTTokenProvider provider;
+    private JWTTokenUtil provider;
 
     @BeforeEach
     void setUp() throws Exception {
-        provider = new JWTTokenProvider();
+        provider = new JWTTokenUtil();
         // Inject secret via reflection
-        Field f = JWTTokenProvider.class.getDeclaredField("jwtSecret");
+        Field f = JWTTokenUtil.class.getDeclaredField("jwtSecret");
         f.setAccessible(true);
         f.set(provider, "test-secret-123");
     }

@@ -8,7 +8,7 @@ import com.teambiund.bander.auth_server.exceptions.CustomException;
 import com.teambiund.bander.auth_server.exceptions.ErrorCode.ErrorCode;
 import com.teambiund.bander.auth_server.repository.AuthRepository;
 import com.teambiund.bander.auth_server.repository.LoginStatusRepository;
-import com.teambiund.bander.auth_server.util.generator.token_generator.TokenProvider;
+import com.teambiund.bander.auth_server.util.generator.token.TokenUtil;
 import com.teambiund.bander.auth_server.util.password_encoder.PasswordEncoder;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -22,7 +22,8 @@ public class LoginServiceImpl implements LoginService {
     private final LoginStatusRepository loginStatusRepository;
     private final AuthRepository authRepository;
     private final PasswordEncoder passwordEncoder;
-    private final TokenProvider tokenProvider;
+    private final TokenUtil tokenUtil;
+    private final TokenStoreService tokenStoreService;
 
     @Override
     public LoginResponse login(String email, String password) {
@@ -32,6 +33,33 @@ public class LoginServiceImpl implements LoginService {
         if (!passwordEncoder.matches(password, auth.getPassword())) {
             throw new CustomException(ErrorCode.PASSWORD_MISMATCH);
         }
+        return generateResponse(auth);
+    }
+
+    @Override
+    public LoginResponse refreshToken(String refreshToken, String deviceId) {
+        if (!tokenUtil.isValid(refreshToken)) {
+            throw new CustomException(ErrorCode.EXPIRED_TOKEN);
+        }
+        String userId = tokenUtil.extractUserId(refreshToken);
+        String deviceIdFromToken = tokenUtil.extractDeviceId(refreshToken);
+        if (userId == null || deviceIdFromToken == null) {
+            throw new CustomException(ErrorCode.INVALID_TOKEN);
+        }
+
+        if (!deviceId.equals(deviceIdFromToken)) {
+            throw new CustomException(ErrorCode.INVALID_DEVICE_ID);
+        }
+
+        Auth auth = authRepository.findById(userId).orElseThrow(
+                () -> new CustomException(ErrorCode.USER_NOT_FOUND)
+        );
+        return generateResponse(auth);
+
+    }
+
+    private LoginResponse generateResponse(Auth auth) {
+
         if (auth.getStatus().equals(Status.ACTIVE)) {
             switch (auth.getStatus()) {
                 case SLEEPING:
@@ -48,10 +76,9 @@ public class LoginServiceImpl implements LoginService {
         }
 
         String deviceId = UUID.randomUUID().toString().substring(0, 4);
-
-        String accessToken = tokenProvider.generateAccessToken(auth.getId(), auth.getUserRole(), deviceId);
-        String refreshToken = tokenProvider.generateRefreshToken(auth.getId(), auth.getUserRole(), deviceId);
-
+        String accessToken = tokenUtil.generateAccessToken(auth.getId(), auth.getUserRole(), deviceId);
+        String refreshToken = tokenUtil.generateRefreshToken(auth.getId(), auth.getUserRole(), deviceId);
+        tokenStoreService.TokenStored(accessToken);
 
         var response = new LoginResponse();
         response.setAccessToken(accessToken);
@@ -64,7 +91,9 @@ public class LoginServiceImpl implements LoginService {
                         .lastLogin(LocalDateTime.now())
                         .build()
         );
+
         return response;
+
     }
 
 

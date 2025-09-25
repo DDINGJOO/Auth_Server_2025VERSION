@@ -35,6 +35,8 @@ public enum ErrorCode {
     USER_IS_BLOCKED("USER_IS_BLOCKED", "User is blocked", HttpStatus.BAD_REQUEST),
     USER_IS_DELETED("USER_IS_DELETED", "User is deleted", HttpStatus.BAD_REQUEST),
     USER_IS_SUSPENDED("USER_IS_SUSPENDED", "User is suspended", HttpStatus.BAD_REQUEST),
+    INVALID_DEVICE_ID("INVALID_DEVICE_ID", "Invalid device id", HttpStatus.BAD_REQUEST),
+    EXPIRED_TOKEN("EXPIRED_TOKEN", "Expired token", HttpStatus.BAD_REQUEST),
     ;
 
 

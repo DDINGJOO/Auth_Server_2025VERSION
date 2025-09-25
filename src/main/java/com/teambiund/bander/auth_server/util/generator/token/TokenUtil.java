@@ -1,4 +1,4 @@
-package com.teambiund.bander.auth_server.util.generator.token_generator;
+package com.teambiund.bander.auth_server.util.generator.token;
 
 import com.teambiund.bander.auth_server.enums.Role;
 
@@ -6,7 +6,7 @@ import com.teambiund.bander.auth_server.enums.Role;
  * TokenProvider defines the contract for issuing and validating JWT (or token-like) strings
  * used by the Auth Server. Implementations should be fast and dependency-light.
  */
-public interface TokenProvider {
+public interface TokenUtil {
     /**
      * Generate a short‑lived access token for the given user.
      *
@@ -58,4 +58,8 @@ public interface TokenProvider {
      * @return device id or null when not present/invalid
      */
     String extractDeviceId(String token);
+
+
+    long extractExpiration(String token);
+
 }
