@@ -5,9 +5,7 @@ import com.teambiund.bander.auth_server.exceptions.CustomException;
 import com.teambiund.bander.auth_server.service.signup.WithdrawService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 @RestController
 @RequestMapping("/api/auth/withdraw")
@@ -16,8 +14,8 @@ public class WithdrawController
 {
     public final WithdrawService withdrawService;
 
-    @PostMapping("/withdraw")
-    public ResponseEntity<Boolean> withdraw(String userId, String withdrawReason) throws CustomException {
+    @PostMapping("/withdraw/{userId}")
+    public ResponseEntity<Boolean> withdraw(@PathVariable(name = "userId") String userId, @RequestParam String withdrawReason) throws CustomException {
         withdrawService.withdraw(userId, withdrawReason);
         return ResponseEntity.ok(true);
     }
