@@ -8,13 +8,13 @@ spring:
       batch-size: 16384
       buffer-memory: 33554432
       key-serializer: org.apache.kafka.common.serialization.StringSerializer
-      value-serializer: org.springframework.kafka.support.serializer.JsonSerializer
+      value-serializer: org.apache.kafka.common.serialization.StringSerializer
 
     consumer:
       group-id: auth-consumer-group
       auto-offset-reset: earliest
       key-deserializer: org.apache.kafka.common.serialization.StringDeserializer
-      value-deserializer: org.springframework.kafka.support.serializer.JsonDeserializer
+      value-deserializer: org.apache.kafka.common.serialization.StringDeserializer
 
     listener:
       ack-mode: record
@@ -62,7 +62,7 @@ email:
     prefix: 'email'
     length: 6
     expire:
-      time: 360
+      time: 290
 security:
   jwt:
     secret: ${JWT_SECRET}

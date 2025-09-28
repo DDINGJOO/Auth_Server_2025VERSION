@@ -94,3 +94,12 @@ CREATE TABLE IF NOT EXISTS shedlock
   DEFAULT CHARSET = utf8mb4
   COLLATE = utf8mb4_0900_ai_ci;
 
+
+
+create table if not exists consents_name
+(
+    id              VARCHAR(250) NOT NULL PRIMARY KEY,
+    consent_name    varchar(255),
+    consent_url     text,
+    consent_version varchar(50)
+)

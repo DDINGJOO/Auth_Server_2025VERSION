@@ -18,6 +18,5 @@ public class PhoneUpdateConsumer {
         } catch (CustomException e) {
             log.error("Phone number update failed : {}", e.getMessage());
         }
-
     }
 }

@@ -1,7 +1,6 @@
 package com.teambiund.bander.auth_server.controller;
 
 
-import com.teambiund.bander.auth_server.exceptions.CustomException;
 import com.teambiund.bander.auth_server.service.update.EmailConfirm;
 import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.*;
@@ -17,12 +16,8 @@ public class EmailConfirmController {
         return emailConfirm.confirmEmail(code, email);
     }
 
-    @PostMapping("/{email}")
-    public boolean resendEmail(@PathVariable(name = "email") String email) throws CustomException {
-        return emailConfirm.resendEmail(email);
-    }
 
-    @PostMapping("/{email}/code")
+    @PostMapping("/{email}")
     public void generateCode(@PathVariable(name = "email") String email) {
         emailConfirm.generateCode(email);
     }
