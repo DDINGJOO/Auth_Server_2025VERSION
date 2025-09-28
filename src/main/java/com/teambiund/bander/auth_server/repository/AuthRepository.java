@@ -25,4 +25,6 @@ public interface AuthRepository extends JpaRepository<Auth, String>
 
 
     void deleteByDeletedAtBefore(LocalDateTime deletedAtBefore);
+
+    boolean existsByEmail(String email);
 }

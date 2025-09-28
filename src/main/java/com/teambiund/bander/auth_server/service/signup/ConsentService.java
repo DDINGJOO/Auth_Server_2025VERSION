@@ -3,7 +3,6 @@ package com.teambiund.bander.auth_server.service.signup;
 import com.teambiund.bander.auth_server.dto.request.ConsentRequest;
 import com.teambiund.bander.auth_server.entity.Auth;
 import com.teambiund.bander.auth_server.entity.Consent;
-import com.teambiund.bander.auth_server.enums.ConsentType;
 import com.teambiund.bander.auth_server.exceptions.CustomException;
 import com.teambiund.bander.auth_server.exceptions.ErrorCode.ErrorCode;
 import com.teambiund.bander.auth_server.repository.AuthRepository;
@@ -39,7 +38,8 @@ public class ConsentService {
             consentList.add(Consent.builder()
                     .id(keyProvider.generateKey())
                     .agreementAt(LocalDateTime.now())
-                    .consentType(request.getConsent())
+                    .version(request.getVersion())
+                    .consentName(request.getConsentName())
                     .user(auth)
                     .consentUrl(request.getVersion())
                     .build());
@@ -48,8 +48,7 @@ public class ConsentService {
     }
 
 
-
-    public void changeConsent(String userId, List<ConsentRequest> req) throws CustomException {
+    public void changeConsent(java.lang.String userId, List<ConsentRequest> req) throws CustomException {
         validator.validateConsentList(req);
 
         // 사용자 엔티티 조회 (연관된 Consent 컬렉션을 강제로 로드할 필요 없이 엔티티만 확보)
@@ -62,14 +61,14 @@ public class ConsentService {
 
         // ConsentType -> Consent 맵 생성 (기존 동의 조회용)
         var authConsentMap = consents.stream()
-                .collect(Collectors.toMap(Consent::getConsentType, c -> c));
+                .collect(Collectors.toMap(Consent::getConsentName, c -> c));
 
         // 요청을 순회하며 추가/삭제할 Consent 결정
         List<Consent> pendingAdd = new ArrayList<>();
         List<Consent> pendingDelete = new ArrayList<>();
 
         for (ConsentRequest r : req) {
-            ConsentType type = r.getConsent();
+            String type = r.getConsentName();
             boolean consented = r.isConsented();
 
             if (consented) {
@@ -78,7 +77,7 @@ public class ConsentService {
                     Consent newConsent = Consent.builder()
                             .id(keyProvider.generateKey())
                             .consentUrl(r.getVersion())
-                            .consentType(type)
+                            .consentName(type)
                             .agreementAt(LocalDateTime.now())
                             .user(auth)
                             .build();
