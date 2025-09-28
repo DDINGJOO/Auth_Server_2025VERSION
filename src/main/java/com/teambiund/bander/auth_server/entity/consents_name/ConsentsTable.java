@@ -30,4 +30,7 @@ public class ConsentsTable {
     @Column(name = "consent_url")
     private String consentUrl;
 
+    @Column(name = "required")
+    private boolean required;
+
 }
