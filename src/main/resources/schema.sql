@@ -64,7 +64,7 @@ CREATE TABLE IF NOT EXISTS consent
     id           VARCHAR(255)                        NOT NULL PRIMARY KEY,
     user_id      VARCHAR(255)                        NOT NULL,
     agreement_at DATETIME(6)                         NOT NULL,
-    consent_type ENUM ('PERSONAL_INFO', 'MARKETING') NOT NULL,
+    consent_type VARCHAR(255) NOT NULL,
     consent_url  VARCHAR(255)                        NOT NULL,
     CONSTRAINT fk_consent_id FOREIGN KEY (user_id) REFERENCES auth (id)
 ) ENGINE = InnoDB

@@ -4,6 +4,7 @@ package com.teambiund.bander.auth_server.config;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.teambiund.bander.auth_server.event.publish.EmailConfirmRequestEventPub;
 import com.teambiund.bander.auth_server.event.publish.EventPublisher;
+import com.teambiund.bander.auth_server.repository.AuthRepository;
 import com.teambiund.bander.auth_server.service.update.EmailConfirm;
 import com.teambiund.bander.auth_server.service.update.impl.EmailConfirmImpl;
 import com.teambiund.bander.auth_server.util.generator.generate_code.EmailCodeGenerator;
@@ -23,10 +24,10 @@ public class GenerateKeyConfig {
     }
 
     @Bean
-    public EmailConfirm emailConfirm(StringRedisTemplate stringRedisTemplate, KafkaTemplate<String, Object> kafkaTemplate, ObjectMapper objectMapper
+    public EmailConfirm emailConfirm(StringRedisTemplate stringRedisTemplate, KafkaTemplate<String, Object> kafkaTemplate, ObjectMapper objectMapper, AuthRepository authRepository
     ) {
         return new EmailConfirmImpl(
-                new EmailCodeGenerator(stringRedisTemplate),
+                new EmailCodeGenerator(authRepository, stringRedisTemplate),
                 new EmailConfirmRequestEventPub(
                         new EventPublisher(kafkaTemplate, objectMapper)
                 ));

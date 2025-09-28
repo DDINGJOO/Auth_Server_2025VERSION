@@ -18,7 +18,7 @@ import static com.teambiund.bander.auth_server.util.data.ConsentTable_init.conse
 @RequestMapping("/api/auth/enums")
 public class ConsentsController {
 
-    @GetMapping("/Consents")
+    @GetMapping("/consents")
     public ResponseEntity<Map<String, ConsentsTable>> getAllConsents(@RequestParam(name = "all") Boolean value
     ) {
         if (value) {

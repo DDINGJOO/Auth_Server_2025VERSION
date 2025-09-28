@@ -58,7 +58,7 @@ public class AuthRepositoryTest {
                 .id("consent1")
                 .consentUrl("www.url.com")
                 .agreementAt(LocalDateTime.now())
-                .consentType(String.PERSONAL_INFO)
+                .consentName("PERSONAL_INFO")
                 .user(user)
                 .build());
         user.setConsent(consents);
