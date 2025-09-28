@@ -5,7 +5,6 @@ import com.teambiund.bander.auth_server.dto.request.ConsentRequest;
 import com.teambiund.bander.auth_server.dto.request.SignupRequest;
 import com.teambiund.bander.auth_server.entity.Auth;
 import com.teambiund.bander.auth_server.entity.Consent;
-import com.teambiund.bander.auth_server.enums.ConsentType;
 import com.teambiund.bander.auth_server.enums.Role;
 import com.teambiund.bander.auth_server.enums.Status;
 import com.teambiund.bander.auth_server.exceptions.CustomException;
@@ -59,7 +58,7 @@ public class ConsentServiceTest {
         consents.add(Consent.builder()
                 .id(UUID.randomUUID().toString())
                 .consentUrl("www.url.comn")
-                .consentType(ConsentType.PERSONAL_INFO)
+                .consentType(String.PERSONAL_INFO)
                 .user(auth)
                 .agreementAt(LocalDateTime.now())
                 .build());
@@ -67,7 +66,7 @@ public class ConsentServiceTest {
         consents.add(Consent.builder()
                 .id(UUID.randomUUID().toString())
                 .consentUrl("www.url.com")
-                .consentType(ConsentType.MARKETING)
+                .consentType(String.MARKETING)
                 .user(auth)
                 .agreementAt(LocalDateTime.now())
                 .build());
@@ -93,7 +92,7 @@ public class ConsentServiceTest {
         //given
         List<ConsentRequest> reqCon = new ArrayList<>();
         ConsentRequest consentRequest = new ConsentRequest();
-        consentRequest.setConsent(ConsentType.PERSONAL_INFO);
+        consentRequest.setConsentName(String.PERSONAL_INFO);
         consentRequest.setVersion("www.url.com");
         consentRequest.setConsented(true);
         reqCon.add(consentRequest);
@@ -119,7 +118,7 @@ public class ConsentServiceTest {
         assertEquals(1, consents.size());
         assertEquals(consents.getFirst().getUser().getId(), auth.getId());
         assertEquals(consents.getFirst().getUser().getEmail(), auth.getEmail());
-        assertEquals(ConsentType.PERSONAL_INFO, consents.getFirst().getConsentType());
+        assertEquals(String.PERSONAL_INFO, consents.getFirst().getConsentName());
 
     }
 
@@ -130,7 +129,7 @@ public class ConsentServiceTest {
         //given
         List<ConsentRequest> reqCon2 = new ArrayList<>();
         ConsentRequest consentRequest2 = new ConsentRequest();
-        consentRequest2.setConsent(ConsentType.MARKETING);
+        consentRequest2.setConsentName(String.MARKETING);
         consentRequest2.setVersion("www.url.com");
         consentRequest2.setConsented(false);
         reqCon2.add(consentRequest2);
@@ -149,9 +148,9 @@ public class ConsentServiceTest {
         assertEquals(1, consents.size());
         assertEquals(consents.getFirst().getUser().getId(), auth.getId());
         assertEquals(consents.getFirst().getUser().getEmail(), auth.getEmail());
-        assertEquals(ConsentType.PERSONAL_INFO, consents.getFirst().getConsentType());
+        assertEquals(String.PERSONAL_INFO, consents.getFirst().getConsentName());
         //마켓팅 삭제
-        assertNotEquals(ConsentType.MARKETING, consents.getFirst().getConsentType());
+        assertNotEquals(String.MARKETING, consents.getFirst().getConsentName());
     }
 
     @Test
@@ -160,7 +159,7 @@ public class ConsentServiceTest {
         //given
         List<ConsentRequest> reqCon2 = new ArrayList<>();
         ConsentRequest consentRequest2 = new ConsentRequest();
-        consentRequest2.setConsent(ConsentType.MARKETING);
+        consentRequest2.setConsentName(String.MARKETING);
         consentRequest2.setVersion("www.url.com");
         consentRequest2.setConsented(true);
         reqCon2.add(consentRequest2);
@@ -176,8 +175,8 @@ public class ConsentServiceTest {
         assertEquals(2, consents.size());
         assertEquals(consents.getFirst().getUser().getId(), auth.getId());
         assertEquals(consents.getFirst().getUser().getEmail(), auth.getEmail());
-        assertEquals(ConsentType.PERSONAL_INFO, consents.getFirst().getConsentType());
-        assertEquals(ConsentType.MARKETING, consents.get(1).getConsentType());
+        assertEquals(String.PERSONAL_INFO, consents.getFirst().getConsentName());
+        assertEquals(String.MARKETING, consents.get(1).getConsentName());
     }
 
 
@@ -187,7 +186,7 @@ public class ConsentServiceTest {
     void updateConsentChangeTrue_case2() {
         List<ConsentRequest> reqCon2 = new ArrayList<>();
         ConsentRequest consentRequest2 = new ConsentRequest();
-        consentRequest2.setConsent(ConsentType.PERSONAL_INFO);
+        consentRequest2.setConsentName(String.PERSONAL_INFO);
         consentRequest2.setVersion("www.url.com");
         consentRequest2.setConsented(false);
         reqCon2.add(consentRequest2);
@@ -196,8 +195,8 @@ public class ConsentServiceTest {
         assertThrows(CustomException.class, () -> consentService.changeConsent("test", reqCon2));
 
         List<Consent> consents = consentRepository.findByUserId("test");
-        List<ConsentType> consentTypes = consents.stream().map(Consent::getConsentType).toList();
-        assertTrue(consentTypes.contains(ConsentType.PERSONAL_INFO));
+        List<String> strings = consents.stream().map(Consent::getConsentName).toList();
+        assertTrue(strings.contains(String.PERSONAL_INFO));
     }
 
 

@@ -7,6 +7,7 @@ import jakarta.annotation.PostConstruct;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
 
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Objects;
@@ -22,6 +23,8 @@ import java.util.Objects;
 @RequiredArgsConstructor
 public class ConsentTable_init {
     public static final HashMap<String, ConsentsTable> consentMaps = new HashMap<>();
+    public static final List<ConsentsTable> requiredConsents = new ArrayList<>();
+    public static final HashMap<String, ConsentsTable> consentsAllMaps = new HashMap<>();
 
     private final ConsentTableRepository consentTableRepository;
 
@@ -31,6 +34,10 @@ public class ConsentTable_init {
 
         // 같은 이름을 가지고 있을땐 버전 정보가 나중인 consent만 채워야함
         for (ConsentsTable consent : consents) {
+            consentsAllMaps.put(consent.getId(), consent);
+            if (consent.isRequired()) {
+                requiredConsents.add(consent);
+            }
             String name = consent.getConsentName();
             if (name == null) {
                 continue;

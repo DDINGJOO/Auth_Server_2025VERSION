@@ -4,7 +4,6 @@ import com.teambiund.bander.auth_server.entity.Auth;
 import com.teambiund.bander.auth_server.entity.Consent;
 import com.teambiund.bander.auth_server.entity.History;
 import com.teambiund.bander.auth_server.entity.Suspend;
-import com.teambiund.bander.auth_server.enums.ConsentType;
 import com.teambiund.bander.auth_server.enums.Role;
 import com.teambiund.bander.auth_server.enums.Status;
 import com.teambiund.bander.auth_server.exceptions.CustomException;
@@ -59,7 +58,7 @@ public class AuthRepositoryTest {
                 .id("consent1")
                 .consentUrl("www.url.com")
                 .agreementAt(LocalDateTime.now())
-                .consentType(ConsentType.PERSONAL_INFO)
+                .consentType(String.PERSONAL_INFO)
                 .user(user)
                 .build());
         user.setConsent(consents);
