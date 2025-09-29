@@ -5,6 +5,7 @@ import com.teambiund.bander.auth_server.entity.Auth;
 import com.teambiund.bander.auth_server.enums.Provider;
 import com.teambiund.bander.auth_server.event.events.CreateProfileRequest;
 import com.teambiund.bander.auth_server.event.publish.CreateProfileRequestEventPub;
+import com.teambiund.bander.auth_server.service.update.EmailConfirm;
 import com.teambiund.bander.auth_server.util.vailidator.Validator;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -20,10 +21,12 @@ public class SignupServiceImpl implements SignupService {
     private final ConsentService consentService;
     private final CreateProfileRequestEventPub publishEvent;
     private final Validator validator;
+    private final EmailConfirm emailConfirm;
 
     @Override
     public Auth signup(String email, String password, String passConfirm, List<ConsentRequest> consentReqs) {
         validator(email, password, passConfirm, consentReqs);
+        emailConfirm.checkedConfirmedEmail(email);
         var auth = signupStoreService.signup(email, password, passConfirm);
         publishEvent.createProfileRequestPub(new CreateProfileRequest(
                 auth.getId(),
