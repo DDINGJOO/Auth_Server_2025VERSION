@@ -37,4 +37,9 @@ public class EmailConfirmImpl implements EmailConfirm {
         String code = emailCodeGenerator.generateCode(email);
         emailConfirmRequestEventPub.emailConfirmReq(new EmailConfirmRequest(email, code));
     }
+
+    @Override
+    public boolean checkedConfirmedEmail(String email) {
+        return emailCodeGenerator.checkCode("confirmed", email);
+    }
 }

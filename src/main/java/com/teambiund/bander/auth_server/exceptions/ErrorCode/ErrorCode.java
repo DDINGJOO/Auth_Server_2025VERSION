@@ -37,6 +37,7 @@ public enum ErrorCode {
     USER_IS_SUSPENDED("USER_IS_SUSPENDED", "User is suspended", HttpStatus.BAD_REQUEST),
     INVALID_DEVICE_ID("INVALID_DEVICE_ID", "Invalid device id", HttpStatus.BAD_REQUEST),
     EXPIRED_TOKEN("EXPIRED_TOKEN", "Expired token", HttpStatus.BAD_REQUEST),
+    NOT_CONFIRMED_EMAIL("NOT_CONFIRMED_EMAIL", "Not confirmed email", HttpStatus.BAD_REQUEST),
     ;
 
 

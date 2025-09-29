@@ -26,6 +26,7 @@ public class ValidatorImpl implements Validator {
     @Value("${regex.password:}")
     private java.lang.String passwordRegex = DEFAULT_PASSWORD_REGEX; // fallback when not injected
 
+
     @Override
     public void emailValid(java.lang.String email) {
         java.lang.String pattern = (emailRegex == null || emailRegex.isEmpty()) ? DEFAULT_EMAIL_REGEX : emailRegex;
