@@ -48,6 +48,17 @@ public class EmailCodeGenerator {
     }
 
     public boolean checkCode(String code, String email) {
+        if (code.equals("confirmed")) {
+            String expect = redisTemplate.opsForValue().get(CODE_PREFIX + email);
+            if (expect == null) {
+                throw new CustomException(ErrorCode.NOT_CONFIRMED_EMAIL);
+            }
+            if (!expect.equals("confirmed")) {
+                throw new CustomException(ErrorCode.NOT_CONFIRMED_EMAIL);
+            }
+            redisTemplate.delete(CODE_PREFIX + email);
+            return true;
+        }
         String expect = redisTemplate.opsForValue().get(CODE_PREFIX + email);
         if (expect == null) {
             return false;
@@ -57,6 +68,7 @@ public class EmailCodeGenerator {
         }
         // Delete the key associated with the email, not the code
         redisTemplate.delete(CODE_PREFIX + email);
+        redisTemplate.opsForValue().set(CODE_PREFIX + email, "confirmed", 300);
         return true;
     }
 

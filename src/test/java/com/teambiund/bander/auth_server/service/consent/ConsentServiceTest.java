@@ -58,7 +58,7 @@ public class ConsentServiceTest {
         consents.add(Consent.builder()
                 .id(UUID.randomUUID().toString())
                 .consentUrl("www.url.comn")
-                .consentName("PERSONAL_INFO")
+                .consentType("PERSONAL_INFO")
                 .user(auth)
                 .agreementAt(LocalDateTime.now())
                 .build());
@@ -66,7 +66,7 @@ public class ConsentServiceTest {
         consents.add(Consent.builder()
                 .id(UUID.randomUUID().toString())
                 .consentUrl("www.url.com")
-                .consentName("MARKETING")
+                .consentType("MARKETING")
                 .user(auth)
                 .agreementAt(LocalDateTime.now())
                 .build());

@@ -8,4 +8,6 @@ public interface EmailConfirm {
     Boolean resendEmail(String email) throws CustomException;
 
     void generateCode(String email);
+
+    boolean checkedConfirmedEmail(String email);
 }
