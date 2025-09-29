@@ -51,7 +51,7 @@ public class EmailCodeGenerator {
         if (code.equals("confirmed")) {
             String expect = redisTemplate.opsForValue().get(CODE_PREFIX + email);
             if (expect == null) {
-                return false;
+                throw new CustomException(ErrorCode.NOT_CONFIRMED_EMAIL);
             }
             if (!expect.equals("confirmed")) {
                 throw new CustomException(ErrorCode.NOT_CONFIRMED_EMAIL);

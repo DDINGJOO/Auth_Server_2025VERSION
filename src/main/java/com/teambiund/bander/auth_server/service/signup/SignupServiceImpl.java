@@ -27,11 +27,14 @@ public class SignupServiceImpl implements SignupService {
     public Auth signup(String email, String password, String passConfirm, List<ConsentRequest> consentReqs) {
         validator(email, password, passConfirm, consentReqs);
         emailConfirm.checkedConfirmedEmail(email);
+
+
         var auth = signupStoreService.signup(email, password, passConfirm);
         publishEvent.createProfileRequestPub(new CreateProfileRequest(
                 auth.getId(),
                 auth.getProvider().toString()
         ));
+
         consentService.saveConsent(auth, consentReqs);
         return auth;
     }
