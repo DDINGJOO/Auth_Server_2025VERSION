@@ -11,6 +11,7 @@ import com.teambiund.bander.auth_server.util.generator.key_gerneratre.KeyProvide
 import com.teambiund.bander.auth_server.util.vailidator.Validator;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDateTime;
 import java.util.ArrayList;
@@ -19,6 +20,7 @@ import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
+@Transactional
 public class ConsentService {
     private final AuthRepository authRepository;
     private final ConsentRepository consentRepository;
@@ -39,7 +41,7 @@ public class ConsentService {
                     .id(keyProvider.generateKey())
                     .agreementAt(LocalDateTime.now())
                     .version(request.getVersion())
-                    .consentName(request.getConsentName())
+                    .consentType(request.getConsentName())
                     .user(auth)
                     .consentUrl(request.getVersion())
                     .build());
@@ -61,7 +63,7 @@ public class ConsentService {
 
         // ConsentType -> Consent 맵 생성 (기존 동의 조회용)
         var authConsentMap = consents.stream()
-                .collect(Collectors.toMap(Consent::getConsentName, c -> c));
+                .collect(Collectors.toMap(Consent::getConsentType, c -> c));
 
         // 요청을 순회하며 추가/삭제할 Consent 결정
         List<Consent> pendingAdd = new ArrayList<>();
@@ -77,7 +79,7 @@ public class ConsentService {
                     Consent newConsent = Consent.builder()
                             .id(keyProvider.generateKey())
                             .consentUrl(r.getVersion())
-                            .consentName(type)
+                            .consentType(type)
                             .agreementAt(LocalDateTime.now())
                             .user(auth)
                             .build();

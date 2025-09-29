@@ -32,7 +32,7 @@ public class Consent {
 
 
     @Column(name = "consent_type")
-    private String consentName;
+    private String consentType;
 
 
     @Column(name = "consent_url")

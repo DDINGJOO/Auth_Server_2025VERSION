@@ -8,10 +8,12 @@ import com.teambiund.bander.auth_server.event.publish.CreateProfileRequestEventP
 import com.teambiund.bander.auth_server.util.vailidator.Validator;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 
 @RequiredArgsConstructor
+@Transactional
 @Service
 public class SignupServiceImpl implements SignupService {
     private final SignupStoreService signupStoreService;

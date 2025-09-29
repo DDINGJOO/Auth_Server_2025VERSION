@@ -118,7 +118,7 @@ public class ConsentServiceTest {
         assertEquals(1, consents.size());
         assertEquals(consents.getFirst().getUser().getId(), auth.getId());
         assertEquals(consents.getFirst().getUser().getEmail(), auth.getEmail());
-        assertEquals("PERSONAL_INFO", consents.getFirst().getConsentName());
+        assertEquals("PERSONAL_INFO", consents.getFirst().getConsentType());
 
     }
 
@@ -148,9 +148,9 @@ public class ConsentServiceTest {
         assertEquals(1, consents.size());
         assertEquals(consents.getFirst().getUser().getId(), auth.getId());
         assertEquals(consents.getFirst().getUser().getEmail(), auth.getEmail());
-        assertEquals("PERSONAL_INFO", consents.getFirst().getConsentName());
+        assertEquals("PERSONAL_INFO", consents.getFirst().getConsentType());
         //마켓팅 삭제
-        assertNotEquals("MARKETING", consents.getFirst().getConsentName());
+        assertNotEquals("MARKETING", consents.getFirst().getConsentType());
     }
 
     @Test
@@ -175,8 +175,8 @@ public class ConsentServiceTest {
         assertEquals(2, consents.size());
         assertEquals(consents.getFirst().getUser().getId(), auth.getId());
         assertEquals(consents.getFirst().getUser().getEmail(), auth.getEmail());
-        assertEquals("PERSONAL_INFO", consents.getFirst().getConsentName());
-        assertEquals("MARKETING", consents.get(1).getConsentName());
+        assertEquals("PERSONAL_INFO", consents.getFirst().getConsentType());
+        assertEquals("MARKETING", consents.get(1).getConsentType());
     }
 
 
@@ -195,7 +195,7 @@ public class ConsentServiceTest {
         consentService.changeConsent("test", reqCon2);
 
         List<Consent> consents = consentRepository.findByUserId("test");
-        List<String> strings = consents.stream().map(Consent::getConsentName).toList();
+        List<String> strings = consents.stream().map(Consent::getConsentType).toList();
         assertFalse(strings.contains("PERSONAL_INFO"));
     }
 
