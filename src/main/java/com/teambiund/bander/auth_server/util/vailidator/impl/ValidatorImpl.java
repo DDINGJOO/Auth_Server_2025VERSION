@@ -68,6 +68,7 @@ public class ValidatorImpl implements Validator {
                         }
                     }
                 }
+                throw new CustomException(ErrorCode.NOT_CONSENTED_REQUIRED_CONSENT);
             }
         }
 
