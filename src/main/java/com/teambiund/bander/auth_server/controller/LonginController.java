@@ -14,15 +14,15 @@ import org.springframework.web.bind.annotation.RestController;
 @RequestMapping("/api/auth/login")
 @RequiredArgsConstructor
 public class LonginController {
-    private final LoginService loginService;
+  private final LoginService loginService;
 
-    @PostMapping("")
-    public LoginResponse login(@RequestBody LoginRequest loginRequest) {
-        return loginService.login(loginRequest.getEmail(), loginRequest.getPassword());
-    }
+  @PostMapping("")
+  public LoginResponse login(@RequestBody LoginRequest loginRequest) {
+    return loginService.login(loginRequest.getEmail(), loginRequest.getPassword());
+  }
 
-    @PostMapping("/refreshToken")
-    public LoginResponse refreshToken(@RequestBody TokenRefreshRequest request) {
-        return loginService.refreshToken(request.getRefreshToken(), request.getDeviceId());
-    }
+  @PostMapping("/refreshToken")
+  public LoginResponse refreshToken(@RequestBody TokenRefreshRequest request) {
+    return loginService.refreshToken(request.getRefreshToken(), request.getDeviceId());
+  }
 }

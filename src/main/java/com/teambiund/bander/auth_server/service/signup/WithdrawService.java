@@ -7,11 +7,10 @@ import com.teambiund.bander.auth_server.exceptions.CustomException;
 import com.teambiund.bander.auth_server.exceptions.ErrorCode.ErrorCode;
 import com.teambiund.bander.auth_server.repository.AuthRepository;
 import com.teambiund.bander.auth_server.repository.WithdrawRepository;
+import java.time.LocalDateTime;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-
-import java.time.LocalDateTime;
 
 @Service
 @Transactional
@@ -32,6 +31,7 @@ public class WithdrawService {
                         .withdrawAt(LocalDateTime.now())
                         .build()
         );
+
         auth.setStatus(Status.DELETED);
         auth.setDeletedAt(LocalDateTime.now());
         authRepository.save(auth);
@@ -42,10 +42,10 @@ public class WithdrawService {
         var auth = authRepository.findByEmail(email).orElseThrow(
                 () ->  new CustomException(ErrorCode.USER_NOT_FOUND)
         );
+
         var withdraw = withdrawRepository.findById(auth.getId()).orElseThrow(
                 () ->  new CustomException(ErrorCode.WITHDRAW_NOT_FOUND)
         );
-
 
         auth.setStatus(Status.ACTIVE);
         authRepository.save(auth);
