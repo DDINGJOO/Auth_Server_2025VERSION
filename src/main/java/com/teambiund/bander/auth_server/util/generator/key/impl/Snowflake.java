@@ -1,6 +1,6 @@
-package com.teambiund.bander.auth_server.util.generator.key_gerneratre.impl;
+package com.teambiund.bander.auth_server.util.generator.key.impl;
 
-import com.teambiund.bander.auth_server.util.generator.key_gerneratre.KeyProvider;
+import com.teambiund.bander.auth_server.util.generator.key.KeyProvider;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Primary;
 import org.springframework.stereotype.Component;

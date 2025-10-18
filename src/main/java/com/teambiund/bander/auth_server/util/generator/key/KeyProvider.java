@@ -1,4 +1,4 @@
-package com.teambiund.bander.auth_server.util.generator.key_gerneratre;
+package com.teambiund.bander.auth_server.util.generator.key;
 
 
 import org.springframework.stereotype.Component;

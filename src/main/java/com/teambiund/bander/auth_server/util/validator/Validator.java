@@ -1,4 +1,4 @@
-package com.teambiund.bander.auth_server.util.vailidator;
+package com.teambiund.bander.auth_server.util.validator;
 
 import com.teambiund.bander.auth_server.dto.request.ConsentRequest;
 import com.teambiund.bander.auth_server.exceptions.CustomException;

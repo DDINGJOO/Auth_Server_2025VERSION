@@ -1,10 +1,10 @@
-package com.teambiund.bander.auth_server.util.vailidator.impl;
+package com.teambiund.bander.auth_server.util.validator.impl;
 
 import com.teambiund.bander.auth_server.dto.request.ConsentRequest;
 import com.teambiund.bander.auth_server.entity.consents_name.ConsentsTable;
 import com.teambiund.bander.auth_server.exceptions.CustomException;
 import com.teambiund.bander.auth_server.exceptions.ErrorCode.ErrorCode;
-import com.teambiund.bander.auth_server.util.vailidator.Validator;
+import com.teambiund.bander.auth_server.util.validator.Validator;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 
