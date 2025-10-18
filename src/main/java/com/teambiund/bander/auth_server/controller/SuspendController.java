@@ -3,6 +3,7 @@ package com.teambiund.bander.auth_server.controller;
 
 import com.teambiund.bander.auth_server.dto.request.SuspendRequest;
 import com.teambiund.bander.auth_server.service.suspension.SuspensionManagementService;
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -14,7 +15,7 @@ public class SuspendController {
     private final SuspensionManagementService suspendedService;
 
     @PostMapping("")
-    public ResponseEntity<Boolean> suspend(@RequestBody SuspendRequest req) throws Exception {
+    public ResponseEntity<Boolean> suspend(@Valid @RequestBody SuspendRequest req) throws Exception {
         suspendedService.suspend(req.getSuspendedUserId(), req.getSuspendReason(), req.getSuspenderUserId(), req.getSuspendDay());
         return ResponseEntity.ok(true);
     }

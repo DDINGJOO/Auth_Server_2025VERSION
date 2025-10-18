@@ -7,7 +7,6 @@ import com.teambiund.bander.auth_server.event.events.CreateProfileRequest;
 import com.teambiund.bander.auth_server.event.publish.CreateProfileRequestEventPub;
 import com.teambiund.bander.auth_server.service.consent.ConsentManagementService;
 import com.teambiund.bander.auth_server.service.update.EmailConfirm;
-import com.teambiund.bander.auth_server.util.validator.Validator;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -21,12 +20,10 @@ public class SignupServiceImpl implements SignupService {
     private final SignupStoreService signupStoreService;
     private final ConsentManagementService consentService;
     private final CreateProfileRequestEventPub publishEvent;
-    private final Validator validator;
     private final EmailConfirm emailConfirm;
 
     @Override
     public Auth signup(String email, String password, String passConfirm, List<ConsentRequest> consentReqs) {
-        validator(email, password, passConfirm, consentReqs);
         emailConfirm.checkedConfirmedEmail(email);
 
 
@@ -48,13 +45,5 @@ public class SignupServiceImpl implements SignupService {
                 auth.getProvider().toString()
         ));
         return auth;
-    }
-
-    private void validator(String email, String password, String passConfirm, List<ConsentRequest> consentReqs) {
-        validator.emailValid(email);
-        validator.passwordValid(password);
-        validator.passConfirmValid(password, passConfirm);
-        validator.validateConsentList(consentReqs);
-
     }
 }

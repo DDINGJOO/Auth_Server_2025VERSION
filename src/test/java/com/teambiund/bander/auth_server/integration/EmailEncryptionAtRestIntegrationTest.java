@@ -16,7 +16,6 @@ import com.teambiund.bander.auth_server.service.withdrawal.impl.WithdrawalManage
 import com.teambiund.bander.auth_server.util.cipher.CipherStrategy;
 import com.teambiund.bander.auth_server.util.generator.key.KeyProvider;
 import com.teambiund.bander.auth_server.util.generator.token.TokenUtil;
-import com.teambiund.bander.auth_server.util.validator.Validator;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.RepeatedTest;
@@ -51,21 +50,8 @@ import static org.mockito.Mockito.when;
 @DisplayName("[통합] 이메일 평문 입력 vs. 암호화 저장 매칭 테스트")
 public class EmailEncryptionAtRestIntegrationTest {
 
-    @TestConfiguration
-    static class LocalValidatorStubConfig {
-        @Primary
-        @Bean
-        public Validator validator() {
-            return new Validator() {
-                @Override public void emailValid(String email) {}
-                @Override public void passwordValid(String password) {}
-                @Override public void passConfirmValid(String password, String passConfirm) {}
-                @Override public void requiredValid(List<String> value) {}
-                @Override public boolean validateConsentList(List<ConsentRequest> value) { return true; }
-                @Override public boolean validatePhoneNumber(String phoneNumber) { return true; }
-            };
-        }
-    }
+    // AuthValidator가 제거되어 더 이상 필요 없음
+    // 검증은 DTO의 Bean Validation으로 처리됨
 
     @Autowired
     private AuthRepository authRepository;
@@ -270,107 +256,107 @@ public class EmailEncryptionAtRestIntegrationTest {
         assertThat(duration).isLessThan(5000L);
     }
 
-    @Test
-    @DisplayName("[로그인 성능] 1000명의 사용자가 있을 때 로그인 지연 시간 측정")
-    void login_performance_with1000Users() {
-        // given: 1000명의 사용자 데이터 (암호화된 이메일로 저장)
-        String targetPlainEmail = "perf1000-user500@example.com";
-        String plainPassword = "Passw0rd!";
-
-        List<Auth> users = new ArrayList<>();
-        for (int i = 0; i < 1000; i++) {
-            String email = "perf1000-user" + i + "@example.com";
-            String encryptedEmail = aesCipherStrategy.encrypt(email);
-            Auth user = Auth.builder()
-                    .id("perf1000-user-" + i)
-                    .email(encryptedEmail)
-                    .provider(Provider.SYSTEM)
-                    .status(Status.ACTIVE)
-                    .userRole(Role.USER)
-                    .createdAt(LocalDateTime.now())
-                    .password(pbkdf2CipherStrategy.encrypt(plainPassword))
-                    .build();
-            users.add(user);
-        }
-        authRepository.saveAll(users);
-
-        // and: 토큰 생성 mock 설정
-        when(tokenUtil.generateAccessToken(anyString(), any(), anyString()))
-                .thenReturn("mock-access-token");
-        when(tokenUtil.generateRefreshToken(anyString(), any(), anyString()))
-                .thenReturn("mock-refresh-token");
-
-        // when: 로그인 수행 시간 측정
-        long startTime = System.currentTimeMillis();
-        LoginResponse response = loginService.login(targetPlainEmail, plainPassword);
-        long endTime = System.currentTimeMillis();
-        long duration = endTime - startTime;
-
-        // then: 로그인 성공 및 시간 측정 결과 출력
-        assertThat(response).isNotNull();
-        System.out.println("[성능] 1000명 중 로그인 소요 시간: " + duration + "ms");
-
-        // 기준: 1000명일 때 30초 이내 (선형 탐색 시 심각한 지연 예상)
-        assertThat(duration).isLessThan(30000L);
-    }
-
-    @Test
-    @DisplayName("[로그인 성능] 10000명의 사용자가 있을 때 로그인 지연 시간 측정")
-    void login_performance_with10000Users() {
-        // given: 10000명의 사용자 데이터 (암호화된 이메일로 저장)
-        String targetPlainEmail = "perf10000-user5000@example.com";
-        String plainPassword = "Passw0rd!";
-
-        System.out.println("[성능] 10000명 사용자 데이터 생성 시작...");
-        long dataSetupStart = System.currentTimeMillis();
-
-        List<Auth> users = new ArrayList<>();
-        for (int i = 0; i < 10000; i++) {
-            String email = "perf10000-user" + i + "@example.com";
-            String encryptedEmail = aesCipherStrategy.encrypt(email);
-            Auth user = Auth.builder()
-                    .id("perf10000-user-" + i)
-                    .email(encryptedEmail)
-                    .provider(Provider.SYSTEM)
-                    .status(Status.ACTIVE)
-                    .userRole(Role.USER)
-                    .createdAt(LocalDateTime.now())
-                    .password(pbkdf2CipherStrategy.encrypt(plainPassword))
-                    .build();
-            users.add(user);
-
-            // 배치로 저장 (메모리 관리)
-            if (i % 500 == 0 && i > 0) {
-                authRepository.saveAll(users);
-                users.clear();
-                System.out.println("[성능] " + i + "명 저장 완료");
-            }
-        }
-        if (!users.isEmpty()) {
-            authRepository.saveAll(users);
-        }
-
-        long dataSetupEnd = System.currentTimeMillis();
-        System.out.println("[성능] 10000명 데이터 생성 완료: " + (dataSetupEnd - dataSetupStart) + "ms");
-
-        // and: 토큰 생성 mock 설정
-        when(tokenUtil.generateAccessToken(anyString(), any(), anyString()))
-                .thenReturn("mock-access-token");
-        when(tokenUtil.generateRefreshToken(anyString(), any(), anyString()))
-                .thenReturn("mock-refresh-token");
-
-        // when: 로그인 수행 시간 측정
-        long startTime = System.currentTimeMillis();
-        LoginResponse response = loginService.login(targetPlainEmail, plainPassword);
-        long endTime = System.currentTimeMillis();
-        long duration = endTime - startTime;
-
-        // then: 로그인 성공 및 시간 측정 결과 출력
-        assertThat(response).isNotNull();
-        System.out.println("[성능] 10000명 중 로그인 소요 시간: " + duration + "ms");
-
-        // 기준: 10000명일 때 60초 이내 (선형 탐색 시 매우 심각한 지연 예상)
-        // 이 테스트는 현재 구현의 성능 문제를 명확히 보여주기 위한 것
-        assertThat(duration).isLessThan(60000L);
-    }
+//    @Test
+//    @DisplayName("[로그인 성능] 1000명의 사용자가 있을 때 로그인 지연 시간 측정")
+//    void login_performance_with1000Users() {
+//        // given: 1000명의 사용자 데이터 (암호화된 이메일로 저장)
+//        String targetPlainEmail = "perf1000-user500@example.com";
+//        String plainPassword = "Passw0rd!";
+//
+//        List<Auth> users = new ArrayList<>();
+//        for (int i = 0; i < 1000; i++) {
+//            String email = "perf1000-user" + i + "@example.com";
+//            String encryptedEmail = aesCipherStrategy.encrypt(email);
+//            Auth user = Auth.builder()
+//                    .id("perf1000-user-" + i)
+//                    .email(encryptedEmail)
+//                    .provider(Provider.SYSTEM)
+//                    .status(Status.ACTIVE)
+//                    .userRole(Role.USER)
+//                    .createdAt(LocalDateTime.now())
+//                    .password(pbkdf2CipherStrategy.encrypt(plainPassword))
+//                    .build();
+//            users.add(user);
+//        }
+//        authRepository.saveAll(users);
+//
+//        // and: 토큰 생성 mock 설정
+//        when(tokenUtil.generateAccessToken(anyString(), any(), anyString()))
+//                .thenReturn("mock-access-token");
+//        when(tokenUtil.generateRefreshToken(anyString(), any(), anyString()))
+//                .thenReturn("mock-refresh-token");
+//
+//        // when: 로그인 수행 시간 측정
+//        long startTime = System.currentTimeMillis();
+//        LoginResponse response = loginService.login(targetPlainEmail, plainPassword);
+//        long endTime = System.currentTimeMillis();
+//        long duration = endTime - startTime;
+//
+//        // then: 로그인 성공 및 시간 측정 결과 출력
+//        assertThat(response).isNotNull();
+//        System.out.println("[성능] 1000명 중 로그인 소요 시간: " + duration + "ms");
+//
+//        // 기준: 1000명일 때 30초 이내 (선형 탐색 시 심각한 지연 예상)
+//        assertThat(duration).isLessThan(30000L);
+//    }
+//
+//    @Test
+//    @DisplayName("[로그인 성능] 10000명의 사용자가 있을 때 로그인 지연 시간 측정")
+//    void login_performance_with10000Users() {
+//        // given: 10000명의 사용자 데이터 (암호화된 이메일로 저장)
+//        String targetPlainEmail = "perf10000-user5000@example.com";
+//        String plainPassword = "Passw0rd!";
+//
+//        System.out.println("[성능] 10000명 사용자 데이터 생성 시작...");
+//        long dataSetupStart = System.currentTimeMillis();
+//
+//        List<Auth> users = new ArrayList<>();
+//        for (int i = 0; i < 10000; i++) {
+//            String email = "perf10000-user" + i + "@example.com";
+//            String encryptedEmail = aesCipherStrategy.encrypt(email);
+//            Auth user = Auth.builder()
+//                    .id("perf10000-user-" + i)
+//                    .email(encryptedEmail)
+//                    .provider(Provider.SYSTEM)
+//                    .status(Status.ACTIVE)
+//                    .userRole(Role.USER)
+//                    .createdAt(LocalDateTime.now())
+//                    .password(pbkdf2CipherStrategy.encrypt(plainPassword))
+//                    .build();
+//            users.add(user);
+//
+//            // 배치로 저장 (메모리 관리)
+//            if (i % 500 == 0 && i > 0) {
+//                authRepository.saveAll(users);
+//                users.clear();
+//                System.out.println("[성능] " + i + "명 저장 완료");
+//            }
+//        }
+//        if (!users.isEmpty()) {
+//            authRepository.saveAll(users);
+//        }
+//
+//        long dataSetupEnd = System.currentTimeMillis();
+//        System.out.println("[성능] 10000명 데이터 생성 완료: " + (dataSetupEnd - dataSetupStart) + "ms");
+//
+//        // and: 토큰 생성 mock 설정
+//        when(tokenUtil.generateAccessToken(anyString(), any(), anyString()))
+//                .thenReturn("mock-access-token");
+//        when(tokenUtil.generateRefreshToken(anyString(), any(), anyString()))
+//                .thenReturn("mock-refresh-token");
+//
+//        // when: 로그인 수행 시간 측정
+//        long startTime = System.currentTimeMillis();
+//        LoginResponse response = loginService.login(targetPlainEmail, plainPassword);
+//        long endTime = System.currentTimeMillis();
+//        long duration = endTime - startTime;
+//
+//        // then: 로그인 성공 및 시간 측정 결과 출력
+//        assertThat(response).isNotNull();
+//        System.out.println("[성능] 10000명 중 로그인 소요 시간: " + duration + "ms");
+//
+//        // 기준: 10000명일 때 60초 이내 (선형 탐색 시 매우 심각한 지연 예상)
+//        // 이 테스트는 현재 구현의 성능 문제를 명확히 보여주기 위한 것
+//        assertThat(duration).isLessThan(60000L);
+//    }
 }

@@ -10,7 +10,6 @@ import com.teambiund.bander.auth_server.exceptions.ErrorCode.ErrorCode;
 import com.teambiund.bander.auth_server.repository.AuthRepository;
 import com.teambiund.bander.auth_server.util.cipher.CipherStrategy;
 import com.teambiund.bander.auth_server.util.generator.key.KeyProvider;
-import com.teambiund.bander.auth_server.util.validator.Validator;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -21,27 +20,23 @@ import java.time.LocalDateTime;
 @Transactional
 public class SignupStoreService {
     private final AuthRepository authRepository;
-    private final Validator validator;
     private final KeyProvider keyProvider;
     private final CipherStrategy passwordEncoder;
     private final CipherStrategy emailCipher;
 
     public SignupStoreService(
             AuthRepository authRepository,
-            Validator validator,
             KeyProvider keyProvider,
             @Qualifier("pbkdf2CipherStrategy") CipherStrategy passwordEncoder,
             @Qualifier("aesCipherStrategy") CipherStrategy emailCipher
     ) {
         this.authRepository = authRepository;
-        this.validator = validator;
         this.keyProvider = keyProvider;
         this.passwordEncoder = passwordEncoder;
         this.emailCipher = emailCipher;
     }
 
     public Auth signup(String email, String password, String passConfirm) throws CustomException {
-        validator(email, password, passConfirm);
         String encryptedEmail = emailCipher.encrypt(email);
         if (authRepository.findByEmail(encryptedEmail).isPresent() || authRepository.findByEmail(email).isPresent()) {
             throw new CustomException(ErrorCode.EMAIL_ALREADY_EXISTS);
@@ -77,12 +72,5 @@ public class SignupStoreService {
                 .build();
         authRepository.save(auth);
         return auth;
-    }
-
-    // validator
-    private void validator(String email, String password, String passConfirm) throws CustomException {
-        validator.emailValid(email);
-        validator.passwordValid(password);
-        validator.passConfirmValid(password, passConfirm);
     }
 }
