@@ -1,7 +1,7 @@
 package com.teambiund.bander.auth_server.aop.statictics;
 
 
-import com.teambiund.bander.auth_server.util.generator.key_gerneratre.KeyProvider;
+import com.teambiund.bander.auth_server.util.generator.key.KeyProvider;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.stereotype.Component;

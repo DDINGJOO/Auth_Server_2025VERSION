@@ -6,9 +6,9 @@ import com.teambiund.bander.auth_server.dto.request.SignupRequest;
 import com.teambiund.bander.auth_server.entity.Auth;
 import com.teambiund.bander.auth_server.exceptions.CustomException;
 import com.teambiund.bander.auth_server.service.SignupClientInterface;
-import com.teambiund.bander.auth_server.service.signup.ConsentService;
+import com.teambiund.bander.auth_server.service.consent.ConsentManagementService;
 import com.teambiund.bander.auth_server.service.signup.SignupStoreService;
-import com.teambiund.bander.auth_server.service.signup.WithdrawService;
+import com.teambiund.bander.auth_server.service.withdrawal.WithdrawalManagementService;
 import com.teambiund.bander.auth_server.service.update.UpdateService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -22,8 +22,8 @@ import java.util.List;
 public class SignupClientService implements SignupClientInterface {
     private final SignupStoreService signupStoreService;
     private final UpdateService updateService;
-    private final WithdrawService withdrawService;
-    private final ConsentService consentService;
+    private final WithdrawalManagementService withdrawService;
+    private final ConsentManagementService consentService;
 
     @Override
     @Transactional
