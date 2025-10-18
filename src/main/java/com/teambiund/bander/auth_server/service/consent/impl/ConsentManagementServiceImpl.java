@@ -80,6 +80,7 @@ public class ConsentManagementServiceImpl implements ConsentManagementService {
                 if (!authConsentMap.containsKey(type)) {
                     Consent newConsent = Consent.builder()
                             .id(keyProvider.generateKey())
+                            .version(r.getVersion())
                             .consentUrl(r.getVersion())
                             .consentType(type)
                             .agreementAt(LocalDateTime.now())
