@@ -8,10 +8,10 @@ import com.teambiund.bander.auth_server.enums.Status;
 import com.teambiund.bander.auth_server.exceptions.CustomException;
 import com.teambiund.bander.auth_server.exceptions.ErrorCode.ErrorCode;
 import com.teambiund.bander.auth_server.repository.AuthRepository;
-import com.teambiund.bander.auth_server.util.generator.key_gerneratre.KeyProvider;
-import com.teambiund.bander.auth_server.util.password_encoder.PasswordEncoder;
-import com.teambiund.bander.auth_server.util.vailidator.Validator;
-import lombok.RequiredArgsConstructor;
+import com.teambiund.bander.auth_server.util.cipher.CipherStrategy;
+import com.teambiund.bander.auth_server.util.generator.key.KeyProvider;
+import com.teambiund.bander.auth_server.util.validator.Validator;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -19,12 +19,23 @@ import java.time.LocalDateTime;
 
 @Service
 @Transactional
-@RequiredArgsConstructor
 public class SignupStoreService {
     private final AuthRepository authRepository;
     private final Validator validator;
     private final KeyProvider keyProvider;
-    private final PasswordEncoder passwordEncoder;
+    private final CipherStrategy passwordEncoder;
+
+    public SignupStoreService(
+            AuthRepository authRepository,
+            Validator validator,
+            KeyProvider keyProvider,
+            @Qualifier("pbkdf2CipherStrategy") CipherStrategy passwordEncoder
+    ) {
+        this.authRepository = authRepository;
+        this.validator = validator;
+        this.keyProvider = keyProvider;
+        this.passwordEncoder = passwordEncoder;
+    }
 
     public Auth signup(String email, String password, String passConfirm) throws CustomException {
         validator(email, password, passConfirm);
@@ -35,7 +46,7 @@ public class SignupStoreService {
         Auth auth = Auth.builder()
                 .id(keyProvider.generateKey())
                 .email(email)
-                .password(passwordEncoder.encode(password))
+                .password(passwordEncoder.encrypt(password))
                 .provider(Provider.SYSTEM)
                 .createdAt(LocalDateTime.now())
                 .status(Status.ACTIVE)
