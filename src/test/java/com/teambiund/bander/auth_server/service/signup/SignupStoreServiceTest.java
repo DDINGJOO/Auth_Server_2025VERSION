@@ -9,7 +9,6 @@ import com.teambiund.bander.auth_server.exceptions.ErrorCode.ErrorCode;
 import com.teambiund.bander.auth_server.repository.AuthRepository;
 import com.teambiund.bander.auth_server.util.cipher.CipherStrategy;
 import com.teambiund.bander.auth_server.util.generator.key.KeyProvider;
-import com.teambiund.bander.auth_server.util.validator.Validator;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
@@ -33,9 +32,6 @@ class SignupStoreServiceTest {
     private AuthRepository authRepository;
 
     @Mock
-    private Validator validator;
-
-    @Mock
     private KeyProvider keyProvider;
 
     @Mock
@@ -53,7 +49,6 @@ class SignupStoreServiceTest {
 
         signupStoreService = new SignupStoreService(
                 authRepository,
-                validator,
                 keyProvider,
                 passwordEncoder,
                 emailCipher
@@ -91,9 +86,7 @@ class SignupStoreServiceTest {
             assertThat(result.getStatus()).isEqualTo(Status.ACTIVE);
             assertThat(result.getUserRole()).isEqualTo(Role.USER);
 
-            verify(validator).emailValid(email);
-            verify(validator).passwordValid(password);
-            verify(validator).passConfirmValid(password, passConfirm);
+            // Validator는 DTO에서 Bean Validation으로 처리됨
             verify(authRepository, atLeast(1)).findByEmail(email);
             verify(passwordEncoder).encrypt(password);
             verify(authRepository).save(any(Auth.class));
@@ -122,27 +115,7 @@ class SignupStoreServiceTest {
             verify(authRepository, never()).save(any(Auth.class));
         }
 
-        @Test
-        @DisplayName("[검증] Validator가 호출됨")
-        void signup_validatorCalled() {
-            // given
-            String email = "test@example.com";
-            String password = "Password123!";
-            String passConfirm = "Password123!";
-
-            when(authRepository.findByEmail(email)).thenReturn(Optional.empty());
-            when(keyProvider.generateKey()).thenReturn("user-id");
-            when(passwordEncoder.encrypt(password)).thenReturn("hashed");
-            when(authRepository.save(any(Auth.class))).thenAnswer(invocation -> invocation.getArgument(0));
-
-            // when
-            signupStoreService.signup(email, password, passConfirm);
-
-            // then
-            verify(validator).emailValid(email);
-            verify(validator).passwordValid(password);
-            verify(validator).passConfirmValid(password, passConfirm);
-        }
+        // Validator 테스트는 BeanValidationTest.java에서 처리됨
 
         @Test
         @DisplayName("[보안] 비밀번호가 평문으로 저장되지 않음")
@@ -259,9 +232,7 @@ class SignupStoreServiceTest {
             // when
             signupStoreService.signupFromOtherProvider(email, provider);
 
-            // then
-            verify(validator, never()).passwordValid(anyString());
-            verify(validator, never()).passConfirmValid(anyString(), anyString());
+            // then (소셜 로그인은 비밀번호 불필요)
             verify(passwordEncoder, never()).encrypt(anyString());
         }
     }
@@ -295,11 +266,8 @@ class SignupStoreServiceTest {
             assertThat(auth.getUserRole()).isEqualTo(Role.USER);
             assertThat(auth.getCreatedAt()).isNotNull();
 
-            // 검증 순서 확인
-            var inOrder = inOrder(validator, authRepository, passwordEncoder);
-            inOrder.verify(validator).emailValid(email);
-            inOrder.verify(validator).passwordValid(password);
-            inOrder.verify(validator).passConfirmValid(password, passConfirm);
+            // 실행 순서 확인 (Validator는 DTO Bean Validation으로 처리됨)
+            var inOrder = inOrder(authRepository, passwordEncoder);
             inOrder.verify(authRepository, atLeast(1)).findByEmail(email);
             inOrder.verify(passwordEncoder).encrypt(password);
             inOrder.verify(authRepository).save(any(Auth.class));

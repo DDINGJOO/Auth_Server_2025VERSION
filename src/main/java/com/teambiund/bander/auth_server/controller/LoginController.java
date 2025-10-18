@@ -4,6 +4,7 @@ import com.teambiund.bander.auth_server.dto.request.LoginRequest;
 import com.teambiund.bander.auth_server.dto.request.TokenRefreshRequest;
 import com.teambiund.bander.auth_server.dto.response.LoginResponse;
 import com.teambiund.bander.auth_server.service.login.LoginService;
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -17,12 +18,12 @@ public class LoginController {
   private final LoginService loginService;
 
   @PostMapping("")
-  public LoginResponse login(@RequestBody LoginRequest loginRequest) {
+  public LoginResponse login(@Valid @RequestBody LoginRequest loginRequest) {
     return loginService.login(loginRequest.getEmail(), loginRequest.getPassword());
   }
 
   @PostMapping("/refreshToken")
-  public LoginResponse refreshToken(@RequestBody TokenRefreshRequest request) {
+  public LoginResponse refreshToken(@Valid @RequestBody TokenRefreshRequest request) {
     return loginService.refreshToken(request.getRefreshToken(), request.getDeviceId());
   }
 }

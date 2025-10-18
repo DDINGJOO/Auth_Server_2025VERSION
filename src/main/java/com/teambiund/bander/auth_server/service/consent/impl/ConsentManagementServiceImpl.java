@@ -8,7 +8,6 @@ import com.teambiund.bander.auth_server.exceptions.ErrorCode.ErrorCode;
 import com.teambiund.bander.auth_server.repository.AuthRepository;
 import com.teambiund.bander.auth_server.service.consent.ConsentManagementService;
 import com.teambiund.bander.auth_server.util.generator.key.KeyProvider;
-import com.teambiund.bander.auth_server.util.validator.Validator;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -24,9 +23,6 @@ import java.util.stream.Collectors;
 public class ConsentManagementServiceImpl implements ConsentManagementService {
     private final AuthRepository authRepository;
     private final KeyProvider keyProvider;
-    private final Validator validator;
-
-
 
     /**
      * 회원가입 시 동의 정보 저장
@@ -34,7 +30,6 @@ public class ConsentManagementServiceImpl implements ConsentManagementService {
      * - Cascade 설정으로 Consent 엔티티 자동 저장
      */
     public void saveConsent(Auth auth, List<ConsentRequest> requests) throws CustomException {
-        validator.validateConsentList(requests);
         List<ConsentRequest> consents = requests.stream()
                 .filter(ConsentRequest::isConsented)
                 .toList();
@@ -65,7 +60,6 @@ public class ConsentManagementServiceImpl implements ConsentManagementService {
      * - Fetch Join을 사용하여 N+1 문제 방지
      */
     public void changeConsent(String userId, List<ConsentRequest> req) throws CustomException {
-        validator.validateConsentList(req);
 
         // Fetch Join으로 사용자와 동의 정보를 한 번에 조회 (N+1 문제 방지)
         Auth auth = authRepository.findByIdWithConsent(userId).orElseThrow(

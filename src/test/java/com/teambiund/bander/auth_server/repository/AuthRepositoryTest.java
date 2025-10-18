@@ -46,7 +46,6 @@ import static org.mockito.Mockito.mock;
 @DisplayName("AuthRepository 테스트")
 public class AuthRepositoryTest {
 	
-	
 	@TestConfiguration
 	static class TestConfig {
 		@Bean

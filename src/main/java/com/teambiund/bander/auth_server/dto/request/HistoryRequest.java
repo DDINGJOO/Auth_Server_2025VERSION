@@ -14,19 +14,19 @@ import java.time.LocalDateTime;
 @AllArgsConstructor
 @Builder
 public class HistoryRequest {
-    public Auth auth;
-    public String beforeValue;
-    public String afterValue;
-    public String updatedColumn;
+  public Auth auth;
+  public String beforeValue;
+  public String afterValue;
+  public String updatedColumn;
 
-    public static History toHistory(HistoryRequest request) {
-        return History.builder()
-                .user(request.getAuth())
-                .beforeColumnValue(request.getBeforeValue())
-                .afterColumnValue(request.getAfterValue())
-                .updatedAt(LocalDateTime.now())
-                .id(new Snowflake().generateKey())
-                .updatedColumn(request.getUpdatedColumn())
-                .build();
-    }
+  public static History toHistory(HistoryRequest request) {
+    return History.builder()
+        .user(request.getAuth())
+        .beforeColumnValue(request.getBeforeValue())
+        .afterColumnValue(request.getAfterValue())
+        .updatedAt(LocalDateTime.now())
+        .id(new Snowflake().generateKey())
+        .updatedColumn(request.getUpdatedColumn())
+        .build();
+  }
 }
