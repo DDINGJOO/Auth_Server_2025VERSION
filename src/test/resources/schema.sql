@@ -53,10 +53,13 @@ CREATE TABLE IF NOT EXISTS login_status (
 
 -- Suspend 테이블
 CREATE TABLE IF NOT EXISTS suspend (
-    user_id VARCHAR(255) PRIMARY KEY,
-    suspend_reason TEXT,
-    suspend_start TIMESTAMP,
-    suspend_end TIMESTAMP,
+    id VARCHAR(255) PRIMARY KEY,
+    user_id VARCHAR(255),
+    reason TEXT,
+    suspend_at TIMESTAMP,
+    suspend_until DATE,
+    suspender VARCHAR(255),
+    version BIGINT DEFAULT 0,
     FOREIGN KEY (user_id) REFERENCES auth(id) ON DELETE CASCADE
 );
 
