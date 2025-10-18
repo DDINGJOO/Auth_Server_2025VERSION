@@ -1,13 +1,10 @@
-package com.teambiund.bander.auth_server.service.signup;
+package com.teambiund.bander.auth_server.service.withdrawal.impl;
 
 
-import com.teambiund.bander.auth_server.entity.Withdraw;
-import com.teambiund.bander.auth_server.enums.Status;
 import com.teambiund.bander.auth_server.exceptions.CustomException;
 import com.teambiund.bander.auth_server.exceptions.ErrorCode.ErrorCode;
 import com.teambiund.bander.auth_server.repository.AuthRepository;
-import com.teambiund.bander.auth_server.repository.WithdrawRepository;
-import java.time.LocalDateTime;
+import com.teambiund.bander.auth_server.service.withdrawal.WithdrawalManagementService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -15,42 +12,45 @@ import org.springframework.transaction.annotation.Transactional;
 @Service
 @Transactional
 @RequiredArgsConstructor
-public class WithdrawService {
-    private final WithdrawRepository withdrawRepository;
+public class WithdrawalManagementServiceImpl implements WithdrawalManagementService {
     private final AuthRepository authRepository;
 
-    @Transactional
+    /**
+     * 회원 탈퇴 처리
+     * - Auth 엔티티의 편의 메서드를 사용하여 탈퇴 처리
+     * - Cascade 설정으로 Withdraw 엔티티 자동 저장
+     */
     public void withdraw(String userId, String withdrawReason) throws CustomException {
         var auth = authRepository.findById(userId).orElseThrow(
-                () ->  new CustomException(ErrorCode.USER_NOT_FOUND)
-        );
-        withdrawRepository.save(
-                Withdraw.builder()
-                        .id(auth.getId())
-                        .withdrawReason(withdrawReason)
-                        .withdrawAt(LocalDateTime.now())
-                        .build()
+                () -> new CustomException(ErrorCode.USER_NOT_FOUND)
         );
 
-        auth.setStatus(Status.DELETED);
-        auth.setDeletedAt(LocalDateTime.now());
+        // 편의 메서드 사용 - Withdraw 엔티티 생성 및 양방향 연관관계 설정
+        auth.markAsDeleted(withdrawReason);
+
+        // CascadeType.ALL로 인해 auth만 save하면 withdraw도 자동 저장됨
         authRepository.save(auth);
     }
 
 
+    /**
+     * 회원 탈퇴 철회
+     * - Auth 엔티티의 편의 메서드를 사용하여 탈퇴 철회
+     * - orphanRemoval=true 설정으로 Withdraw 엔티티 자동 삭제
+     */
     public void withdrawRetraction(String email) throws CustomException {
         var auth = authRepository.findByEmail(email).orElseThrow(
-                () ->  new CustomException(ErrorCode.USER_NOT_FOUND)
+                () -> new CustomException(ErrorCode.USER_NOT_FOUND)
         );
 
-        var withdraw = withdrawRepository.findById(auth.getId()).orElseThrow(
-                () ->  new CustomException(ErrorCode.WITHDRAW_NOT_FOUND)
-        );
+        if (auth.getWithdraw() == null) {
+            throw new CustomException(ErrorCode.WITHDRAW_NOT_FOUND);
+        }
 
-        auth.setStatus(Status.ACTIVE);
+        // 편의 메서드 사용 - 상태 변경 및 withdraw 연관관계 제거
+        auth.cancelWithdrawal();
+
+        // orphanRemoval=true로 인해 withdraw 참조 제거 시 자동 삭제됨
         authRepository.save(auth);
-        withdrawRepository.delete(withdraw);
-
-        withdrawRepository.deleteById(auth.getId());
     }
 }

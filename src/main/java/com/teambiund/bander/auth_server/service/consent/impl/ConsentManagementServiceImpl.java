@@ -1,4 +1,4 @@
-package com.teambiund.bander.auth_server.service.signup;
+package com.teambiund.bander.auth_server.service.consent.impl;
 
 import com.teambiund.bander.auth_server.dto.request.ConsentRequest;
 import com.teambiund.bander.auth_server.entity.Auth;
@@ -6,109 +6,110 @@ import com.teambiund.bander.auth_server.entity.Consent;
 import com.teambiund.bander.auth_server.exceptions.CustomException;
 import com.teambiund.bander.auth_server.exceptions.ErrorCode.ErrorCode;
 import com.teambiund.bander.auth_server.repository.AuthRepository;
-import com.teambiund.bander.auth_server.repository.ConsentRepository;
-import com.teambiund.bander.auth_server.util.generator.key_gerneratre.KeyProvider;
-import com.teambiund.bander.auth_server.util.vailidator.Validator;
+import com.teambiund.bander.auth_server.service.consent.ConsentManagementService;
+import com.teambiund.bander.auth_server.util.generator.key.KeyProvider;
+import com.teambiund.bander.auth_server.util.validator.Validator;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDateTime;
-import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
 @Transactional
-public class ConsentService {
+public class ConsentManagementServiceImpl implements ConsentManagementService {
     private final AuthRepository authRepository;
-    private final ConsentRepository consentRepository;
     private final KeyProvider keyProvider;
     private final Validator validator;
 
 
 
+    /**
+     * 회원가입 시 동의 정보 저장
+     * - Auth 엔티티의 편의 메서드를 사용하여 양방향 연관관계 설정
+     * - Cascade 설정으로 Consent 엔티티 자동 저장
+     */
     public void saveConsent(Auth auth, List<ConsentRequest> requests) throws CustomException {
         validator.validateConsentList(requests);
-        List<ConsentRequest> consents = requests.stream().filter(
-                ConsentRequest::isConsented).toList();
+        List<ConsentRequest> consents = requests.stream()
+                .filter(ConsentRequest::isConsented)
+                .toList();
 
-
-        List<Consent> consentList = new ArrayList<>();
         for (ConsentRequest request : consents) {
-            consentList.add(Consent.builder()
+            Consent consent = Consent.builder()
                     .id(keyProvider.generateKey())
                     .agreementAt(LocalDateTime.now())
                     .version(request.getVersion())
                     .consentType(request.getConsentName())
-                    .user(auth)
                     .consentUrl(request.getVersion())
-                    .build());
+                    .build();
+
+            // 편의 메서드 사용 - 양방향 연관관계 설정
+            auth.addConsent(consent);
         }
-        consentRepository.saveAll(consentList);
+
+        // CascadeType.ALL로 인해 auth의 consent 컬렉션도 자동 저장됨
+        // 하지만 명시적으로 save를 호출하는 것이 더 명확함
+        // authRepository.save(auth); // 이미 영속 상태라면 불필요
     }
 
 
-    public void changeConsent(java.lang.String userId, List<ConsentRequest> req) throws CustomException {
+    /**
+     * 동의 정보 변경
+     * - Auth 엔티티의 편의 메서드를 사용하여 양방향 연관관계 관리
+     * - orphanRemoval=true 설정으로 삭제된 Consent 자동 제거
+     * - Fetch Join을 사용하여 N+1 문제 방지
+     */
+    public void changeConsent(String userId, List<ConsentRequest> req) throws CustomException {
         validator.validateConsentList(req);
 
-        // 사용자 엔티티 조회 (연관된 Consent 컬렉션을 강제로 로드할 필요 없이 엔티티만 확보)
-        Auth auth = authRepository.findById(userId).orElseThrow(
+        // Fetch Join으로 사용자와 동의 정보를 한 번에 조회 (N+1 문제 방지)
+        Auth auth = authRepository.findByIdWithConsent(userId).orElseThrow(
                 () -> new CustomException(ErrorCode.USER_NOT_FOUND)
         );
 
-        // DB에서 해당 사용자의 consent만 조회
-        List<Consent> consents = consentRepository.findByUserId(userId);
-
         // ConsentType -> Consent 맵 생성 (기존 동의 조회용)
-        var authConsentMap = consents.stream()
+        // auth.getConsent()는 이미 fetch join으로 로드된 상태
+        Map<String, Consent> authConsentMap = auth.getConsent().stream()
                 .collect(Collectors.toMap(Consent::getConsentType, c -> c));
-
-        // 요청을 순회하며 추가/삭제할 Consent 결정
-        List<Consent> pendingAdd = new ArrayList<>();
-        List<Consent> pendingDelete = new ArrayList<>();
 
         for (ConsentRequest r : req) {
             String type = r.getConsentName();
             boolean consented = r.isConsented();
 
             if (consented) {
-                // consented = true 이면, 이미 존재하면 아무 작업도 하지 않음
+                // consented = true 이면, 이미 존재하지 않는 경우에만 추가
                 if (!authConsentMap.containsKey(type)) {
                     Consent newConsent = Consent.builder()
                             .id(keyProvider.generateKey())
                             .consentUrl(r.getVersion())
                             .consentType(type)
                             .agreementAt(LocalDateTime.now())
-                            .user(auth)
                             .build();
-                    pendingAdd.add(newConsent);
-                    // 맵에 반영하여 동일 항목 중복 추가 방지
+
+                    // 편의 메서드 사용 - 양방향 연관관계 설정
+                    auth.addConsent(newConsent);
                     authConsentMap.put(type, newConsent);
                 }
             } else {
-                // consented = false 이면, 기존에 동의가 있어도 삭제
+                // consented = false 이면, 기존 동의 삭제
                 if (authConsentMap.containsKey(type)) {
-                    pendingDelete.add(authConsentMap.get(type));
+                    Consent toRemove = authConsentMap.get(type);
+
+                    // 편의 메서드 사용 - 양방향 연관관계 제거
+                    auth.removeConsent(toRemove);
                     authConsentMap.remove(type);
                 }
             }
         }
 
-        // DB 반영: 삭제 먼저 처리
-        if (!pendingDelete.isEmpty()) {
-            // auth의 컬렉션에서 제거 (연관관계 정리)
-            consentRepository.deleteAll(pendingDelete);
-            consentRepository.flush();
-        }
-
-        // 추가 처리
-        if (!pendingAdd.isEmpty()) {
-            consentRepository.saveAll(pendingAdd);
-            consentRepository.flush();
-        }
-
+        // orphanRemoval=true로 인해 컬렉션에서 제거된 Consent는 자동 삭제됨
+        // CascadeType.ALL로 인해 새로 추가된 Consent는 자동 저장됨
+        authRepository.save(auth);
     }
 
 }

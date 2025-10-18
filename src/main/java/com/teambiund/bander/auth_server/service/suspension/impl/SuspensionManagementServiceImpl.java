@@ -1,4 +1,4 @@
-package com.teambiund.bander.auth_server.service.signup;
+package com.teambiund.bander.auth_server.service.suspension.impl;
 
 import com.teambiund.bander.auth_server.entity.Auth;
 import com.teambiund.bander.auth_server.entity.Suspend;
@@ -8,7 +8,8 @@ import com.teambiund.bander.auth_server.exceptions.CustomException;
 import com.teambiund.bander.auth_server.exceptions.ErrorCode.ErrorCode;
 import com.teambiund.bander.auth_server.repository.AuthRepository;
 import com.teambiund.bander.auth_server.repository.SuspendRepository;
-import com.teambiund.bander.auth_server.util.generator.key_gerneratre.KeyProvider;
+import com.teambiund.bander.auth_server.service.suspension.SuspensionManagementService;
+import com.teambiund.bander.auth_server.util.generator.key.KeyProvider;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -20,7 +21,7 @@ import java.time.LocalDateTime;
 @Service
 @RequiredArgsConstructor
 @Transactional
-public class SuspendedService {
+public class SuspensionManagementServiceImpl implements SuspensionManagementService {
 
     private final SuspendRepository suspendRepository;
     private final AuthRepository authRepository;
@@ -36,6 +37,11 @@ public class SuspendedService {
         authRepository.save(suspended);
     }
 
+    /**
+     * 사용자 정지 처리
+     * - Auth 엔티티의 편의 메서드를 사용하여 양방향 연관관계 설정
+     * - Cascade 설정으로 Suspend 엔티티 자동 저장
+     */
     public void suspend(String userId, String suspendReason, String suspenderUserId, Long suspendDate) throws CustomException {
         Auth suspended = authRepository.findById(userId).orElseThrow(
                 () ->  new CustomException(ErrorCode.USER_NOT_FOUND)
@@ -53,17 +59,19 @@ public class SuspendedService {
             throw new CustomException(ErrorCode.USER_ALREADY_BLOCKED);
         }
 
-        suspendRepository.save(
-                Suspend.builder()
-                        .id(keyProvider.generateKey())
-                        .reason(suspendReason)
-                        .suspendAt(LocalDateTime.now())
-                        .suspendUntil(LocalDate.now().plusDays(suspendDate))
-                        .suspenderUserId(suspenderUserId)
-                        .suspendedUserId(userId)
-                        .build()
-        );
+        Suspend suspend = Suspend.builder()
+                .id(keyProvider.generateKey())
+                .reason(suspendReason)
+                .suspendAt(LocalDateTime.now())
+                .suspendUntil(LocalDate.now().plusDays(suspendDate))
+                .suspenderUserId(suspenderUserId)
+                .build();
+
+        // 편의 메서드 사용 - 양방향 연관관계 설정
+        suspended.addSuspension(suspend);
         suspended.setStatus(Status.BLOCKED);
+
+        // CascadeType.ALL로 인해 auth만 save하면 suspend도 자동 저장됨
         authRepository.save(suspended);
     }
 
