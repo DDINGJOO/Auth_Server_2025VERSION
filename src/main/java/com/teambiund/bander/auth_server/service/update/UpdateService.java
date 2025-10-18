@@ -7,21 +7,32 @@ import com.teambiund.bander.auth_server.enums.Status;
 import com.teambiund.bander.auth_server.exceptions.CustomException;
 import com.teambiund.bander.auth_server.exceptions.ErrorCode.ErrorCode;
 import com.teambiund.bander.auth_server.repository.AuthRepository;
-import com.teambiund.bander.auth_server.util.password_encoder.PasswordEncoder;
-import com.teambiund.bander.auth_server.util.vailidator.Validator;
-import lombok.RequiredArgsConstructor;
+import com.teambiund.bander.auth_server.util.cipher.CipherStrategy;
+import com.teambiund.bander.auth_server.util.validator.Validator;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 @Service
-@RequiredArgsConstructor
 @Transactional
 public class UpdateService
 {
     private final AuthRepository authRepository;
     private final HistoryService historyService;
     private final Validator validator;
-    private final PasswordEncoder passwordEncoder;
+    private final CipherStrategy passwordEncoder;
+
+    public UpdateService(
+            AuthRepository authRepository,
+            HistoryService historyService,
+            Validator validator,
+            @Qualifier("pbkdf2CipherStrategy") CipherStrategy passwordEncoder
+    ) {
+        this.authRepository = authRepository;
+        this.historyService = historyService;
+        this.validator = validator;
+        this.passwordEncoder = passwordEncoder;
+    }
 
 
     // 2025-09-21 기존 로직 백업 용
@@ -53,7 +64,7 @@ public class UpdateService
     }
 
     private void changePassword(Auth auth, String newPassword) {
-        auth.setPassword(passwordEncoder.encode(newPassword));
+        auth.setPassword(passwordEncoder.encrypt(newPassword));
         authRepository.save(auth);
         historyService.createHistory(HistoryRequest.builder()
                 .auth(auth)
