@@ -3,7 +3,7 @@ package com.teambiund.bander.auth_server.controller;
 
 import com.teambiund.bander.auth_server.dto.request.ConsentRequest;
 import com.teambiund.bander.auth_server.exceptions.CustomException;
-import com.teambiund.bander.auth_server.service.signup.ConsentService;
+import com.teambiund.bander.auth_server.service.consent.ConsentManagementService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -14,7 +14,7 @@ import java.util.List;
 @RequestMapping("/api/auth/consent")
 @RequiredArgsConstructor
 public class ConsentController {
-    private final ConsentService consentService;
+    private final ConsentManagementService consentService;
 
     @PutMapping("/{userId}")
     public ResponseEntity<Boolean> consent(@RequestParam(name = "userId") String userId, @RequestBody List<ConsentRequest> requests) throws CustomException {

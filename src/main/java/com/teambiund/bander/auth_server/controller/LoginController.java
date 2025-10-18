@@ -13,7 +13,7 @@ import org.springframework.web.bind.annotation.RestController;
 @RestController
 @RequestMapping("/api/auth/login")
 @RequiredArgsConstructor
-public class LonginController {
+public class LoginController {
   private final LoginService loginService;
 
   @PostMapping("")
