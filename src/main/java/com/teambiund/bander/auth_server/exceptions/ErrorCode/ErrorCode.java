@@ -29,7 +29,8 @@ public enum ErrorCode {
     PHONE_NUMBER_REGEX_NOT_MATCH("PHONE_NUMBER_REGEX_NOT_MATCH", "Phone number regex not match", HttpStatus.BAD_REQUEST),
     CAN_NOT_RESEND_EMAIl("CAN_NOT_RESEND_EMAIL", "Can not resend email", HttpStatus.BAD_REQUEST),
     ALREADY_GENERATE_CODE("ALREADY_GENERATE_CODE", "Already generate code", HttpStatus.BAD_REQUEST),
-    MARKETING_CONSENT_NOT_PROVIDED("MARKETING_CONSENT_NOT_PROVIDED", "Marketing consent not provided", HttpStatus.BAD_REQUEST), PERSONAL_INFO_NOT_PROVIDED("PERSONAL_INFO_NOT_PROVIDED", "Personal info not provided", HttpStatus.BAD_REQUEST),
+    MARKETING_CONSENT_NOT_PROVIDED("MARKETING_CONSENT_NOT_PROVIDED", "Marketing consent not provided", HttpStatus.BAD_REQUEST),
+	PERSONAL_INFO_NOT_PROVIDED("PERSONAL_INFO_NOT_PROVIDED", "Personal info not provided", HttpStatus.BAD_REQUEST),
     PASSWORD_MISMATCH("PASSWORD_MISMATCH", "Password mismatch", HttpStatus.BAD_REQUEST),
     USER_IS_SLEEPING("USER_IS_SLEEPING", "User is sleeping", HttpStatus.BAD_REQUEST),
     USER_IS_BLOCKED("USER_IS_BLOCKED", "User is blocked", HttpStatus.BAD_REQUEST),
@@ -39,7 +40,11 @@ public enum ErrorCode {
     EXPIRED_TOKEN("EXPIRED_TOKEN", "Expired token", HttpStatus.BAD_REQUEST),
     NOT_CONFIRMED_EMAIL("NOT_CONFIRMED_EMAIL", "Not confirmed email", HttpStatus.BAD_REQUEST),
     NOT_CONSENTED_REQUIRED_CONSENT("NOT_CONSENTED_REQUIRED_CONSENT", "Not confirmed consent", HttpStatus.BAD_REQUEST),
-    ;
+    ENCRYPTION_ERROR("ENCRYPTION_ERROR", "Encryption error", HttpStatus.INTERNAL_SERVER_ERROR),
+    DECRYPTION_ERROR("DECRYPTION_ERROR", "Decryption error", HttpStatus.INTERNAL_SERVER_ERROR),
+	INVALID_EMAIL("INVALID_EMAIL", "Invalid email" , HttpStatus.BAD_REQUEST ),
+	INVALID_PASSWORD("INVALID_PASSWORD", "Invalid password" , HttpStatus.BAD_REQUEST ),
+	;
 
 
 

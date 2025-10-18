@@ -23,6 +23,9 @@ public interface AuthRepository extends JpaRepository<Auth, String>
     @Query("select a from Auth a left join fetch a.consent c where a.email = :email")
     Optional<Auth> findByEmailWithConsent(String email);
 
+    @Query("select a from Auth a left join fetch a.consent c where a.id = :id")
+    Optional<Auth> findByIdWithConsent(@Param("id") String id);
+
 
     void deleteByDeletedAtBefore(LocalDateTime deletedAtBefore);
 

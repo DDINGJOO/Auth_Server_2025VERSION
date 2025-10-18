@@ -1,7 +1,7 @@
 package com.teambiund.bander.auth_server.config;
 
 
-import com.teambiund.bander.auth_server.util.vailidator.impl.ValidatorImpl;
+import com.teambiund.bander.auth_server.util.validator.impl.ValidatorImpl;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 

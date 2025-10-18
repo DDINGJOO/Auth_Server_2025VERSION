@@ -4,7 +4,9 @@ package com.teambiund.bander.auth_server.util.generator.generate_code;
 import com.teambiund.bander.auth_server.exceptions.CustomException;
 import com.teambiund.bander.auth_server.exceptions.ErrorCode.ErrorCode;
 import com.teambiund.bander.auth_server.repository.AuthRepository;
+import com.teambiund.bander.auth_server.util.cipher.CipherStrategy;
 import lombok.RequiredArgsConstructor;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.redis.core.StringRedisTemplate;
 import org.springframework.stereotype.Component;
@@ -12,11 +14,21 @@ import org.springframework.stereotype.Component;
 import java.time.Duration;
 
 @Component
-@RequiredArgsConstructor
 public class EmailCodeGenerator {
     private static final int DEFAULT_EXPIRE_SECONDS = 290; // Fallback to 6 minutes
     private final AuthRepository authRepository;
     private final StringRedisTemplate redisTemplate;
+    private final CipherStrategy emailCipher;
+
+    public EmailCodeGenerator(
+            AuthRepository authRepository,
+            StringRedisTemplate redisTemplate,
+            @Qualifier("aesCipherStrategy") CipherStrategy emailCipher
+    ) {
+        this.authRepository = authRepository;
+        this.redisTemplate = redisTemplate;
+        this.emailCipher = emailCipher;
+    }
     @Value("${email.code.prefix}")
     private String CODE_PREFIX = "email:";
     @Value("${email.code.length}")
@@ -26,7 +38,8 @@ public class EmailCodeGenerator {
 
     // 6글자, TTL 6분
     public String generateCode(String email) {
-        if (authRepository.existsByEmail(email)) {
+        String encryptedEmail = emailCipher.encrypt(email);
+        if (authRepository.existsByEmail(encryptedEmail) || authRepository.existsByEmail(email)) {
             throw new CustomException(ErrorCode.EMAIL_ALREADY_EXISTS);
         }
 

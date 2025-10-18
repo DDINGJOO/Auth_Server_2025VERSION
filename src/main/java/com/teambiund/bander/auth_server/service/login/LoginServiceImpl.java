@@ -8,29 +8,46 @@ import com.teambiund.bander.auth_server.exceptions.CustomException;
 import com.teambiund.bander.auth_server.exceptions.ErrorCode.ErrorCode;
 import com.teambiund.bander.auth_server.repository.AuthRepository;
 import com.teambiund.bander.auth_server.repository.LoginStatusRepository;
-import com.teambiund.bander.auth_server.util.generator.key_gerneratre.KeyProvider;
+import com.teambiund.bander.auth_server.util.cipher.CipherStrategy;
+import com.teambiund.bander.auth_server.util.generator.key.KeyProvider;
 import com.teambiund.bander.auth_server.util.generator.token.TokenUtil;
-import com.teambiund.bander.auth_server.util.password_encoder.PasswordEncoder;
-import lombok.RequiredArgsConstructor;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
 import java.util.UUID;
 
 @Service
-@RequiredArgsConstructor
 public class LoginServiceImpl implements LoginService {
     private final LoginStatusRepository loginStatusRepository;
     private final AuthRepository authRepository;
     private final KeyProvider keyProvider;
-    private final PasswordEncoder passwordEncoder;
+    private final CipherStrategy passwordEncoder;
     private final TokenUtil tokenUtil;
+    private final CipherStrategy emailCipher;
+
+    public LoginServiceImpl(
+            LoginStatusRepository loginStatusRepository,
+            AuthRepository authRepository,
+            KeyProvider keyProvider,
+            @Qualifier("pbkdf2CipherStrategy") CipherStrategy passwordEncoder,
+            TokenUtil tokenUtil,
+            @Qualifier("aesCipherStrategy") CipherStrategy emailCipher
+    ) {
+        this.loginStatusRepository = loginStatusRepository;
+        this.authRepository = authRepository;
+        this.keyProvider = keyProvider;
+        this.passwordEncoder = passwordEncoder;
+        this.tokenUtil = tokenUtil;
+        this.emailCipher = emailCipher;
+    }
 
     @Override
     public LoginResponse login(String email, String password) {
-        Auth auth = authRepository.findByEmail(email).orElseThrow(
-                () -> new CustomException(ErrorCode.USER_NOT_FOUND)
-        );
+        String encryptedEmail = emailCipher.encrypt(email);
+        Auth auth = authRepository.findByEmail(encryptedEmail)
+                .or(() -> authRepository.findByEmail(email)) // Backward-compatibility for legacy plaintext rows
+                .orElseThrow(() -> new CustomException(ErrorCode.USER_NOT_FOUND));
         if (!passwordEncoder.matches(password, auth.getPassword())) {
             throw new CustomException(ErrorCode.PASSWORD_MISMATCH);
         }
@@ -86,13 +103,16 @@ public class LoginServiceImpl implements LoginService {
         response.setDeviceId(deviceId);
 
 
-        loginStatusRepository.save(
-                LoginStatus.builder()
-                        .id(keyProvider.generateKey())
-                        .userId(auth.getId())
-                        .lastLogin(LocalDateTime.now())
-                        .build()
-        );
+        // LoginStatus 생성 또는 업데이트
+        LoginStatus loginStatus = LoginStatus.builder()
+                .lastLogin(LocalDateTime.now())
+                .build();
+
+        // 편의 메서드 사용 - 양방향 연관관계 설정
+        auth.setLoginStatus(loginStatus);
+
+        // CascadeType.ALL로 인해 auth만 save하면 loginStatus도 자동 저장됨
+        authRepository.save(auth);
 
         return response;
 

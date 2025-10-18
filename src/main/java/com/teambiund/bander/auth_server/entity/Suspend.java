@@ -1,9 +1,6 @@
 package com.teambiund.bander.auth_server.entity;
 
-import jakarta.persistence.Column;
-import jakarta.persistence.Entity;
-import jakarta.persistence.Id;
-import jakarta.persistence.Table;
+import jakarta.persistence.*;
 import lombok.*;
 
 import java.time.LocalDate;
@@ -21,8 +18,9 @@ public class Suspend {
     @Column(name = "id")
     private String id;
 
-    @Column(name = "user_id")
-    private String suspendedUserId;
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "user_id")
+    private Auth suspendedUser;
 
     @Column(name = "reason")
     private String reason;
@@ -36,6 +34,7 @@ public class Suspend {
     @Column(name="suspender")
     private String suspenderUserId;
 
+    @Version
     @Column(name="version")
     private int version;
 }

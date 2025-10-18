@@ -5,8 +5,9 @@ import com.teambiund.bander.auth_server.entity.Auth;
 import com.teambiund.bander.auth_server.enums.Provider;
 import com.teambiund.bander.auth_server.event.events.CreateProfileRequest;
 import com.teambiund.bander.auth_server.event.publish.CreateProfileRequestEventPub;
+import com.teambiund.bander.auth_server.service.consent.ConsentManagementService;
 import com.teambiund.bander.auth_server.service.update.EmailConfirm;
-import com.teambiund.bander.auth_server.util.vailidator.Validator;
+import com.teambiund.bander.auth_server.util.validator.Validator;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -18,7 +19,7 @@ import java.util.List;
 @Service
 public class SignupServiceImpl implements SignupService {
     private final SignupStoreService signupStoreService;
-    private final ConsentService consentService;
+    private final ConsentManagementService consentService;
     private final CreateProfileRequestEventPub publishEvent;
     private final Validator validator;
     private final EmailConfirm emailConfirm;

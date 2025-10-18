@@ -1,0 +1,60 @@
+spring:
+  main:
+    allow-bean-definition-overriding: true
+
+  datasource:
+    url: jdbc:h2:mem:testdb
+    driver-class-name: org.h2.Driver
+    username: sa
+    password:
+
+  jpa:
+    hibernate:
+      ddl-auto: none
+    show-sql: true
+    properties:
+      hibernate:
+        format_sql: true
+        dialect: org.hibernate.dialect.H2Dialect
+
+  sql:
+    init:
+      mode: always
+      schema-locations: classpath:schema.sql
+
+  h2:
+    console:
+      enabled: true
+
+  data:
+    redis:
+      host: localhost
+      port: 6379
+
+  autoconfigure:
+    exclude:
+      - org.springframework.boot.autoconfigure.kafka.KafkaAutoConfiguration
+
+# Security JWT 설정
+security:
+  jwt:
+    secret: test-jwt-secret-key-for-testing-purpose-only-min-256-bits-required
+    access-token-expire-time: 3600000
+    refresh-token-expire-time: 86400000
+
+# Regex 설정
+regex:
+  email: '^[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\.[A-Za-z]{2,}$'
+  password: '^(?=.*[A-Za-z])(?=.*\d).{8,}$'
+
+# Email 설정
+email:
+  code:
+    prefix: 'email'
+    length: 6
+    expire:
+      time: 290
+
+# Redis 환경 변수 설정
+REDIS_HOST: localhost
+REDIS_PORT: 6379
