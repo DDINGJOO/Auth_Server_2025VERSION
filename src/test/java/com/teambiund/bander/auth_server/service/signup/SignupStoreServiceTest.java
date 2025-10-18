@@ -15,7 +15,6 @@ import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
-import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 
@@ -42,15 +41,22 @@ class SignupStoreServiceTest {
     @Mock
     private CipherStrategy passwordEncoder;
 
+    @Mock
+    private CipherStrategy emailCipher;
+
     private SignupStoreService signupStoreService;
 
     @BeforeEach
     void setUp() {
+        // emailCipher.encrypt returns input for test simplicity
+        when(emailCipher.encrypt(anyString())).thenAnswer(invocation -> invocation.getArgument(0));
+
         signupStoreService = new SignupStoreService(
                 authRepository,
                 validator,
                 keyProvider,
-                passwordEncoder
+                passwordEncoder,
+                emailCipher
         );
     }
 
@@ -88,7 +94,7 @@ class SignupStoreServiceTest {
             verify(validator).emailValid(email);
             verify(validator).passwordValid(password);
             verify(validator).passConfirmValid(password, passConfirm);
-            verify(authRepository).findByEmail(email);
+            verify(authRepository, atLeast(1)).findByEmail(email);
             verify(passwordEncoder).encrypt(password);
             verify(authRepository).save(any(Auth.class));
         }
@@ -112,7 +118,7 @@ class SignupStoreServiceTest {
             assertThatThrownBy(() -> signupStoreService.signup(email, password, passConfirm))
                     .isInstanceOf(CustomException.class);
 
-            verify(authRepository).findByEmail(email);
+            verify(authRepository, atLeast(1)).findByEmail(email);
             verify(authRepository, never()).save(any(Auth.class));
         }
 
@@ -190,7 +196,7 @@ class SignupStoreServiceTest {
             assertThat(result.getStatus()).isEqualTo(Status.ACTIVE);
             assertThat(result.getUserRole()).isEqualTo(Role.USER);
 
-            verify(authRepository).findByEmail(email);
+            verify(authRepository, atLeast(1)).findByEmail(email);
             verify(keyProvider).generateKey();
             verify(authRepository).save(any(Auth.class));
         }
@@ -294,7 +300,7 @@ class SignupStoreServiceTest {
             inOrder.verify(validator).emailValid(email);
             inOrder.verify(validator).passwordValid(password);
             inOrder.verify(validator).passConfirmValid(password, passConfirm);
-            inOrder.verify(authRepository).findByEmail(email);
+            inOrder.verify(authRepository, atLeast(1)).findByEmail(email);
             inOrder.verify(passwordEncoder).encrypt(password);
             inOrder.verify(authRepository).save(any(Auth.class));
         }

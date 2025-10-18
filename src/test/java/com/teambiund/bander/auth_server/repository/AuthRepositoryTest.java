@@ -8,6 +8,7 @@ import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.teambiund.bander.auth_server.repository.ConsentTableRepository;
+import com.teambiund.bander.auth_server.util.cipher.CipherStrategy;
 import com.teambiund.bander.auth_server.util.data.ConsentTable_init;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.jdbc.AutoConfigureTestDatabase;
@@ -21,6 +22,7 @@ import org.springframework.context.annotation.Import;
 import org.springframework.context.annotation.Primary;
 import org.springframework.data.redis.core.StringRedisTemplate;
 import org.springframework.kafka.core.KafkaTemplate;
+import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.jdbc.Sql;
 
 import java.time.LocalDateTime;
@@ -40,6 +42,7 @@ import static org.mockito.Mockito.mock;
 @AutoConfigureTestDatabase(replace = AutoConfigureTestDatabase.Replace.ANY)
 @Import(AuthRepositoryTest.TestConfig.class)
 @Sql(scripts = "/schema.sql", executionPhase = Sql.ExecutionPhase.BEFORE_TEST_METHOD)
+@ActiveProfiles("test")
 @DisplayName("AuthRepository 테스트")
 public class AuthRepositoryTest {
 	
@@ -64,15 +67,22 @@ public class AuthRepositoryTest {
 			return mock(StringRedisTemplate.class);
 		}
 
-		// ConsentTable_init를 빈으로 등록하지 않도록 mock 제공
-		// @PostConstruct가 실행되지 않음
+		@Bean("aesCipherStrategy")
+		@Primary
+		public CipherStrategy aesCipherStrategy() {
+			return mock(CipherStrategy.class);
+		}
+
+		@Bean("pbkdf2CipherStrategy")
+		@Primary
+		public CipherStrategy pbkdf2CipherStrategy() {
+			return mock(CipherStrategy.class);
+		}
+
 		@Bean
 		@Primary
-		public ConsentTable_init consentTableInit(ConsentTableRepository repository) {
-			// Mock 대신 실제 인스턴스를 반환하되 @PostConstruct 호출하지 않음
-			ConsentTable_init init = new ConsentTable_init(repository);
-			// @PostConstruct가 자동 호출되지 않으므로 초기화 안됨
-			return init;
+		public ConsentTableRepository consentTableRepository() {
+			return mock(ConsentTableRepository.class);
 		}
 	}
     @Autowired
