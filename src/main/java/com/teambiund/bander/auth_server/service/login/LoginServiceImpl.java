@@ -78,7 +78,7 @@ public class LoginServiceImpl implements LoginService {
 
     private LoginResponse generateResponse(Auth auth) {
 
-        if (auth.getStatus().equals(Status.ACTIVE)) {
+        if (!auth.getStatus().equals(Status.ACTIVE)) {
             switch (auth.getStatus()) {
                 case SLEEPING:
                     throw new CustomException(ErrorCode.USER_IS_SLEEPING);
