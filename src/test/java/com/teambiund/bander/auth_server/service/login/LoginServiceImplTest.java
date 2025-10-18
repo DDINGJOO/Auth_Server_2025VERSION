@@ -1,8 +1,12 @@
 package com.teambiund.bander.auth_server.service.login;
 
+import static org.assertj.core.api.Assertions.*;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.anyString;
+import static org.mockito.Mockito.*;
+
 import com.teambiund.bander.auth_server.dto.response.LoginResponse;
 import com.teambiund.bander.auth_server.entity.Auth;
-import com.teambiund.bander.auth_server.entity.LoginStatus;
 import com.teambiund.bander.auth_server.enums.Provider;
 import com.teambiund.bander.auth_server.enums.Role;
 import com.teambiund.bander.auth_server.enums.Status;
@@ -13,6 +17,7 @@ import com.teambiund.bander.auth_server.repository.LoginStatusRepository;
 import com.teambiund.bander.auth_server.util.cipher.CipherStrategy;
 import com.teambiund.bander.auth_server.util.generator.key.KeyProvider;
 import com.teambiund.bander.auth_server.util.generator.token.TokenUtil;
+import java.util.Optional;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
@@ -21,14 +26,6 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.ArgumentCaptor;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
-
-import java.time.LocalDateTime;
-import java.util.Optional;
-
-import static org.assertj.core.api.Assertions.*;
-import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.ArgumentMatchers.anyString;
-import static org.mockito.Mockito.*;
 
 @ExtendWith(MockitoExtension.class)
 @DisplayName("LoginServiceImpl 테스트")

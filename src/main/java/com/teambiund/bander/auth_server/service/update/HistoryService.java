@@ -4,12 +4,10 @@ import com.teambiund.bander.auth_server.dto.request.HistoryRequest;
 import com.teambiund.bander.auth_server.entity.History;
 import com.teambiund.bander.auth_server.repository.AuthRepository;
 import com.teambiund.bander.auth_server.util.generator.key.KeyProvider;
+import java.time.LocalDateTime;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
-
-import java.time.LocalDateTime;
-
 
 @Component
 @RequiredArgsConstructor

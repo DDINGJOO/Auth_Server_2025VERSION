@@ -3,7 +3,6 @@ package com.teambiund.bander.auth_server.service.consent;
 import com.teambiund.bander.auth_server.dto.request.ConsentRequest;
 import com.teambiund.bander.auth_server.entity.Auth;
 import com.teambiund.bander.auth_server.exceptions.CustomException;
-
 import java.util.List;
 
 /**

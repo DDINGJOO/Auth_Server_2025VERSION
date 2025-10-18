@@ -1,6 +1,5 @@
 package com.teambiund.bander.auth_server.controller;
 
-
 import com.teambiund.bander.auth_server.dto.request.SuspendRequest;
 import com.teambiund.bander.auth_server.service.suspension.SuspensionManagementService;
 import jakarta.validation.Valid;
@@ -12,18 +11,21 @@ import org.springframework.web.bind.annotation.*;
 @RestController
 @RequiredArgsConstructor
 public class SuspendController {
-    private final SuspensionManagementService suspendedService;
+  private final SuspensionManagementService suspendedService;
 
-    @PostMapping("")
-    public ResponseEntity<Boolean> suspend(@Valid @RequestBody SuspendRequest req) throws Exception {
-        suspendedService.suspend(req.getSuspendedUserId(), req.getSuspendReason(), req.getSuspenderUserId(), req.getSuspendDay());
-        return ResponseEntity.ok(true);
-    }
+  @PostMapping("")
+  public ResponseEntity<Boolean> suspend(@Valid @RequestBody SuspendRequest req) throws Exception {
+    suspendedService.suspend(
+        req.getSuspendedUserId(),
+        req.getSuspendReason(),
+        req.getSuspenderUserId(),
+        req.getSuspendDay());
+    return ResponseEntity.ok(true);
+  }
 
-    @GetMapping("/release")
-    public ResponseEntity<Boolean> unsuspend(@RequestParam String userId) throws Exception {
-        suspendedService.release(userId);
-        return ResponseEntity.ok(true);
-    }
+  @GetMapping("/release")
+  public ResponseEntity<Boolean> unsuspend(@RequestParam String userId) throws Exception {
+    suspendedService.release(userId);
+    return ResponseEntity.ok(true);
+  }
 }
-

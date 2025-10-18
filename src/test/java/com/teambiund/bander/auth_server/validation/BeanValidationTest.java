@@ -1,5 +1,7 @@
 package com.teambiund.bander.auth_server.validation;
 
+import static org.assertj.core.api.Assertions.assertThat;
+
 import com.teambiund.bander.auth_server.dto.request.ConsentRequest;
 import com.teambiund.bander.auth_server.dto.request.LoginRequest;
 import com.teambiund.bander.auth_server.dto.request.SignupRequest;
@@ -9,15 +11,12 @@ import jakarta.validation.ConstraintViolation;
 import jakarta.validation.Validation;
 import jakarta.validation.Validator;
 import jakarta.validation.ValidatorFactory;
-import org.junit.jupiter.api.BeforeAll;
-import org.junit.jupiter.api.DisplayName;
-import org.junit.jupiter.api.Test;
-
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Set;
-
-import static org.assertj.core.api.Assertions.assertThat;
+import org.junit.jupiter.api.BeforeAll;
+import org.junit.jupiter.api.DisplayName;
+import org.junit.jupiter.api.Test;
 
 @DisplayName("Bean Validation 테스트")
 class BeanValidationTest {

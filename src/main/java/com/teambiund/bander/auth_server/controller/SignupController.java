@@ -14,13 +14,15 @@ import org.springframework.web.bind.annotation.RestController;
 @RestController
 @RequestMapping("/api/auth")
 @RequiredArgsConstructor
-public class SignupController
-{
-    private final SignupService signupStoreService;
-    @PostMapping("/signup")
-    public ResponseEntity<Boolean> signup(@Valid @RequestBody SignupRequest req) throws CustomException {
+public class SignupController {
+  private final SignupService signupStoreService;
 
-        signupStoreService.signup(req.getEmail(), req.getPassword(), req.getPasswordConfirm(), req.getConsentReqs());
-        return ResponseEntity.ok(true);
-    }
+  @PostMapping("/signup")
+  public ResponseEntity<Boolean> signup(@Valid @RequestBody SignupRequest req)
+      throws CustomException {
+
+    signupStoreService.signup(
+        req.getEmail(), req.getPassword(), req.getPasswordConfirm(), req.getConsentReqs());
+    return ResponseEntity.ok(true);
+  }
 }

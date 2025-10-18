@@ -11,14 +11,17 @@ import org.springframework.web.bind.annotation.RestController;
 @RestController
 @RequestMapping("/api/auth/passwordChange")
 @RequiredArgsConstructor
-public class PasswordChangeController
-{
-    private final UpdateService updateService;
+public class PasswordChangeController {
+  private final UpdateService updateService;
 
-    @PostMapping("/changePassword")
-    //TODO : CHANGE REQUEST PARAM TO OBJECT
-    public ResponseEntity<Boolean> changePassword(@RequestParam String email, @RequestParam String newPassword, @RequestParam String passConfirm) throws Exception {
-        updateService.changePassword(email, newPassword, passConfirm);
-        return ResponseEntity.ok(true);
-    }
+  @PostMapping("/changePassword")
+  // TODO : CHANGE REQUEST PARAM TO OBJECT
+  public ResponseEntity<Boolean> changePassword(
+      @RequestParam String email,
+      @RequestParam String newPassword,
+      @RequestParam String passConfirm)
+      throws Exception {
+    updateService.changePassword(email, newPassword, passConfirm);
+    return ResponseEntity.ok(true);
+  }
 }

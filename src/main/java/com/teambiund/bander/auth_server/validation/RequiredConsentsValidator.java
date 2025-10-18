@@ -1,13 +1,12 @@
 package com.teambiund.bander.auth_server.validation;
 
+import static com.teambiund.bander.auth_server.util.data.ConsentTable_init.requiredConsents;
+
 import com.teambiund.bander.auth_server.dto.request.ConsentRequest;
 import com.teambiund.bander.auth_server.entity.consents_name.ConsentsTable;
 import jakarta.validation.ConstraintValidator;
 import jakarta.validation.ConstraintValidatorContext;
-
 import java.util.List;
-
-import static com.teambiund.bander.auth_server.util.data.ConsentTable_init.requiredConsents;
 
 /**
  * 필수 동의항목 검증 구현체

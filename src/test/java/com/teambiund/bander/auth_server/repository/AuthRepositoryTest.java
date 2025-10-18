@@ -1,36 +1,31 @@
 package com.teambiund.bander.auth_server.repository;
 
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.mockito.Mockito.mock;
+
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.teambiund.bander.auth_server.entity.*;
 import com.teambiund.bander.auth_server.enums.Provider;
 import com.teambiund.bander.auth_server.enums.Role;
 import com.teambiund.bander.auth_server.enums.Status;
+import com.teambiund.bander.auth_server.util.cipher.CipherStrategy;
+import java.time.LocalDateTime;
+import java.util.List;
+import java.util.Optional;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
-import com.fasterxml.jackson.databind.ObjectMapper;
-import com.teambiund.bander.auth_server.repository.ConsentTableRepository;
-import com.teambiund.bander.auth_server.util.cipher.CipherStrategy;
-import com.teambiund.bander.auth_server.util.data.ConsentTable_init;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.jdbc.AutoConfigureTestDatabase;
 import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
 import org.springframework.boot.test.autoconfigure.orm.jpa.TestEntityManager;
 import org.springframework.boot.test.context.TestConfiguration;
 import org.springframework.context.annotation.Bean;
-import org.springframework.context.annotation.ComponentScan;
-import org.springframework.context.annotation.FilterType;
 import org.springframework.context.annotation.Import;
 import org.springframework.context.annotation.Primary;
 import org.springframework.data.redis.core.StringRedisTemplate;
 import org.springframework.kafka.core.KafkaTemplate;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.jdbc.Sql;
-
-import java.time.LocalDateTime;
-import java.util.List;
-import java.util.Optional;
-
-import static org.assertj.core.api.Assertions.assertThat;
-import static org.mockito.Mockito.mock;
 
 /**
  * AuthRepository 테스트
@@ -46,51 +41,10 @@ import static org.mockito.Mockito.mock;
 @DisplayName("AuthRepository 테스트")
 public class AuthRepositoryTest {
 	
-	@TestConfiguration
-	static class TestConfig {
-		@Bean
-		@Primary
-		public KafkaTemplate<String, Object> kafkaTemplate() {
-			return mock(KafkaTemplate.class);
-		}
-
-		@Bean
-		@Primary
-		public ObjectMapper objectMapper() {
-			return new ObjectMapper();
-		}
-
-		@Bean
-		@Primary
-		public StringRedisTemplate stringRedisTemplate() {
-			return mock(StringRedisTemplate.class);
-		}
-
-		@Bean("aesCipherStrategy")
-		@Primary
-		public CipherStrategy aesCipherStrategy() {
-			return mock(CipherStrategy.class);
-		}
-
-		@Bean("pbkdf2CipherStrategy")
-		@Primary
-		public CipherStrategy pbkdf2CipherStrategy() {
-			return mock(CipherStrategy.class);
-		}
-
-		@Bean
-		@Primary
-		public ConsentTableRepository consentTableRepository() {
-			return mock(ConsentTableRepository.class);
-		}
-	}
     @Autowired
     private TestEntityManager em;
-
     @Autowired
     private AuthRepository authRepository;
-
-    // ===== 기본 CRUD 테스트 =====
 
     @Test
     @DisplayName("[성공] save - 새로운 Auth 저장")
@@ -110,9 +64,11 @@ public class AuthRepositoryTest {
         assertThat(found.get().getEmail()).isEqualTo("save@example.com");
     }
 
-    @Test
-    @DisplayName("[성공] findById - 존재하는 ID로 조회")
-    void findByIdSuccess() {
+  // ===== 기본 CRUD 테스트 =====
+
+  @Test
+  @DisplayName("[성공] findById - 존재하는 ID로 조회")
+  void findByIdSuccess() {
         // given
         Auth auth = createTestAuth("findid@example.com");
         em.persist(auth);
@@ -267,8 +223,6 @@ public class AuthRepositoryTest {
         assertThat(count).isGreaterThanOrEqualTo(2);
     }
 
-    // ===== Cascade 및 연관관계 테스트 =====
-
     @Test
     @DisplayName("[성공] Auth와 History Cascade 저장")
     void saveAuthWithHistoryCascade() {
@@ -297,9 +251,11 @@ public class AuthRepositoryTest {
         assertThat(saved.getHistory().get(0).getUser()).isEqualTo(saved);
     }
 
-    @Test
-    @DisplayName("[성공] Auth와 Consent Cascade 저장")
-    void saveAuthWithConsentCascade() {
+  // ===== Cascade 및 연관관계 테스트 =====
+
+  @Test
+  @DisplayName("[성공] Auth와 Consent Cascade 저장")
+  void saveAuthWithConsentCascade() {
         // given
         Auth auth = createTestAuth("consent@example.com");
 
@@ -399,8 +355,6 @@ public class AuthRepositoryTest {
         assertThat(saved.getWithdraw().getUser()).isEqualTo(saved);
     }
 
-    // ===== 편의 메서드 테스트 =====
-
     @Test
     @DisplayName("[성공] markAsDeleted 편의 메서드")
     void markAsDeletedMethod() {
@@ -425,9 +379,11 @@ public class AuthRepositoryTest {
         assertThat(result.getWithdraw().getWithdrawReason()).isEqualTo("서비스 불만족");
     }
 
-    @Test
-    @DisplayName("[성공] cancelWithdrawal 편의 메서드")
-    void cancelWithdrawalMethod() {
+  // ===== 편의 메서드 테스트 =====
+
+  @Test
+  @DisplayName("[성공] cancelWithdrawal 편의 메서드")
+  void cancelWithdrawalMethod() {
         // given
         Auth auth = createTestAuth("cancel@example.com");
         auth.markAsDeleted("테스트");
@@ -448,8 +404,6 @@ public class AuthRepositoryTest {
         assertThat(result.getDeletedAt()).isNull();
         assertThat(result.getWithdraw()).isNull();
     }
-
-    // ===== Custom Query 메서드 테스트 =====
 
     @Test
     @DisplayName("[성공] findByEmailWithHistory - History 있음")
@@ -479,9 +433,11 @@ public class AuthRepositoryTest {
         assertThat(result.get().getHistory().get(0).getUpdatedColumn()).isEqualTo("password");
     }
 
-    @Test
-    @DisplayName("[성공] findByEmailWithHistory - History 없음")
-    void findByEmailWithHistoryEmpty() {
+  // ===== Custom Query 메서드 테스트 =====
+
+  @Test
+  @DisplayName("[성공] findByEmailWithHistory - History 없음")
+  void findByEmailWithHistoryEmpty() {
         // given
         Auth auth = createTestAuth("nohistory@example.com");
         authRepository.save(auth);
@@ -609,8 +565,6 @@ public class AuthRepositoryTest {
         assertThat(afterCount).isEqualTo(beforeCount);
     }
 
-    // ===== 복합 시나리오 테스트 =====
-
     @Test
     @DisplayName("[통합] 회원 가입부터 탈퇴까지 전체 흐름")
     void fullUserLifecycle() {
@@ -678,9 +632,11 @@ public class AuthRepositoryTest {
         assertThat(finalAuth.getConsent()).hasSize(1);
     }
 
-    @Test
-    @DisplayName("[경계 케이스] 대량의 History와 함께 저장 및 조회")
-    void saveAndFindAuthWithManyHistories() {
+  // ===== 복합 시나리오 테스트 =====
+
+  @Test
+  @DisplayName("[경계 케이스] 대량의 History와 함께 저장 및 조회")
+  void saveAndFindAuthWithManyHistories() {
         // given
         Auth auth = createTestAuth("manyhistories@example.com");
 
@@ -773,5 +729,43 @@ public class AuthRepositoryTest {
                 .createdAt(LocalDateTime.now())
                 .build();
     }
-	
+
+  @TestConfiguration
+  static class TestConfig {
+    @Bean
+    @Primary
+    public KafkaTemplate<String, Object> kafkaTemplate() {
+      return mock(KafkaTemplate.class);
+    }
+
+    @Bean
+    @Primary
+    public ObjectMapper objectMapper() {
+      return new ObjectMapper();
+    }
+
+    @Bean
+    @Primary
+    public StringRedisTemplate stringRedisTemplate() {
+      return mock(StringRedisTemplate.class);
+    }
+
+    @Bean("aesCipherStrategy")
+    @Primary
+    public CipherStrategy aesCipherStrategy() {
+      return mock(CipherStrategy.class);
+    }
+
+    @Bean("pbkdf2CipherStrategy")
+    @Primary
+    public CipherStrategy pbkdf2CipherStrategy() {
+      return mock(CipherStrategy.class);
+    }
+
+    @Bean
+    @Primary
+    public ConsentTableRepository consentTableRepository() {
+      return mock(ConsentTableRepository.class);
+    }
+  }
 }

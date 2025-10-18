@@ -7,7 +7,6 @@ import com.teambiund.bander.auth_server.util.generator.generate_code.EmailCodeGe
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
-
 @Service
 @RequiredArgsConstructor
 public class EmailConfirmImpl implements EmailConfirm {

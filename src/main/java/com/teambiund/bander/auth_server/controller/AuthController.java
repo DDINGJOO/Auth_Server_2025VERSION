@@ -1,6 +1,5 @@
 package com.teambiund.bander.auth_server.controller;
 
-
 import com.teambiund.bander.auth_server.dto.response.SimpleAuthResponse;
 import com.teambiund.bander.auth_server.exceptions.CustomException;
 import com.teambiund.bander.auth_server.service.auth_service.AuthService;
@@ -17,25 +16,26 @@ import org.springframework.web.bind.annotation.RestController;
 @Slf4j
 @RequestMapping("/api/auth")
 public class AuthController {
-    private final AuthService authService;
+  private final AuthService authService;
 
+  @GetMapping("{userId}")
+  public ResponseEntity<SimpleAuthResponse> getAuth(@PathVariable(name = "userId") String userId)
+      throws CustomException {
+    return ResponseEntity.ok(authService.getAuth(userId));
+  }
 
-    @GetMapping("{userId}")
-    public ResponseEntity<SimpleAuthResponse> getAuth(@PathVariable(name = "userId") String userId) throws CustomException {
-        return ResponseEntity.ok(authService.getAuth(userId));
-    }
-
-//    @PutMapping("/email-confirm") // userId from gateWay
-//    public ResponseEntity<Boolean> emailConfirm(@RequestParam String code, @RequestParam String userId) throws CustomException {
-//        String userIdByCode = redisUtil.checkCode(code);
-//        if (userIdByCode == null) {
-//            throw new CustomException(ErrorCode.INVALID_CODE);
-//        }
-//        if (!userId.equals(userIdByCode)) {
-//            throw new CustomException(ErrorCode.INVALID_USER);
-//        }
-//        updateService.EmailConfirm(userId);
-//        return ResponseEntity.ok(true);
-//    }
+  //    @PutMapping("/email-confirm") // userId from gateWay
+  //    public ResponseEntity<Boolean> emailConfirm(@RequestParam String code, @RequestParam String
+  // userId) throws CustomException {
+  //        String userIdByCode = redisUtil.checkCode(code);
+  //        if (userIdByCode == null) {
+  //            throw new CustomException(ErrorCode.INVALID_CODE);
+  //        }
+  //        if (!userId.equals(userIdByCode)) {
+  //            throw new CustomException(ErrorCode.INVALID_USER);
+  //        }
+  //        updateService.EmailConfirm(userId);
+  //        return ResponseEntity.ok(true);
+  //    }
 
 }

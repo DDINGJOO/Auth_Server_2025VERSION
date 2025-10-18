@@ -1,11 +1,10 @@
 package com.teambiund.bander.auth_server.util.generator.key.impl;
 
 import com.teambiund.bander.auth_server.util.generator.key.KeyProvider;
+import java.util.concurrent.ThreadLocalRandom;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Primary;
 import org.springframework.stereotype.Component;
-
-import java.util.concurrent.ThreadLocalRandom;
 
 /**
  * Snowflake ID Generator
