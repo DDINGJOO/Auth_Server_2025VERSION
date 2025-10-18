@@ -5,15 +5,25 @@ import com.teambiund.bander.auth_server.exceptions.CustomException;
 import com.teambiund.bander.auth_server.exceptions.ErrorCode.ErrorCode;
 import com.teambiund.bander.auth_server.repository.AuthRepository;
 import com.teambiund.bander.auth_server.service.withdrawal.WithdrawalManagementService;
+import com.teambiund.bander.auth_server.util.cipher.CipherStrategy;
 import lombok.RequiredArgsConstructor;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 @Service
 @Transactional
-@RequiredArgsConstructor
 public class WithdrawalManagementServiceImpl implements WithdrawalManagementService {
     private final AuthRepository authRepository;
+    private final CipherStrategy emailCipher;
+
+    public WithdrawalManagementServiceImpl(
+            AuthRepository authRepository,
+            @Qualifier("aesCipherStrategy") CipherStrategy emailCipher
+    ) {
+        this.authRepository = authRepository;
+        this.emailCipher = emailCipher;
+    }
 
     /**
      * 회원 탈퇴 처리
@@ -39,9 +49,10 @@ public class WithdrawalManagementServiceImpl implements WithdrawalManagementServ
      * - orphanRemoval=true 설정으로 Withdraw 엔티티 자동 삭제
      */
     public void withdrawRetraction(String email) throws CustomException {
-        var auth = authRepository.findByEmail(email).orElseThrow(
-                () -> new CustomException(ErrorCode.USER_NOT_FOUND)
-        );
+        String encryptedEmail = emailCipher.encrypt(email);
+        var auth = authRepository.findByEmail(encryptedEmail)
+                .or(() -> authRepository.findByEmail(email))
+                .orElseThrow(() -> new CustomException(ErrorCode.USER_NOT_FOUND));
 
         if (auth.getWithdraw() == null) {
             throw new CustomException(ErrorCode.WITHDRAW_NOT_FOUND);

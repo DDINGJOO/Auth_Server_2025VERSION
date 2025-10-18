@@ -24,26 +24,30 @@ public class LoginServiceImpl implements LoginService {
     private final KeyProvider keyProvider;
     private final CipherStrategy passwordEncoder;
     private final TokenUtil tokenUtil;
+    private final CipherStrategy emailCipher;
 
     public LoginServiceImpl(
             LoginStatusRepository loginStatusRepository,
             AuthRepository authRepository,
             KeyProvider keyProvider,
             @Qualifier("pbkdf2CipherStrategy") CipherStrategy passwordEncoder,
-            TokenUtil tokenUtil
+            TokenUtil tokenUtil,
+            @Qualifier("aesCipherStrategy") CipherStrategy emailCipher
     ) {
         this.loginStatusRepository = loginStatusRepository;
         this.authRepository = authRepository;
         this.keyProvider = keyProvider;
         this.passwordEncoder = passwordEncoder;
         this.tokenUtil = tokenUtil;
+        this.emailCipher = emailCipher;
     }
 
     @Override
     public LoginResponse login(String email, String password) {
-        Auth auth = authRepository.findByEmail(email).orElseThrow(
-                () -> new CustomException(ErrorCode.USER_NOT_FOUND)
-        );
+        String encryptedEmail = emailCipher.encrypt(email);
+        Auth auth = authRepository.findByEmail(encryptedEmail)
+                .or(() -> authRepository.findByEmail(email)) // Backward-compatibility for legacy plaintext rows
+                .orElseThrow(() -> new CustomException(ErrorCode.USER_NOT_FOUND));
         if (!passwordEncoder.matches(password, auth.getPassword())) {
             throw new CustomException(ErrorCode.PASSWORD_MISMATCH);
         }

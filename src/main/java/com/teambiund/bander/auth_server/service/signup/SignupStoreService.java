@@ -24,28 +24,32 @@ public class SignupStoreService {
     private final Validator validator;
     private final KeyProvider keyProvider;
     private final CipherStrategy passwordEncoder;
+    private final CipherStrategy emailCipher;
 
     public SignupStoreService(
             AuthRepository authRepository,
             Validator validator,
             KeyProvider keyProvider,
-            @Qualifier("pbkdf2CipherStrategy") CipherStrategy passwordEncoder
+            @Qualifier("pbkdf2CipherStrategy") CipherStrategy passwordEncoder,
+            @Qualifier("aesCipherStrategy") CipherStrategy emailCipher
     ) {
         this.authRepository = authRepository;
         this.validator = validator;
         this.keyProvider = keyProvider;
         this.passwordEncoder = passwordEncoder;
+        this.emailCipher = emailCipher;
     }
 
     public Auth signup(String email, String password, String passConfirm) throws CustomException {
         validator(email, password, passConfirm);
-        if (authRepository.findByEmail(email).isPresent()) {
+        String encryptedEmail = emailCipher.encrypt(email);
+        if (authRepository.findByEmail(encryptedEmail).isPresent() || authRepository.findByEmail(email).isPresent()) {
             throw new CustomException(ErrorCode.EMAIL_ALREADY_EXISTS);
         }
 
         Auth auth = Auth.builder()
                 .id(keyProvider.generateKey())
-                .email(email)
+                .email(encryptedEmail)
                 .password(passwordEncoder.encrypt(password))
                 .provider(Provider.SYSTEM)
                 .createdAt(LocalDateTime.now())
@@ -58,13 +62,14 @@ public class SignupStoreService {
     }
 
     public Auth signupFromOtherProvider(String email, Provider provider) {
-        if (authRepository.findByEmail(email).isPresent()) {
+        String encryptedEmail = emailCipher.encrypt(email);
+        if (authRepository.findByEmail(encryptedEmail).isPresent() || authRepository.findByEmail(email).isPresent()) {
             throw new CustomException(ErrorCode.EMAIL_ALREADY_EXISTS);
         }
 
         Auth auth = Auth.builder()
                 .id(keyProvider.generateKey())
-                .email(email)
+                .email(encryptedEmail)
                 .provider(provider)
                 .createdAt(LocalDateTime.now())
                 .status(Status.ACTIVE)

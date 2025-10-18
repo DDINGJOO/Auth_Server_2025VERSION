@@ -21,17 +21,20 @@ public class UpdateService
     private final HistoryService historyService;
     private final Validator validator;
     private final CipherStrategy passwordEncoder;
+    private final CipherStrategy emailCipher;
 
     public UpdateService(
             AuthRepository authRepository,
             HistoryService historyService,
             Validator validator,
-            @Qualifier("pbkdf2CipherStrategy") CipherStrategy passwordEncoder
+            @Qualifier("pbkdf2CipherStrategy") CipherStrategy passwordEncoder,
+            @Qualifier("aesCipherStrategy") CipherStrategy emailCipher
     ) {
         this.authRepository = authRepository;
         this.historyService = historyService;
         this.validator = validator;
         this.passwordEncoder = passwordEncoder;
+        this.emailCipher = emailCipher;
     }
 
 
@@ -54,8 +57,10 @@ public class UpdateService
     }
 
     public void changePassword(String email, String newPassword, String passConfirm) throws CustomException {
-        Auth auth = authRepository.findByEmailWithHistory(email).orElseThrow(
-                () -> new CustomException(ErrorCode.USER_NOT_FOUND));
+        String encryptedEmail = emailCipher.encrypt(email);
+        Auth auth = authRepository.findByEmailWithHistory(encryptedEmail)
+                .or(() -> authRepository.findByEmailWithHistory(email)) // Backward-compatibility for legacy plaintext rows
+                .orElseThrow(() -> new CustomException(ErrorCode.USER_NOT_FOUND));
         validator.passwordValid(newPassword);
         validator.passConfirmValid(newPassword,passConfirm);
 
@@ -84,7 +89,8 @@ public class UpdateService
     }
 
     private Auth changeEmail(Auth auth, String newEmail) {
-        auth.setEmail(newEmail);
+        String encryptedEmail = emailCipher.encrypt(newEmail);
+        auth.setEmail(encryptedEmail);
         auth.setStatus(Status.UNCONFIRMED);
         return auth;
     }
