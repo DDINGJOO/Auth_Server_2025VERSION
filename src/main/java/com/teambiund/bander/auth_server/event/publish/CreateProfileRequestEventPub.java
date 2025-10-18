@@ -7,11 +7,11 @@ import org.springframework.stereotype.Component;
 @Component
 @RequiredArgsConstructor
 public class CreateProfileRequestEventPub {
-    private final EventPublisher eventPublisher;
+  private final EventPublisher eventPublisher;
 
-    private final String TOPIC = "profile-create-request";
+  private final String TOPIC = "profile-create-request";
 
-    public void createProfileRequestPub(CreateProfileRequest req) {
-        eventPublisher.publish(TOPIC, req);
-    }
+  public void createProfileRequestPub(CreateProfileRequest req) {
+    eventPublisher.publish(TOPIC, req);
+  }
 }

@@ -1,10 +1,8 @@
 package com.teambiund.bander.auth_server.entity;
 
-
 import jakarta.persistence.*;
-import lombok.*;
-
 import java.time.LocalDateTime;
+import lombok.*;
 
 @Table(name = "consent")
 @Entity
@@ -14,28 +12,21 @@ import java.time.LocalDateTime;
 @Getter
 @Setter
 public class Consent {
-    @Id
-    private String id;
+  @Id private String id;
 
+  @ManyToOne
+  @JoinColumn(name = "user_id")
+  private Auth user;
 
-    @ManyToOne
-    @JoinColumn(name = "user_id")
-    private Auth user;
+  @Column(name = "version")
+  private String version;
 
+  @Column(name = "agreement_at")
+  private LocalDateTime agreementAt;
 
-    @Column(name = "version")
-    private String version;
+  @Column(name = "consent_type")
+  private String consentType;
 
-
-    @Column(name = "agreement_at")
-    private LocalDateTime agreementAt;
-
-
-    @Column(name = "consent_type")
-    private String consentType;
-
-
-    @Column(name = "consent_url")
-    private java.lang.String consentUrl; // url 관련 테이블도 따로 만들어야 하나.,.?
-
+  @Column(name = "consent_url")
+  private String consentUrl; // url 관련 테이블도 따로 만들어야 하나.,.?
 }

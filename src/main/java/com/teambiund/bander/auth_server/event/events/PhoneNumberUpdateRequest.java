@@ -11,10 +11,10 @@ import lombok.*;
 @AllArgsConstructor
 public class PhoneNumberUpdateRequest {
 
-    @NotBlank(message = "사용자 ID는 필수입니다")
-    private String userId;
+  @NotBlank(message = "사용자 ID는 필수입니다")
+  private String userId;
 
-    @NotBlank(message = "전화번호는 필수입니다")
-    @PhoneNumber
-    private String phoneNumber;
+  @NotBlank(message = "전화번호는 필수입니다")
+  @PhoneNumber
+  private String phoneNumber;
 }

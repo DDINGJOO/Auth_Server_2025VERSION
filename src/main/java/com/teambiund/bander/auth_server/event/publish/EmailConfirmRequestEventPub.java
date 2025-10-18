@@ -7,11 +7,11 @@ import org.springframework.stereotype.Component;
 @Component
 @RequiredArgsConstructor
 public class EmailConfirmRequestEventPub {
-    private final EventPublisher eventPublisher;
+  private final EventPublisher eventPublisher;
 
-    private final String TOPIC = "email-confirm-request";
+  private final String TOPIC = "email-confirm-request";
 
-    public void emailConfirmReq(EmailConfirmRequest req) {
-        eventPublisher.publish(TOPIC, req);
-    }
+  public void emailConfirmReq(EmailConfirmRequest req) {
+    eventPublisher.publish(TOPIC, req);
+  }
 }
