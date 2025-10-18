@@ -1,5 +1,7 @@
 package com.teambiund.bander.auth_server.util.cipher;
 
+import static org.assertj.core.api.Assertions.*;
+
 import com.teambiund.bander.auth_server.exceptions.CustomException;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
@@ -9,13 +11,11 @@ import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.NullAndEmptySource;
 import org.junit.jupiter.params.provider.ValueSource;
 
-import static org.assertj.core.api.Assertions.*;
-
 @DisplayName("AESCipherStrategy 테스트")
 class AESCipherStrategyTest {
 
-    private CipherStrategy aesCipher;
     private static final String ENCRYPTION_KEY = "test-encryption-key-for-unit-testing";
+  private CipherStrategy aesCipher;
 
     @BeforeEach
     void setUp() {

@@ -4,7 +4,6 @@ package com.teambiund.bander.auth_server.service;
 import com.teambiund.bander.auth_server.dto.request.ConsentRequest;
 import com.teambiund.bander.auth_server.dto.request.SignupRequest;
 import com.teambiund.bander.auth_server.exceptions.CustomException;
-
 import java.util.List;
 
 public interface SignupClientInterface {

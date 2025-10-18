@@ -1,12 +1,11 @@
 package com.teambiund.bander.auth_server.entity;
 
 import jakarta.persistence.*;
-import lombok.*;
-
 import java.time.LocalDate;
 import java.time.LocalDateTime;
+import lombok.*;
 
-@Table(name ="suspend")
+@Table(name = "suspend")
 @Entity
 @Getter
 @Setter
@@ -14,27 +13,27 @@ import java.time.LocalDateTime;
 @AllArgsConstructor
 @Builder
 public class Suspend {
-    @Id
-    @Column(name = "id")
-    private String id;
+  @Id
+  @Column(name = "id")
+  private String id;
 
-    @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "user_id")
-    private Auth suspendedUser;
+  @ManyToOne(fetch = FetchType.LAZY)
+  @JoinColumn(name = "user_id")
+  private Auth suspendedUser;
 
-    @Column(name = "reason")
-    private String reason;
+  @Column(name = "reason")
+  private String reason;
 
-    @Column(name = "suspend_at")
-    private LocalDateTime suspendAt;
+  @Column(name = "suspend_at")
+  private LocalDateTime suspendAt;
 
-    @Column(name = "suspend_until")
-    private LocalDate suspendUntil;
+  @Column(name = "suspend_until")
+  private LocalDate suspendUntil;
 
-    @Column(name="suspender")
-    private String suspenderUserId;
+  @Column(name = "suspender")
+  private String suspenderUserId;
 
-    @Version
-    @Column(name="version")
-    private int version;
+  @Version
+  @Column(name = "version")
+  private int version;
 }

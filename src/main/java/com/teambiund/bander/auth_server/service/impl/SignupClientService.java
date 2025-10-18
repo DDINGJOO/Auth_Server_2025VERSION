@@ -8,14 +8,12 @@ import com.teambiund.bander.auth_server.exceptions.CustomException;
 import com.teambiund.bander.auth_server.service.SignupClientInterface;
 import com.teambiund.bander.auth_server.service.consent.ConsentManagementService;
 import com.teambiund.bander.auth_server.service.signup.SignupStoreService;
-import com.teambiund.bander.auth_server.service.withdrawal.WithdrawalManagementService;
 import com.teambiund.bander.auth_server.service.update.UpdateService;
+import com.teambiund.bander.auth_server.service.withdrawal.WithdrawalManagementService;
+import java.util.List;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-
-import java.util.List;
-
 
 @Service
 @RequiredArgsConstructor

@@ -5,13 +5,11 @@ import com.teambiund.bander.auth_server.exceptions.CustomException;
 import com.teambiund.bander.auth_server.exceptions.ErrorCode.ErrorCode;
 import com.teambiund.bander.auth_server.repository.AuthRepository;
 import com.teambiund.bander.auth_server.util.cipher.CipherStrategy;
-import lombok.RequiredArgsConstructor;
+import java.time.Duration;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.redis.core.StringRedisTemplate;
 import org.springframework.stereotype.Component;
-
-import java.time.Duration;
 
 @Component
 public class EmailCodeGenerator {
@@ -19,6 +17,15 @@ public class EmailCodeGenerator {
     private final AuthRepository authRepository;
     private final StringRedisTemplate redisTemplate;
     private final CipherStrategy emailCipher;
+
+  @Value("${email.code.prefix}")
+  private String CODE_PREFIX = "email:";
+
+  @Value("${email.code.length}")
+  private int CODE_LENGTH = 6;
+
+  @Value("${email.code.expire.time}")
+  private int CODE_EXPIRE_TIME = 290;
 
     public EmailCodeGenerator(
             AuthRepository authRepository,
@@ -29,12 +36,6 @@ public class EmailCodeGenerator {
         this.redisTemplate = redisTemplate;
         this.emailCipher = emailCipher;
     }
-    @Value("${email.code.prefix}")
-    private String CODE_PREFIX = "email:";
-    @Value("${email.code.length}")
-    private int CODE_LENGTH = 6;
-    @Value("${email.code.expire.time}")
-    private int CODE_EXPIRE_TIME = 290;
 
     // 6글자, TTL 6분
     public String generateCode(String email) {

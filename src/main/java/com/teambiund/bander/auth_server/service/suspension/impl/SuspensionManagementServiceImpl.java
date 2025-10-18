@@ -10,13 +10,11 @@ import com.teambiund.bander.auth_server.repository.AuthRepository;
 import com.teambiund.bander.auth_server.repository.SuspendRepository;
 import com.teambiund.bander.auth_server.service.suspension.SuspensionManagementService;
 import com.teambiund.bander.auth_server.util.generator.key.KeyProvider;
+import java.time.LocalDate;
+import java.time.LocalDateTime;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-
-import java.time.LocalDate;
-import java.time.LocalDateTime;
-
 
 @Service
 @RequiredArgsConstructor

@@ -2,11 +2,6 @@ package com.teambiund.bander.auth_server.util.generator.token.impl;
 
 import com.teambiund.bander.auth_server.enums.Role;
 import com.teambiund.bander.auth_server.util.generator.token.TokenUtil;
-import org.springframework.beans.factory.annotation.Value;
-import org.springframework.stereotype.Component;
-
-import javax.crypto.Mac;
-import javax.crypto.spec.SecretKeySpec;
 import java.nio.charset.StandardCharsets;
 import java.time.Duration;
 import java.time.Instant;
@@ -14,7 +9,10 @@ import java.util.Base64;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.UUID;
-
+import javax.crypto.Mac;
+import javax.crypto.spec.SecretKeySpec;
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.stereotype.Component;
 
 @Component
 public class JWTTokenUtil implements TokenUtil {

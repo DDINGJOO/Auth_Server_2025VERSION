@@ -10,7 +10,6 @@ import lombok.Setter;
 @NoArgsConstructor
 @AllArgsConstructor
 public class CreateProfileRequest {
-    private String userId;
-    private String provider;
-
+  private String userId;
+  private String provider;
 }

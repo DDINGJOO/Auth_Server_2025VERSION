@@ -8,6 +8,6 @@ import lombok.*;
 @AllArgsConstructor
 @Builder
 public class EmailConfirmRequest {
-    private String email;
-    private String code;
+  private String email;
+  private String code;
 }

@@ -4,14 +4,12 @@ package com.teambiund.bander.auth_server.util.data;
 import com.teambiund.bander.auth_server.entity.consents_name.ConsentsTable;
 import com.teambiund.bander.auth_server.repository.ConsentTableRepository;
 import jakarta.annotation.PostConstruct;
-import lombok.RequiredArgsConstructor;
-import org.springframework.stereotype.Component;
-
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Objects;
-
+import lombok.RequiredArgsConstructor;
+import org.springframework.stereotype.Component;
 
 /**
  * Consent 테이블 초기화 유틸리티.

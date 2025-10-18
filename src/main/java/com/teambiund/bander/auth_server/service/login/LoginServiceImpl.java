@@ -11,11 +11,10 @@ import com.teambiund.bander.auth_server.repository.LoginStatusRepository;
 import com.teambiund.bander.auth_server.util.cipher.CipherStrategy;
 import com.teambiund.bander.auth_server.util.generator.key.KeyProvider;
 import com.teambiund.bander.auth_server.util.generator.token.TokenUtil;
-import org.springframework.beans.factory.annotation.Qualifier;
-import org.springframework.stereotype.Service;
-
 import java.time.LocalDateTime;
 import java.util.UUID;
+import org.springframework.beans.factory.annotation.Qualifier;
+import org.springframework.stereotype.Service;
 
 @Service
 public class LoginServiceImpl implements LoginService {
