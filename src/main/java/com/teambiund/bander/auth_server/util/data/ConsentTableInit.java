@@ -23,7 +23,6 @@ public class ConsentTableInit {
     public static final HashMap<String, ConsentsTable> consentMaps = new HashMap<>();
     public static final List<ConsentsTable> requiredConsents = new ArrayList<>();
     public static final HashMap<String, ConsentsTable> consentsAllMaps = new HashMap<>();
-	public static final List<String> requiredConsentTypes= new ArrayList<>();
     private final ConsentTableRepository consentTableRepository;
 
     @PostConstruct
@@ -50,11 +49,6 @@ public class ConsentTableInit {
                 }
             }
         }
-		
-		for(ConsentsTable req : requiredConsents)
-		{
-			requiredConsentTypes.add(req.getConsentName());
-		}
     }
 
 

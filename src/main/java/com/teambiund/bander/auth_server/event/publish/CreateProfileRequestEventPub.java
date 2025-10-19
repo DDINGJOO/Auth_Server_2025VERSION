@@ -9,7 +9,7 @@ import org.springframework.stereotype.Component;
 public class CreateProfileRequestEventPub {
   private final EventPublisher eventPublisher;
 
-  private final String TOPIC = "profile-create-request";
+  private final String TOPIC = "user-created";
 
   public void createProfileRequestPub(CreatedUserEvent req) {
     eventPublisher.publish(TOPIC, req);
