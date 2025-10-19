@@ -19,10 +19,11 @@ import org.springframework.stereotype.Component;
  */
 @Component
 @RequiredArgsConstructor
-public class ConsentTableInit {
+public class ConsentTableUtils {
     public static final HashMap<String, ConsentsTable> consentMaps = new HashMap<>();
     public static final List<ConsentsTable> requiredConsents = new ArrayList<>();
     public static final HashMap<String, ConsentsTable> consentsAllMaps = new HashMap<>();
+	public static final List<String> requiredConsentTypes= new ArrayList<>();
 
     private final ConsentTableRepository consentTableRepository;
 
@@ -51,7 +52,22 @@ public class ConsentTableInit {
                 }
             }
         }
+		
+		for(ConsentsTable req : requiredConsents)
+		{
+			requiredConsentTypes.add(req.getConsentName());
+		}
     }
+	
+	private boolean checkAllRequiredConsents(List<ConsentsTable> requiredConsents)
+	{
+		for(ConsentsTable req : requiredConsents)
+		{
+			if(!consentMaps.containsKey(req.getConsentName()))
+				return false;
+		}
+		return true;
+	}
 
     /**
      * 주어진 두 버전 문자열을 비교하여 v1이 v2보다 최신인지 판단한다.
