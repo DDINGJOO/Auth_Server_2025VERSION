@@ -43,15 +43,7 @@ public class ConsentManagementServiceImpl implements ConsentManagementService {
             if (consentTable == null) {
                 throw new CustomException(ErrorCode.CONSENT_NOT_VALID);
             }
-
-            Consent consent = Consent.builder()
-                    .id(keyProvider.generateKey())
-                    .agreementAt(LocalDateTime.now())
-                    .version(consentTable.getVersion())
-                    .consentType(consentTable.getConsentName())
-                    .consentUrl(consentTable.getConsentUrl())
-                    .build();
-
+			Consent consent = toEntity(request, consentTable);
             // 편의 메서드 사용 - 양방향 연관관계 설정
             auth.addConsent(consent);
         }
@@ -94,13 +86,7 @@ public class ConsentManagementServiceImpl implements ConsentManagementService {
             if (consented) {
                 // consented = true 이면, 이미 존재하지 않는 경우에만 추가
                 if (!authConsentMap.containsKey(type)) {
-                    Consent newConsent = Consent.builder()
-                            .id(keyProvider.generateKey())
-                            .version(consentTable.getVersion())
-                            .consentUrl(consentTable.getConsentUrl())
-                            .consentType(type)
-                            .agreementAt(LocalDateTime.now())
-                            .build();
+					Consent newConsent = toEntity(r, consentTable);
 
                     // 편의 메서드 사용 - 양방향 연관관계 설정
                     auth.addConsent(newConsent);
@@ -122,5 +108,18 @@ public class ConsentManagementServiceImpl implements ConsentManagementService {
         // CascadeType.ALL로 인해 새로 추가된 Consent는 자동 저장됨
         authRepository.save(auth);
     }
+	
+	// 편의 메소드
+	private Consent toEntity(ConsentRequest req, ConsentsTable consentTable) {
+		return Consent.builder()
+				.id(keyProvider.generateKey())
+				.consentType(req.getConsentId())
+				.version(consentTable.getVersion())
+				.consentUrl(consentTable.getConsentUrl())
+				.agreementAt(LocalDateTime.now())
+				.build();
+	}
+	
+	
 
 }

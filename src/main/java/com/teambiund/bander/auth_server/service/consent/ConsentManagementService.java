@@ -27,4 +27,7 @@ public interface ConsentManagementService {
      * @throws CustomException 사용자를 찾을 수 없거나 유효하지 않은 동의 정보
      */
     void changeConsent(String userId, List<ConsentRequest> req) throws CustomException;
+	
+	
+	
 }
