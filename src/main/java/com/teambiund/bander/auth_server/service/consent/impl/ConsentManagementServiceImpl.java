@@ -10,6 +10,7 @@ import com.teambiund.bander.auth_server.exceptions.CustomException;
 import com.teambiund.bander.auth_server.exceptions.ErrorCode.ErrorCode;
 import com.teambiund.bander.auth_server.repository.AuthRepository;
 import com.teambiund.bander.auth_server.service.consent.ConsentManagementService;
+import com.teambiund.bander.auth_server.util.data.ConsentTableInit;
 import com.teambiund.bander.auth_server.util.generator.key.KeyProvider;
 import java.time.LocalDateTime;
 import java.util.List;
@@ -43,9 +44,12 @@ public class ConsentManagementServiceImpl implements ConsentManagementService {
             if (consentTable == null) {
                 throw new CustomException(ErrorCode.CONSENT_NOT_VALID);
             }
-			Consent consent = toEntity(request, consentTable);
-            // 편의 메서드 사용 - 양방향 연관관계 설정
-            auth.addConsent(consent);
+            // ID와 시간은 Service에서 생성하여 주입
+            auth.addConsentWithTable(
+                    keyProvider.generateKey(),
+                    consentTable,
+                    LocalDateTime.now()
+            );
         }
 
         // CascadeType.ALL로 인해 auth의 consent 컬렉션도 자동 저장됨
@@ -67,59 +71,55 @@ public class ConsentManagementServiceImpl implements ConsentManagementService {
         Auth auth = authRepository.findByIdWithConsent(userId).orElseThrow(
                 () -> new CustomException(ErrorCode.USER_NOT_FOUND)
         );
+		
+		List<ConsentsTable> exsistConsentsTableList = auth.getConsent().stream()
+		        .map(Consent::getConsentsTable)
+				.toList();
+		
+		for(ConsentRequest request : req) {
+			ConsentsTable consentTable = consentsAllMaps.get(request.getConsentId());
+			if(consentTable == null) {
+				throw new CustomException(ErrorCode.CONSENT_NOT_VALID);
+			}
 
-        // ConsentType -> Consent 맵 생성 (기존 동의 조회용)
-        // auth.getConsent()는 이미 fetch join으로 로드된 상태
-        Map<String, Consent> authConsentMap = auth.getConsent().stream()
-                .collect(Collectors.toMap(Consent::getConsentType, c -> c));
-
-        for (ConsentRequest r : req) {
-            // consentId로 ConsentsTable 조회
-            ConsentsTable consentTable = consentsAllMaps.get(r.getConsentId());
-            if (consentTable == null) {
-                throw new CustomException(ErrorCode.CONSENT_NOT_VALID);
-            }
-
-            String type = consentTable.getConsentName();
-            boolean consented = r.isConsented();
-
-            if (consented) {
-                // consented = true 이면, 이미 존재하지 않는 경우에만 추가
-                if (!authConsentMap.containsKey(type)) {
-					Consent newConsent = toEntity(r, consentTable);
-
-                    // 편의 메서드 사용 - 양방향 연관관계 설정
-                    auth.addConsent(newConsent);
-                    authConsentMap.put(type, newConsent);
-                }
-            } else {
-                // consented = false 이면, 기존 동의 삭제
-                if (authConsentMap.containsKey(type)) {
-                    Consent toRemove = authConsentMap.get(type);
-
-                    // 편의 메서드 사용 - 양방향 연관관계 제거
-                    auth.removeConsent(toRemove);
-                    authConsentMap.remove(type);
-                }
-            }
-        }
-
+			if(!request.isConsented()) {
+				// 동의 철회
+				auth.removeConsentByTable(consentTable);
+			}
+			else
+			{
+				if(!auth.hasConsentForTable(consentTable.getId())) {
+					// 새로운 동의 추가
+					auth.addConsentWithTable(
+							keyProvider.generateKey(),
+							consentTable,
+							LocalDateTime.now()
+					);
+				}
+				else
+				{
+					// 기존 동의 버전 체크
+					for(ConsentsTable exsistConsentsTable : exsistConsentsTableList) {
+						if(exsistConsentsTable.getConsentName().equals(consentTable.getConsentName()))
+						{
+							if(consentTable.isNewerVersion(exsistConsentsTable.getVersion()))
+							{
+								// 버전 업그레이드: 기존 제거 후 새 버전 추가
+								auth.removeConsentByTable(exsistConsentsTable);
+								auth.addConsentWithTable(
+										keyProvider.generateKey(),
+										consentTable,
+										LocalDateTime.now()
+								);
+							}
+						}
+					}
+				}
+			}
+		}
+		
         // orphanRemoval=true로 인해 컬렉션에서 제거된 Consent는 자동 삭제됨
         // CascadeType.ALL로 인해 새로 추가된 Consent는 자동 저장됨
         authRepository.save(auth);
     }
-	
-	// 편의 메소드
-	private Consent toEntity(ConsentRequest req, ConsentsTable consentTable) {
-		return Consent.builder()
-				.id(keyProvider.generateKey())
-				.consentType(req.getConsentId())
-				.version(consentTable.getVersion())
-				.consentUrl(consentTable.getConsentUrl())
-				.agreementAt(LocalDateTime.now())
-				.build();
-	}
-	
-	
-
 }
