@@ -1,5 +1,6 @@
 package com.teambiund.bander.auth_server.service.consent;
 
+import static com.teambiund.bander.auth_server.util.data.ConsentTable_init.consentsAllMaps;
 import static org.assertj.core.api.Assertions.*;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyString;
@@ -8,6 +9,7 @@ import static org.mockito.Mockito.*;
 import com.teambiund.bander.auth_server.dto.request.ConsentRequest;
 import com.teambiund.bander.auth_server.entity.Auth;
 import com.teambiund.bander.auth_server.entity.Consent;
+import com.teambiund.bander.auth_server.entity.consents_name.ConsentsTable;
 import com.teambiund.bander.auth_server.enums.Status;
 import com.teambiund.bander.auth_server.exceptions.CustomException;
 import com.teambiund.bander.auth_server.exceptions.ErrorCode.ErrorCode;
@@ -17,6 +19,7 @@ import com.teambiund.bander.auth_server.util.generator.key.KeyProvider;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
@@ -37,6 +40,39 @@ class ConsentManagementServiceImplTest {
 
     @InjectMocks
     private ConsentManagementServiceImpl consentService;
+
+    /**
+     * 각 테스트 실행 전 ConsentsTable Mock 데이터 초기화
+     */
+    @BeforeEach
+    void setUp() {
+        // consentsAllMaps를 초기화하고 테스트용 ConsentsTable 데이터 추가
+        consentsAllMaps.clear();
+        consentsAllMaps.put(TestFixture.CONSENT_ID_TERMS,
+                ConsentsTable.builder()
+                        .id(TestFixture.CONSENT_ID_TERMS)
+                        .consentName("TERMS_OF_SERVICE")
+                        .version("v1.0")
+                        .consentUrl("https://example.com/terms")
+                        .required(true)
+                        .build());
+        consentsAllMaps.put(TestFixture.CONSENT_ID_PRIVACY,
+                ConsentsTable.builder()
+                        .id(TestFixture.CONSENT_ID_PRIVACY)
+                        .consentName("PRIVACY_POLICY")
+                        .version("v1.0")
+                        .consentUrl("https://example.com/privacy")
+                        .required(true)
+                        .build());
+        consentsAllMaps.put(TestFixture.CONSENT_ID_MARKETING,
+                ConsentsTable.builder()
+                        .id(TestFixture.CONSENT_ID_MARKETING)
+                        .consentName("MARKETING")
+                        .version("v1.0")
+                        .consentUrl("https://example.com/marketing")
+                        .required(false)
+                        .build());
+    }
 
     /**
      * 테스트 픽스처: 재사용 가능한 테스트 객체 생성 헬퍼 클래스
@@ -113,6 +149,9 @@ class ConsentManagementServiceImplTest {
 
             // then
             assertThat(auth.getConsent()).hasSize(2);
+            assertThat(auth.getConsent())
+                    .extracting(Consent::getConsentType)
+                    .containsExactlyInAnyOrder("TERMS_OF_SERVICE", "PRIVACY_POLICY");
             verify(keyProvider, times(2)).generateKey();
         }
 
@@ -133,6 +172,9 @@ class ConsentManagementServiceImplTest {
 
             // then
             assertThat(auth.getConsent()).hasSize(1);
+            assertThat(auth.getConsent())
+                    .extracting(Consent::getConsentType)
+                    .containsExactly("TERMS_OF_SERVICE");
             verify(keyProvider, times(1)).generateKey();
         }
 
@@ -187,6 +229,9 @@ class ConsentManagementServiceImplTest {
             // then
             Consent savedConsent = auth.getConsent().get(0);
             assertThat(savedConsent.getId()).isEqualTo("consent-id-123");
+            assertThat(savedConsent.getConsentType()).isEqualTo("TERMS_OF_SERVICE");
+            assertThat(savedConsent.getVersion()).isEqualTo("v1.0");
+            assertThat(savedConsent.getConsentUrl()).isEqualTo("https://example.com/terms");
             assertThat(savedConsent.getAgreementAt()).isNotNull();
         }
     }
@@ -219,6 +264,9 @@ class ConsentManagementServiceImplTest {
 
             // then
             assertThat(auth.getConsent()).hasSize(2);
+            assertThat(auth.getConsent())
+                    .extracting(Consent::getConsentType)
+                    .containsExactlyInAnyOrder("TERMS_OF_SERVICE", "PRIVACY_POLICY");
             verify(authRepository).findByIdWithConsent(userId);
             verify(authRepository).save(auth);
         }
@@ -410,6 +458,9 @@ class ConsentManagementServiceImplTest {
 
             // then
             assertThat(auth.getConsent()).hasSize(2);
+            assertThat(auth.getConsent())
+                    .extracting(Consent::getConsentType)
+                    .containsExactlyInAnyOrder("TERMS_OF_SERVICE", "MARKETING");
         }
 
         @Test
@@ -466,7 +517,17 @@ class ConsentManagementServiceImplTest {
 
             List<ConsentRequest> requests = new ArrayList<>();
             for (int i = 0; i < 50; i++) {
-                requests.add(TestFixture.createConsentRequest("CONSENT_" + i, true));
+                String consentId = "CONSENT_" + i;
+                // 각 consentId에 대한 ConsentsTable 추가
+                consentsAllMaps.put(consentId,
+                        ConsentsTable.builder()
+                                .id(consentId)
+                                .consentName("CONSENT_TYPE_" + i)
+                                .version("v1.0")
+                                .consentUrl("https://example.com/consent/" + i)
+                                .required(false)
+                                .build());
+                requests.add(TestFixture.createConsentRequest(consentId, true));
             }
 
             when(keyProvider.generateKey()).thenAnswer(invocation -> "consent-id-" + System.nanoTime());
@@ -485,6 +546,16 @@ class ConsentManagementServiceImplTest {
             Auth auth = TestFixture.createAuth("user-id-123");
 
             String longConsentId = "VERY_LONG_CONSENT_ID_" + "A".repeat(200);
+            // 긴 consentId에 대한 ConsentsTable 추가
+            consentsAllMaps.put(longConsentId,
+                    ConsentsTable.builder()
+                            .id(longConsentId)
+                            .consentName("LONG_CONSENT_TYPE")
+                            .version("v1.0")
+                            .consentUrl("https://example.com/long")
+                            .required(false)
+                            .build());
+
             List<ConsentRequest> requests = List.of(
                     TestFixture.createConsentRequest(longConsentId, true)
             );
@@ -496,6 +567,7 @@ class ConsentManagementServiceImplTest {
 
             // then
             assertThat(auth.getConsent()).hasSize(1);
+            assertThat(auth.getConsent().get(0).getConsentType()).isEqualTo("LONG_CONSENT_TYPE");
         }
     }
 
