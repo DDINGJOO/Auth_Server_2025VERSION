@@ -117,8 +117,8 @@ public class LoginServiceImpl implements LoginService {
 
     }
 
-    @Override
-    public LoginResponse generateLoginResponse(Auth auth, String providedDeviceId) {
+  @Override
+  public LoginResponse generateLoginResponse(Auth auth) {
         if (!auth.getStatus().equals(Status.ACTIVE)) {
             switch (auth.getStatus()) {
                 case SLEEPING:
@@ -133,26 +133,7 @@ public class LoginServiceImpl implements LoginService {
                     break;
             }
         }
-
-        String deviceId = (providedDeviceId != null && !providedDeviceId.isEmpty())
-                ? providedDeviceId
-                : UUID.randomUUID().toString().substring(0, 4);
-
-        String accessToken = tokenUtil.generateAccessToken(auth.getId(), auth.getUserRole(), deviceId);
-        String refreshToken = tokenUtil.generateRefreshToken(auth.getId(), auth.getUserRole(), deviceId);
-
-        var response = new LoginResponse();
-        response.setAccessToken(accessToken);
-        response.setRefreshToken(refreshToken);
-        response.setDeviceId(deviceId);
-
-        LoginStatus loginStatus = LoginStatus.builder()
-                .lastLogin(LocalDateTime.now())
-                .build();
-
-        loginStatusRepository.save(loginStatus);
-
-        return response;
+    return generateResponse(auth);
     }
 
 

@@ -8,5 +8,5 @@ public interface LoginService {
 
   LoginResponse refreshToken(String refreshToken, String deviceId);
 
-  LoginResponse generateLoginResponse(Auth auth, String deviceId);
+  LoginResponse generateLoginResponse(Auth auth);
 }

@@ -29,21 +29,21 @@ public class SocialLoginService {
   private final SignupService signupService;
   private final LoginService loginService;
 
-  public LoginResponse kakaoLogin(String accessToken, String deviceId) {
+  public LoginResponse kakaoLogin(String accessToken) {
     KakaoUserInfo userInfo = kakaoOAuthClient.getUserInfo(accessToken);
     String email = userInfo.getEmail();
 
-    return processLogin(email, Provider.KAKAO, deviceId);
+    return processLogin(email, Provider.KAKAO);
   }
 
-  public LoginResponse appleLogin(String identityToken, String deviceId) {
+  public LoginResponse appleLogin(String identityToken) {
     AppleUserInfo userInfo = appleOAuthClient.getUserInfo(identityToken);
     String email = userInfo.getEmail();
 
-    return processLogin(email, Provider.APPLE, deviceId);
+    return processLogin(email, Provider.APPLE);
   }
 
-  private LoginResponse processLogin(String email, Provider provider, String deviceId) {
+  private LoginResponse processLogin(String email, Provider provider) {
     Auth auth = authRepository.findByEmail(email).orElse(null);
 
     if (auth == null) {
@@ -61,6 +61,6 @@ public class SocialLoginService {
       log.info("기존 사용자 로그인 처리: email={}, provider={}", email, provider);
     }
 
-    return loginService.generateLoginResponse(auth, deviceId);
+    return loginService.generateLoginResponse(auth);
   }
 }
