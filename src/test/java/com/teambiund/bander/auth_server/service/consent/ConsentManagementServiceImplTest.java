@@ -55,13 +55,11 @@ class ConsentManagementServiceImplTest {
 
             List<ConsentRequest> requests = List.of(
                     ConsentRequest.builder()
-                            .consentName("TERMS_OF_SERVICE")
-                            .version("v1.0")
+                            .consentId("test-consent-id-1")
                             .consented(true)
                             .build(),
                     ConsentRequest.builder()
-                            .consentName("PRIVACY_POLICY")
-                            .version("v1.0")
+                            .consentId("test-consent-id-2")
                             .consented(true)
                             .build()
             );
@@ -91,13 +89,11 @@ class ConsentManagementServiceImplTest {
 
             List<ConsentRequest> requests = List.of(
                     ConsentRequest.builder()
-                            .consentName("TERMS_OF_SERVICE")
-                            .version("v1.0")
+                            .consentId("test-consent-id-1")
                             .consented(true)
                             .build(),
                     ConsentRequest.builder()
-                            .consentName("MARKETING")
-                            .version("v1.0")
+                            .consentId("test-consent-id-3")
                             .consented(false)  // 동의하지 않음
                             .build()
             );
@@ -146,8 +142,7 @@ class ConsentManagementServiceImplTest {
 
             List<ConsentRequest> requests = List.of(
                     ConsentRequest.builder()
-                            .consentName("TERMS")
-                            .version("v1.0")
+                            .consentId("test-consent-id-1")
                             .consented(true)
                             .build()
             );
@@ -173,8 +168,7 @@ class ConsentManagementServiceImplTest {
 
             List<ConsentRequest> requests = List.of(
                     ConsentRequest.builder()
-                            .consentName("TERMS_OF_SERVICE")
-                            .version("v1.0")
+                            .consentId("test-consent-id-1")
                             .consented(true)
                             .build()
             );
@@ -217,8 +211,7 @@ class ConsentManagementServiceImplTest {
 
             List<ConsentRequest> requests = List.of(
                     ConsentRequest.builder()
-                            .consentName("PRIVACY_POLICY")
-                            .version("v1.0")
+                            .consentId("test-consent-id-2")
                             .consented(true)
                             .build()
             );
@@ -259,8 +252,7 @@ class ConsentManagementServiceImplTest {
 
             List<ConsentRequest> requests = List.of(
                     ConsentRequest.builder()
-                            .consentName("MARKETING")
-                            .version("v1.0")
+                            .consentId("test-consent-id-marketing")
                             .consented(false)  // 동의 철회
                             .build()
             );
@@ -424,8 +416,7 @@ class ConsentManagementServiceImplTest {
 
             List<ConsentRequest> initialRequests = List.of(
                     ConsentRequest.builder()
-                            .consentName("TERMS_OF_SERVICE")
-                            .version("v1.0")
+                            .consentId("test-consent-id-1")
                             .consented(true)
                             .build(),
                     ConsentRequest.builder()

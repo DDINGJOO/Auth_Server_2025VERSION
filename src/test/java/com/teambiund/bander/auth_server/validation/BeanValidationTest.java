@@ -40,8 +40,7 @@ class BeanValidationTest {
 
         List<ConsentRequest> consents = new ArrayList<>();
         ConsentRequest consent = new ConsentRequest();
-        consent.setConsentName("서비스 이용약관");
-        consent.setVersion("1.0");
+        consent.setConsentId("consent-id-1");
         consent.setConsented(true);
         consents.add(consent);
         request.setConsentReqs(consents);
@@ -64,8 +63,7 @@ class BeanValidationTest {
 
         List<ConsentRequest> consents = new ArrayList<>();
         ConsentRequest consent = new ConsentRequest();
-        consent.setConsentName("서비스 이용약관");
-        consent.setVersion("1.0");
+        consent.setConsentId("consent-id-1");
         consent.setConsented(true);
         consents.add(consent);
         request.setConsentReqs(consents);
@@ -90,8 +88,7 @@ class BeanValidationTest {
 
         List<ConsentRequest> consents = new ArrayList<>();
         ConsentRequest consent = new ConsentRequest();
-        consent.setConsentName("서비스 이용약관");
-        consent.setVersion("1.0");
+        consent.setConsentId("consent-id-1");
         consent.setConsented(true);
         consents.add(consent);
         request.setConsentReqs(consents);
@@ -116,8 +113,7 @@ class BeanValidationTest {
 
         List<ConsentRequest> consents = new ArrayList<>();
         ConsentRequest consent = new ConsentRequest();
-        consent.setConsentName("서비스 이용약관");
-        consent.setVersion("1.0");
+        consent.setConsentId("consent-id-1");
         consent.setConsented(true);
         consents.add(consent);
         request.setConsentReqs(consents);
@@ -142,8 +138,7 @@ class BeanValidationTest {
 
         List<ConsentRequest> consents = new ArrayList<>();
         ConsentRequest consent = new ConsentRequest();
-        consent.setConsentName("서비스 이용약관");
-        consent.setVersion("1.0");
+        consent.setConsentId("consent-id-1");
         consent.setConsented(true);
         consents.add(consent);
         request.setConsentReqs(consents);
@@ -168,8 +163,7 @@ class BeanValidationTest {
 
         List<ConsentRequest> consents = new ArrayList<>();
         ConsentRequest consent = new ConsentRequest();
-        consent.setConsentName("서비스 이용약관");
-        consent.setVersion("1.0");
+        consent.setConsentId("consent-id-1");
         consent.setConsented(true);
         consents.add(consent);
         request.setConsentReqs(consents);
@@ -256,8 +250,7 @@ class BeanValidationTest {
     void consentRequest_Valid() {
         // Given
         ConsentRequest request = new ConsentRequest();
-        request.setConsentName("서비스 이용약관");
-        request.setVersion("1.0");
+        request.setConsentId("consent-id-1");
         request.setConsented(true);
 
         // When
@@ -268,12 +261,11 @@ class BeanValidationTest {
     }
 
     @Test
-    @DisplayName("ConsentRequest - 동의 항목 이름 누락")
-    void consentRequest_BlankConsentName() {
+    @DisplayName("ConsentRequest - 동의 항목 ID 누락")
+    void consentRequest_BlankConsentId() {
         // Given
         ConsentRequest request = new ConsentRequest();
-        request.setConsentName("");
-        request.setVersion("1.0");
+        request.setConsentId("");
         request.setConsented(true);
 
         // When
@@ -282,25 +274,7 @@ class BeanValidationTest {
         // Then
         assertThat(violations).hasSize(1);
         assertThat(violations.iterator().next().getMessage())
-                .isEqualTo("동의 항목 이름은 필수입니다");
-    }
-
-    @Test
-    @DisplayName("ConsentRequest - 버전 누락")
-    void consentRequest_BlankVersion() {
-        // Given
-        ConsentRequest request = new ConsentRequest();
-        request.setConsentName("서비스 이용약관");
-        request.setVersion("");
-        request.setConsented(true);
-
-        // When
-        Set<ConstraintViolation<ConsentRequest>> violations = validator.validate(request);
-
-        // Then
-        assertThat(violations).hasSize(1);
-        assertThat(violations.iterator().next().getMessage())
-                .isEqualTo("동의 항목 버전은 필수입니다");
+                .isEqualTo("동의 항목 ID는 필수입니다");
     }
 
     @Test
@@ -421,8 +395,7 @@ class BeanValidationTest {
 
         List<ConsentRequest> consents = new ArrayList<>();
         ConsentRequest invalidConsent = new ConsentRequest();
-        invalidConsent.setConsentName("");  // 유효하지 않은 값
-        invalidConsent.setVersion("1.0");
+        invalidConsent.setConsentId("");  // 유효하지 않은 값
         invalidConsent.setConsented(true);
         consents.add(invalidConsent);
         request.setConsentReqs(consents);
@@ -433,7 +406,7 @@ class BeanValidationTest {
         // Then
         assertThat(violations).hasSize(1);
         assertThat(violations.iterator().next().getMessage())
-                .isEqualTo("동의 항목 이름은 필수입니다");
+                .isEqualTo("동의 항목 ID는 필수입니다");
     }
 
     @Test
