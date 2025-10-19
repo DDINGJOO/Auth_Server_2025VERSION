@@ -71,5 +71,11 @@ security:
   aes:
     encryption-key: default-aes-encryption-key-change-in-production
 
+oauth:
+  kakao:
+    user-info-uri: https://kapi.kakao.com/v2/user/me
+  apple:
+    issuer: https://appleid.apple.com
+
 
 

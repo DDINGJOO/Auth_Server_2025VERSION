@@ -50,6 +50,7 @@ public enum ErrorCode {
   DECRYPTION_ERROR("DECRYPTION_ERROR", "Decryption error", HttpStatus.INTERNAL_SERVER_ERROR),
   INVALID_EMAIL("INVALID_EMAIL", "Invalid email", HttpStatus.BAD_REQUEST),
   INVALID_PASSWORD("INVALID_PASSWORD", "Invalid password", HttpStatus.BAD_REQUEST),
+  SOCIAL_LOGIN_FAILED("SOCIAL_LOGIN_FAILED", "Social login failed", HttpStatus.UNAUTHORIZED),
   ;
 
   private final String errCode;
