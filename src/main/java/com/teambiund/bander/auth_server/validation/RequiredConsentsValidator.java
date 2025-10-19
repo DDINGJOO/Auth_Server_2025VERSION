@@ -1,10 +1,10 @@
 package com.teambiund.bander.auth_server.validation;
 
-import static com.teambiund.bander.auth_server.util.data.ConsentTable_init.requiredConsents;
-import static com.teambiund.bander.auth_server.util.data.ConsentTable_init.consentsAllMaps;
+import static com.teambiund.bander.auth_server.util.data.ConsentTableInit.requiredConsents;
+import static com.teambiund.bander.auth_server.util.data.ConsentTableInit.consentsAllMaps;
 
 import com.teambiund.bander.auth_server.dto.request.ConsentRequest;
-import com.teambiund.bander.auth_server.entity.consents_name.ConsentsTable;
+import com.teambiund.bander.auth_server.entity.consentsname.ConsentsTable;
 import jakarta.validation.ConstraintValidator;
 import jakarta.validation.ConstraintValidatorContext;
 import java.util.List;

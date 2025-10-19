@@ -1,6 +1,6 @@
 package com.teambiund.bander.auth_server.service.consent;
 
-import static com.teambiund.bander.auth_server.util.data.ConsentTable_init.consentsAllMaps;
+import static com.teambiund.bander.auth_server.util.data.ConsentTableInit.consentsAllMaps;
 import static org.assertj.core.api.Assertions.*;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyString;
@@ -9,7 +9,7 @@ import static org.mockito.Mockito.*;
 import com.teambiund.bander.auth_server.dto.request.ConsentRequest;
 import com.teambiund.bander.auth_server.entity.Auth;
 import com.teambiund.bander.auth_server.entity.Consent;
-import com.teambiund.bander.auth_server.entity.consents_name.ConsentsTable;
+import com.teambiund.bander.auth_server.entity.consentsname.ConsentsTable;
 import com.teambiund.bander.auth_server.enums.Status;
 import com.teambiund.bander.auth_server.exceptions.CustomException;
 import com.teambiund.bander.auth_server.exceptions.ErrorCode.ErrorCode;

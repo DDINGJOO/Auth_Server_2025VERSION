@@ -1,4 +1,4 @@
-package com.teambiund.bander.auth_server.aop.statictics;
+package com.teambiund.bander.auth_server.aop.statistics;
 
 import jakarta.servlet.http.HttpServletRequest;
 import java.util.concurrent.CompletableFuture;

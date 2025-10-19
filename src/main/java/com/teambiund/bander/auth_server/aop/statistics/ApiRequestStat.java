@@ -1,4 +1,4 @@
-package com.teambiund.bander.auth_server.aop.statictics;
+package com.teambiund.bander.auth_server.aop.statistics;
 
 
 import com.teambiund.bander.auth_server.util.generator.key.KeyProvider;

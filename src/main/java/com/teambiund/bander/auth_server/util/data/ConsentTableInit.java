@@ -1,7 +1,7 @@
 package com.teambiund.bander.auth_server.util.data;
 
 
-import com.teambiund.bander.auth_server.entity.consents_name.ConsentsTable;
+import com.teambiund.bander.auth_server.entity.consentsname.ConsentsTable;
 import com.teambiund.bander.auth_server.repository.ConsentTableRepository;
 import jakarta.annotation.PostConstruct;
 import java.util.ArrayList;
@@ -19,7 +19,7 @@ import org.springframework.stereotype.Component;
  */
 @Component
 @RequiredArgsConstructor
-public class ConsentTable_init {
+public class ConsentTableInit {
     public static final HashMap<String, ConsentsTable> consentMaps = new HashMap<>();
     public static final List<ConsentsTable> requiredConsents = new ArrayList<>();
     public static final HashMap<String, ConsentsTable> consentsAllMaps = new HashMap<>();

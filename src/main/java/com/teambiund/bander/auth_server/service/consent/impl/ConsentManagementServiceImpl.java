@@ -1,11 +1,11 @@
 package com.teambiund.bander.auth_server.service.consent.impl;
 
-import static com.teambiund.bander.auth_server.util.data.ConsentTable_init.consentsAllMaps;
+import static com.teambiund.bander.auth_server.util.data.ConsentTableInit.consentsAllMaps;
 
 import com.teambiund.bander.auth_server.dto.request.ConsentRequest;
 import com.teambiund.bander.auth_server.entity.Auth;
 import com.teambiund.bander.auth_server.entity.Consent;
-import com.teambiund.bander.auth_server.entity.consents_name.ConsentsTable;
+import com.teambiund.bander.auth_server.entity.consentsname.ConsentsTable;
 import com.teambiund.bander.auth_server.exceptions.CustomException;
 import com.teambiund.bander.auth_server.exceptions.ErrorCode.ErrorCode;
 import com.teambiund.bander.auth_server.repository.AuthRepository;
