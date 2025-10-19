@@ -24,16 +24,14 @@ public class SocialLoginController {
   @PostMapping("/kakao")
   public ResponseEntity<LoginResponse> kakaoLogin(@Valid @RequestBody SocialLoginRequest request) {
     log.info("카카오 로그인 요청");
-    LoginResponse response =
-        socialLoginService.kakaoLogin(request.getAccessToken(), request.getDeviceId());
+    LoginResponse response = socialLoginService.kakaoLogin(request.getAccessToken());
     return new ResponseEntity<>(response, HttpStatus.OK);
   }
 
   @PostMapping("/apple")
   public ResponseEntity<LoginResponse> appleLogin(@Valid @RequestBody SocialLoginRequest request) {
     log.info("애플 로그인 요청");
-    LoginResponse response =
-        socialLoginService.appleLogin(request.getAccessToken(), request.getDeviceId());
+    LoginResponse response = socialLoginService.appleLogin(request.getAccessToken());
     return new ResponseEntity<>(response, HttpStatus.OK);
   }
 }
