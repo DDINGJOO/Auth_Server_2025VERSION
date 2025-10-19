@@ -1,8 +1,11 @@
 package com.teambiund.bander.auth_server.service.consent.impl;
 
+import static com.teambiund.bander.auth_server.util.data.ConsentTable_init.consentsAllMaps;
+
 import com.teambiund.bander.auth_server.dto.request.ConsentRequest;
 import com.teambiund.bander.auth_server.entity.Auth;
 import com.teambiund.bander.auth_server.entity.Consent;
+import com.teambiund.bander.auth_server.entity.consents_name.ConsentsTable;
 import com.teambiund.bander.auth_server.exceptions.CustomException;
 import com.teambiund.bander.auth_server.exceptions.ErrorCode.ErrorCode;
 import com.teambiund.bander.auth_server.repository.AuthRepository;
@@ -25,6 +28,7 @@ public class ConsentManagementServiceImpl implements ConsentManagementService {
 
     /**
      * 회원가입 시 동의 정보 저장
+     * - consentId로 ConsentsTable 조회
      * - Auth 엔티티의 편의 메서드를 사용하여 양방향 연관관계 설정
      * - Cascade 설정으로 Consent 엔티티 자동 저장
      */
@@ -34,12 +38,18 @@ public class ConsentManagementServiceImpl implements ConsentManagementService {
                 .toList();
 
         for (ConsentRequest request : consents) {
+            // consentId로 ConsentsTable 조회
+            ConsentsTable consentTable = consentsAllMaps.get(request.getConsentId());
+            if (consentTable == null) {
+                throw new CustomException(ErrorCode.CONSENT_NOT_VALID);
+            }
+
             Consent consent = Consent.builder()
                     .id(keyProvider.generateKey())
                     .agreementAt(LocalDateTime.now())
-                    .version(request.getVersion())
-                    .consentType(request.getConsentName())
-                    .consentUrl(request.getVersion())
+                    .version(consentTable.getVersion())
+                    .consentType(consentTable.getConsentName())
+                    .consentUrl(consentTable.getConsentUrl())
                     .build();
 
             // 편의 메서드 사용 - 양방향 연관관계 설정
@@ -48,12 +58,13 @@ public class ConsentManagementServiceImpl implements ConsentManagementService {
 
         // CascadeType.ALL로 인해 auth의 consent 컬렉션도 자동 저장됨
         // 하지만 명시적으로 save를 호출하는 것이 더 명확함
-        // authRepository.save(auth); // 이미 영속 상태라면 불필요
+         authRepository.save(auth);
     }
 
 
     /**
      * 동의 정보 변경
+     * - consentId로 ConsentsTable 조회
      * - Auth 엔티티의 편의 메서드를 사용하여 양방향 연관관계 관리
      * - orphanRemoval=true 설정으로 삭제된 Consent 자동 제거
      * - Fetch Join을 사용하여 N+1 문제 방지
@@ -71,7 +82,13 @@ public class ConsentManagementServiceImpl implements ConsentManagementService {
                 .collect(Collectors.toMap(Consent::getConsentType, c -> c));
 
         for (ConsentRequest r : req) {
-            String type = r.getConsentName();
+            // consentId로 ConsentsTable 조회
+            ConsentsTable consentTable = consentsAllMaps.get(r.getConsentId());
+            if (consentTable == null) {
+                throw new CustomException(ErrorCode.CONSENT_NOT_VALID);
+            }
+
+            String type = consentTable.getConsentName();
             boolean consented = r.isConsented();
 
             if (consented) {
@@ -79,8 +96,8 @@ public class ConsentManagementServiceImpl implements ConsentManagementService {
                 if (!authConsentMap.containsKey(type)) {
                     Consent newConsent = Consent.builder()
                             .id(keyProvider.generateKey())
-                            .version(r.getVersion())
-                            .consentUrl(r.getVersion())
+                            .version(consentTable.getVersion())
+                            .consentUrl(consentTable.getConsentUrl())
                             .consentType(type)
                             .agreementAt(LocalDateTime.now())
                             .build();

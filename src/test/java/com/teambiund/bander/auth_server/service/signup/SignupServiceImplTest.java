@@ -64,8 +64,7 @@ class SignupServiceImplTest {
             String passConfirm = "Password123!";
             List<ConsentRequest> consentReqs = List.of(
                     ConsentRequest.builder()
-                            .consentName("TERMS_OF_SERVICE")
-                            .version("v1.0")
+                            .consentId("test-consent-id-1")
                             .consented(true)
                             .build()
             );
@@ -174,8 +173,8 @@ class SignupServiceImplTest {
             String password = "Password123!";
             String passConfirm = "Password123!";
             List<ConsentRequest> consentReqs = List.of(
-                    ConsentRequest.builder().consentName("TERMS").version("v1.0").consented(true).build(),
-                    ConsentRequest.builder().consentName("PRIVACY").version("v1.0").consented(true).build()
+                    ConsentRequest.builder().consentId("test-consent-id-1").consented(true).build(),
+                    ConsentRequest.builder().consentId("test-consent-id-2").consented(true).build()
             );
 
             Auth expectedAuth = Auth.builder()
@@ -325,7 +324,7 @@ class SignupServiceImplTest {
             String password = "Password123!";
             String passConfirm = "Password123!";
             List<ConsentRequest> consentReqs = List.of(
-                    ConsentRequest.builder().consentName("TERMS").version("v1.0").consented(true).build()
+                    ConsentRequest.builder().consentId("test-consent-id-1").consented(true).build()
             );
 
             Auth expectedAuth = Auth.builder()
@@ -427,7 +426,7 @@ class SignupServiceImplTest {
             String password = "Password123!";
             String passConfirm = "Password123!";
             List<ConsentRequest> consentReqs = List.of(
-                    ConsentRequest.builder().consentName("TERMS").version("v1.0").consented(true).build()
+                    ConsentRequest.builder().consentId("test-consent-id-1").consented(true).build()
             );
 
             Auth expectedAuth = Auth.builder().id("user-id").provider(Provider.SYSTEM).build();

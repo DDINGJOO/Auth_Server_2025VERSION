@@ -10,11 +10,8 @@ import lombok.*;
 @AllArgsConstructor
 @Builder
 public class ConsentRequest {
-  @NotBlank(message = "동의 항목 이름은 필수입니다")
-  private String consentName;
-
-  @NotBlank(message = "동의 항목 버전은 필수입니다")
-  private String version;
+  @NotBlank(message = "동의 항목 ID는 필수입니다")
+  private String consentId;
 
   private boolean consented;
 }
