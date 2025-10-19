@@ -1,9 +1,9 @@
 package com.teambiund.bander.auth_server.controller.enums;
 
-import static com.teambiund.bander.auth_server.util.data.ConsentTable_init.consentMaps;
-import static com.teambiund.bander.auth_server.util.data.ConsentTable_init.consentsAllMaps;
+import static com.teambiund.bander.auth_server.util.data.ConsentTableInit.consentMaps;
+import static com.teambiund.bander.auth_server.util.data.ConsentTableInit.consentsAllMaps;
 
-import com.teambiund.bander.auth_server.entity.consents_name.ConsentsTable;
+import com.teambiund.bander.auth_server.entity.consentsname.ConsentsTable;
 import java.util.Map;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;

@@ -8,7 +8,7 @@ import org.springframework.web.bind.annotation.RestController;
 @RestController
 @RequestMapping("/health")
 @Slf4j
-public class healthCheckController {
+public class HealthCheckController {
 
   @GetMapping
   public String healthCheck() {

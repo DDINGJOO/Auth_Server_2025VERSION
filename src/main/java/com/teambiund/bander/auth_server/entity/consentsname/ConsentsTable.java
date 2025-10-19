@@ -1,4 +1,4 @@
-package com.teambiund.bander.auth_server.entity.consents_name;
+package com.teambiund.bander.auth_server.entity.consentsname;
 
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
