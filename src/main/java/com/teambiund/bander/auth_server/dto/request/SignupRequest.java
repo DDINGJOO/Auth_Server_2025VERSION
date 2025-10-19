@@ -8,16 +8,16 @@ import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Pattern;
 import java.util.List;
-import lombok.Data;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.Setter;
+
+import lombok.*;
 
 @Data
 @Setter
 @Getter
 @NoArgsConstructor
 @PasswordMatches
+@Builder
+@AllArgsConstructor
 public class SignupRequest
 {
 

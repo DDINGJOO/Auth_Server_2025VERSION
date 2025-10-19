@@ -1,13 +1,12 @@
 package com.teambiund.bander.auth_server.service.signup;
 
-import com.teambiund.bander.auth_server.dto.request.ConsentRequest;
+import com.teambiund.bander.auth_server.dto.request.SignupRequest;
 import com.teambiund.bander.auth_server.entity.Auth;
 import com.teambiund.bander.auth_server.enums.Provider;
-import com.teambiund.bander.auth_server.event.events.CreateProfileRequest;
+import com.teambiund.bander.auth_server.event.events.CreatedUserEvent;
 import com.teambiund.bander.auth_server.event.publish.CreateProfileRequestEventPub;
 import com.teambiund.bander.auth_server.service.consent.ConsentManagementService;
 import com.teambiund.bander.auth_server.service.update.EmailConfirm;
-import java.util.List;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -22,15 +21,14 @@ public class SignupServiceImpl implements SignupService {
   private final EmailConfirm emailConfirm;
 
   @Override
-  public Auth signup(
-      String email, String password, String passConfirm, List<ConsentRequest> consentReqs) {
-    emailConfirm.checkedConfirmedEmail(email);
+  public Auth signup(SignupRequest request) {
+    emailConfirm.checkedConfirmedEmail(request.getEmail());
 
-    var auth = signupStoreService.signup(email, password, passConfirm);
+    var auth = signupStoreService.signup(request.getEmail(), request.getPassword());
     publishEvent.createProfileRequestPub(
-        new CreateProfileRequest(auth.getId(), auth.getProvider().toString()));
+        new CreatedUserEvent(auth.getId(), auth.getProvider().toString()));
 
-    consentService.saveConsent(auth, consentReqs);
+    consentService.saveConsent(auth, request.getConsentReqs());
     return auth;
   }
 
@@ -38,7 +36,7 @@ public class SignupServiceImpl implements SignupService {
   public Auth signupFromOtherProvider(String email, Provider provider) {
     var auth = signupStoreService.signupFromOtherProvider(email, provider);
     publishEvent.createProfileRequestPub(
-        new CreateProfileRequest(auth.getId(), auth.getProvider().toString()));
+        new CreatedUserEvent(auth.getId(), auth.getProvider().toString()));
     return auth;
   }
 }

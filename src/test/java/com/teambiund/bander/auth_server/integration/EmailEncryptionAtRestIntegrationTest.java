@@ -92,7 +92,7 @@ public class EmailEncryptionAtRestIntegrationTest {
         when(keyProvider.generateKey()).thenReturn("new-user-id");
 
         // when & then: 평문 이메일로 가입 시도하면 중복으로 예외
-        assertThatThrownBy(() -> signupStoreService.signup(plainEmail, "NewPass123!", "NewPass123!"))
+        assertThatThrownBy(() -> signupStoreService.signup(plainEmail, "NewPass123!"))
                 .isInstanceOf(CustomException.class)
                 .hasMessageContaining(ErrorCode.EMAIL_ALREADY_EXISTS.name());
     }

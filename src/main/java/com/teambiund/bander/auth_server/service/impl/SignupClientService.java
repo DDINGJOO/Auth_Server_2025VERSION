@@ -26,7 +26,7 @@ public class SignupClientService implements SignupClientInterface {
     @Override
     @Transactional
     public void signup(SignupRequest request) throws CustomException {
-        Auth auth = signupStoreService.signup(request.getEmail(), request.getPassword(), request.getPasswordConfirm());
+        Auth auth = signupStoreService.signup(request.getEmail(), request.getPassword());
         consentService.saveConsent(auth, request.getConsentReqs());
 
     }

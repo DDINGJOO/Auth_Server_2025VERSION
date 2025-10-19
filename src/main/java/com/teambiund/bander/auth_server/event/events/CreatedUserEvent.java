@@ -9,7 +9,7 @@ import lombok.Setter;
 @Setter
 @NoArgsConstructor
 @AllArgsConstructor
-public class CreateProfileRequest {
+public class CreatedUserEvent {
   private String userId;
   private String provider;
 }

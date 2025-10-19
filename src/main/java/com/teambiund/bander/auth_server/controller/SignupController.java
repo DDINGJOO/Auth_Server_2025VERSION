@@ -21,8 +21,7 @@ public class SignupController {
   public ResponseEntity<Boolean> signup(@Valid @RequestBody SignupRequest req)
       throws CustomException {
 
-    signupStoreService.signup(
-        req.getEmail(), req.getPassword(), req.getPasswordConfirm(), req.getConsentReqs());
+    signupStoreService.signup(req);
     return ResponseEntity.ok(true);
   }
 }
