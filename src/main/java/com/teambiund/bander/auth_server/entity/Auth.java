@@ -1,6 +1,7 @@
 package com.teambiund.bander.auth_server.entity;
 
 
+import com.teambiund.bander.auth_server.entity.consentsname.ConsentsTable;
 import com.teambiund.bander.auth_server.enums.Provider;
 import com.teambiund.bander.auth_server.enums.Role;
 import com.teambiund.bander.auth_server.enums.Status;
@@ -175,6 +176,41 @@ public class Auth
         this.status = Status.ACTIVE;
         this.deletedAt = null;
         this.withdraw = null;
+    }
+	
+    /**
+     * ConsentsTable을 이용한 Consent 추가 헬퍼 메서드
+     * Service 레이어에서 ID와 시간을 주입받아 사용
+     *
+     * @param consentId ID (Service에서 생성)
+     * @param consentsTable 동의 유형 테이블
+     * @param consentedAt 동의 시각 (Service에서 생성)
+     */
+    public void addConsentWithTable(String consentId, ConsentsTable consentsTable, LocalDateTime consentedAt) {
+        Consent consent = Consent.builder()
+                .id(consentId)
+                .consentedAt(consentedAt)
+                .build();
+        consent.setConsentsTable(consentsTable);
+        this.addConsent(consent);
+    }
+
+    /**
+     * ConsentsTable 기준으로 Consent 제거 편의 메서드
+     * 특정 동의 유형의 모든 동의 기록을 제거
+     */
+    public void removeConsentByTable(ConsentsTable consentsTable) {
+        this.consent.removeIf(c -> c.getConsentsTable() != null
+                && c.getConsentsTable().getConsentName().equals(consentsTable.getConsentName()));
+    }
+
+    /**
+     * ConsentsTable ID 기준으로 Consent 존재 여부 확인
+     */
+    public boolean hasConsentForTable(String consentTableId) {
+        return this.consent.stream()
+                .anyMatch(c -> c.getConsentsTable() != null
+                        && c.getConsentsTable().getId().equals(consentTableId));
     }
 
 }

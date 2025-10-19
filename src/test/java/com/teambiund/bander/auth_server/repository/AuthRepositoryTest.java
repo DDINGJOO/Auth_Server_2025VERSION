@@ -5,6 +5,7 @@ import static org.mockito.Mockito.mock;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.teambiund.bander.auth_server.entity.*;
+import com.teambiund.bander.auth_server.entity.consentsname.ConsentsTable;
 import com.teambiund.bander.auth_server.enums.Provider;
 import com.teambiund.bander.auth_server.enums.Role;
 import com.teambiund.bander.auth_server.enums.Status;
@@ -259,18 +260,35 @@ public class AuthRepositoryTest {
         // given
         Auth auth = createTestAuth("consent@example.com");
 
+        // ConsentsTable은 먼저 영속화해야 함 (참조 무결성)
+        ConsentsTable consentTable1 = ConsentsTable.builder()
+                .id("consent-table-1")
+		    .consentName("Privacy Policy")
+		    .consentUrl("https://example.com/privacy")
+		    .version("1.0")
+		    .required(true)
+		    .build();
+        em.persist(consentTable1);
+
+	  ConsentsTable consentTable2 = ConsentsTable.builder()
+                .id("consent-table-2")
+			  .consentName("Terms of Service")
+			  .consentUrl("https://example.com/terms")
+			  .version("1.0")
+			  .required(true)
+			  .build();
+        em.persist(consentTable2);
+
         Consent consent1 = Consent.builder()
                 .id("consent-1")
-                .consentType("PRIVACY")
-                .version("1.0")
-                .agreementAt(LocalDateTime.now())
+		        .consentsTable(consentTable1)
+		        .consentedAt(LocalDateTime.now())
                 .build();
 
         Consent consent2 = Consent.builder()
                 .id("consent-2")
-                .consentType("TERMS")
-                .version("1.0")
-                .agreementAt(LocalDateTime.now())
+		        .consentsTable(consentTable2)
+		        .consentedAt(LocalDateTime.now())
                 .build();
 
         auth.addConsent(consent1);
@@ -284,9 +302,8 @@ public class AuthRepositoryTest {
         // then
         Auth saved = authRepository.findById(auth.getId()).orElseThrow();
         assertThat(saved.getConsent()).hasSize(2);
-        assertThat(saved.getConsent())
-                .extracting(Consent::getConsentType)
-                .containsExactlyInAnyOrder("PRIVACY", "TERMS");
+        assertThat(saved.getConsent()).extracting(Consent::getId)
+		        .contains("consent-1", "consent-2");
     }
 
     @Test
@@ -295,22 +312,25 @@ public class AuthRepositoryTest {
         // given
         Auth auth = createTestAuth("orphan@example.com");
 
-        Consent consent1 = Consent.builder()
-                .id("consent-1")
-                .consentType("PRIVACY")
-                .version("1.0")
-                .agreementAt(LocalDateTime.now())
-                .build();
+        // ConsentsTable 먼저 영속화
+	    ConsentsTable consentTable1 = ConsentsTable.builder()
+                .id("consent-table-orphan-1")
+			    .consentName("Privacy Policy")
+			    .consentUrl("https://example.com/privacy")
+			    .version("1.0")
+			    .required(true)
+			    .build();
+        em.persist(consentTable1);
 
-        Consent consent2 = Consent.builder()
-                .id("consent-2")
-                .consentType("TERMS")
-                .version("1.0")
-                .agreementAt(LocalDateTime.now())
-                .build();
+	    Consent consent1 = Consent.builder()
+			    .id("consent-1")
+			    .consentsTable(consentTable1)
+			    .consentedAt(LocalDateTime.now())
+			    .build();
 
-        auth.addConsent(consent1);
-        auth.addConsent(consent2);
+
+	    auth.addConsent(consent1);
+
         authRepository.save(auth);
         em.flush();
         em.clear();
@@ -325,7 +345,7 @@ public class AuthRepositoryTest {
 
         // then
         Auth result = authRepository.findById(auth.getId()).orElseThrow();
-        assertThat(result.getConsent()).hasSize(1);
+        assertThat(result.getConsent()).isEmpty();  // 제거되어야 하므로 0개
     }
 
     @Test
@@ -458,14 +478,39 @@ public class AuthRepositoryTest {
         // given
         Auth auth = createTestAuth("withconsent@example.com");
 
-        Consent consent = Consent.builder()
-                .id("consent-1")
-                .consentType("PRIVACY")
-                .version("1.0")
-                .agreementAt(LocalDateTime.now())
-                .build();
+        // ConsentsTable 먼저 영속화
+	    ConsentsTable consentTable1 = ConsentsTable.builder()
+                .id("consent-table-with-1")
+			    .consentName("Privacy Policy")
+			    .consentUrl("https://example.com/privacy")
+			    .version("1.0")
+			    .required(true)
+			    .build();
+        em.persist(consentTable1);
 
-        auth.addConsent(consent);
+	    ConsentsTable consentTable2 = ConsentsTable.builder()
+                .id("consent-table-with-2")
+			    .consentName("Terms of Service")
+			    .consentUrl("https://example.com/terms")
+			    .version("1.0")
+			    .required(true)
+			    .build();
+        em.persist(consentTable2);
+
+	    Consent consent1 = Consent.builder()
+			    .id("consent-1")
+			    .consentsTable(consentTable1)
+			    .consentedAt(LocalDateTime.now())
+			    .build();
+
+	    Consent consent2 = Consent.builder()
+			    .id("consent-2")
+			    .consentsTable(consentTable2)
+			    .consentedAt(LocalDateTime.now())
+			    .build();
+
+	    auth.addConsent(consent1);
+
         authRepository.save(auth);
         em.flush();
         em.clear();
@@ -476,7 +521,9 @@ public class AuthRepositoryTest {
         // then
         assertThat(result).isPresent();
         assertThat(result.get().getConsent()).hasSize(1);
-        assertThat(result.get().getConsent().get(0).getConsentType()).isEqualTo("PRIVACY");
+		assertThat(result.get().getConsent().get(0).getConsentedAt()).isEqualTo(consent1.getConsentedAt());
+	    assertThat(result.get().getConsent().get(0).getConsentsTable().getConsentName()).isEqualTo(consent1.getConsentsTable().getConsentName());
+		
     }
 
     @Test
@@ -500,16 +547,26 @@ public class AuthRepositoryTest {
     @DisplayName("[성공] findByIdWithConsent")
     void findByIdWithConsent() {
         // given
-        Auth auth = createTestAuth("idconsent@example.com");
+	    Auth auth = createTestAuth("withconsent@example.com");
 
-        Consent consent = Consent.builder()
-                .id("consent-1")
-                .consentType("TERMS")
-                .version("2.0")
-                .agreementAt(LocalDateTime.now())
-                .build();
+        // ConsentsTable 먼저 영속화
+	    ConsentsTable consentTable1 = ConsentsTable.builder()
+                .id("consent-table-findbyid")
+			    .consentName("Privacy Policy")
+			    .consentUrl("https://example.com/privacy")
+			    .version("1.0")
+			    .required(true)
+			    .build();
+        em.persist(consentTable1);
 
-        auth.addConsent(consent);
+	    Consent consent1 = Consent.builder()
+			    .id("consent-1")
+			    .consentsTable(consentTable1)
+			    .consentedAt(LocalDateTime.now())
+			    .build();
+
+
+        auth.addConsent(consent1);
         authRepository.save(auth);
         em.flush();
         em.clear();
@@ -520,7 +577,7 @@ public class AuthRepositoryTest {
         // then
         assertThat(result).isPresent();
         assertThat(result.get().getConsent()).hasSize(1);
-        assertThat(result.get().getConsent().get(0).getVersion()).isEqualTo("2.0");
+        assertThat(result.get().getConsent().get(0).getConsentsTable().getVersion()).isEqualTo("1.0");
     }
 
     @Test
@@ -575,13 +632,22 @@ public class AuthRepositoryTest {
         em.clear();
         assertThat(authRepository.existsByEmail("lifecycle@example.com")).isTrue();
 
+        // ConsentsTable 먼저 영속화
+		ConsentsTable consentsTable = ConsentsTable.builder()
+				.id("consent-table-lifecycle")
+				.consentName("PRIVACY")
+				.consentUrl("https://example.com/privacy")
+				.version("1.0")
+				.required(false)
+				.build();
+        em.persist(consentsTable);
+
         // 2. 동의서 추가
         auth = authRepository.findById(saved.getId()).orElseThrow();
         Consent consent = Consent.builder()
                 .id("consent-lifecycle")
-                .consentType("PRIVACY")
-                .version("1.0")
-                .agreementAt(LocalDateTime.now())
+		        .consentsTable(consentsTable)
+		        .consentedAt(LocalDateTime.now())
                 .build();
         auth.addConsent(consent);
         authRepository.save(auth);
@@ -669,11 +735,20 @@ public class AuthRepositoryTest {
         Auth auth = createTestAuth("manyconsents@example.com");
 
         for (int i = 0; i < 30; i++) {
+            // ConsentsTable 먼저 영속화
+			ConsentsTable consentsTable = ConsentsTable.builder()
+					.id("consent-table-" + i)
+					.consentName("PRIVACY")
+					.consentUrl("https://example.com/privacy")
+					.version("1.0")
+					.required(false)
+					.build();
+            em.persist(consentsTable);
+
             Consent consent = Consent.builder()
                     .id("consent-" + i)
-                    .consentType("TYPE-" + i)
-                    .version("1.0")
-                    .agreementAt(LocalDateTime.now())
+		            .consentsTable(consentsTable)
+		            .consentedAt(LocalDateTime.now())
                     .build();
             auth.addConsent(consent);
         }

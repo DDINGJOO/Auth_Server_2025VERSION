@@ -2,6 +2,7 @@ package com.teambiund.bander.auth_server.entity;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
+import com.teambiund.bander.auth_server.entity.consentsname.ConsentsTable;
 import com.teambiund.bander.auth_server.enums.Provider;
 import com.teambiund.bander.auth_server.enums.Role;
 import com.teambiund.bander.auth_server.enums.Status;
@@ -67,13 +68,17 @@ class AuthTest {
     @Test
     @DisplayName("Consent 추가 편의 메서드 테스트")
     void addConsent() {
-        // given
-        Consent consent = Consent.builder()
-                .id("consent-id")
-                .consentType("PRIVACY")
-                .version("1.0")
-                .agreementAt(LocalDateTime.now())
-                .build();
+    // given
+    Consent consent =
+        Consent.builder()
+		        .id("consent-id")
+		        .consentsTable(ConsentsTable.builder()
+				        .id("consent-table-id")
+				        .required(true)
+				        .version("1.0")
+				        .consentName("PRIVACY")
+				        .build())
+		        .build();
 
         // when
         auth.addConsent(consent);
@@ -88,12 +93,17 @@ class AuthTest {
     @DisplayName("Consent 제거 편의 메서드 테스트")
     void removeConsent() {
         // given
-        Consent consent = Consent.builder()
-                .id("consent-id")
-                .consentType("PRIVACY")
-                .version("1.0")
-                .agreementAt(LocalDateTime.now())
-                .build();
+	    Consent consent =
+			    Consent.builder()
+					    .id("consent-id")
+					    .consentsTable(ConsentsTable.builder()
+							    .id("consent-table-id")
+							    .required(true)
+							    .version("1.0")
+							    .consentName("PRIVACY")
+							    .build())
+					    .build();
+
         auth.addConsent(consent);
 
         // when
@@ -103,6 +113,7 @@ class AuthTest {
         assertThat(auth.getConsent()).isEmpty();
         assertThat(consent.getUser()).isNull();
     }
+	
 
     @Test
     @DisplayName("Withdraw 설정 편의 메서드 테스트")
@@ -225,19 +236,27 @@ class AuthTest {
     @DisplayName("여러 Consent 추가 및 제거 테스트")
     void addAndRemoveMultipleConsents() {
         // given
-        Consent consent1 = Consent.builder()
-                .id("consent-id-1")
-                .consentType("PRIVACY")
-                .version("1.0")
-                .agreementAt(LocalDateTime.now())
-                .build();
-
-        Consent consent2 = Consent.builder()
-                .id("consent-id-2")
-                .consentType("TERMS")
-                .version("1.0")
-                .agreementAt(LocalDateTime.now())
-                .build();
+	    Consent consent1 =
+			    Consent.builder()
+					    .id("consent-id")
+					    .consentsTable(ConsentsTable.builder()
+							    .id("consent-table-id")
+							    .required(true)
+							    .version("1.0")
+							    .consentName("PRIVACY")
+							    .build())
+					    .build();
+	    
+	    Consent consent2 =
+			    Consent.builder()
+					    .id("consent-id")
+					    .consentsTable(ConsentsTable.builder()
+							    .id("consent-table-id1")
+							    .required(true)
+							    .version("1.0")
+							    .consentName("TERMS")
+							    .build())
+					    .build();
 
         // when
         auth.addConsent(consent1);
@@ -379,19 +398,30 @@ class AuthTest {
     @DisplayName("[엣지 케이스] 존재하지 않는 Consent 제거 시도")
     void removeNonExistentConsent() {
         // given
-        Consent consent1 = Consent.builder()
-                .id("consent-1")
-                .consentType("PRIVACY")
-                .version("1.0")
-                .agreementAt(LocalDateTime.now())
-                .build();
+	    Consent consent1 =
+			    Consent.builder()
+					    .id("consent-id")
+					    .consentsTable(ConsentsTable.builder()
+							    .id("consent-table-id")
+							    .required(true)
+							    .version("1.0")
+							    .consentName("PRIVACY")
+							    .build())
+					    .build();
+	    
+	    Consent consent2 =
+			    Consent.builder()
+					    .id("consent-id")
+					    .consentsTable(ConsentsTable.builder()
+							    .id("consent-table-id1")
+							    .required(true)
+							    .version("1.0")
+							    .consentName("TERMS")
+							    .build())
+					    .build();
 
-        Consent consent2 = Consent.builder()
-                .id("consent-2")
-                .consentType("TERMS")
-                .version("1.0")
-                .agreementAt(LocalDateTime.now())
-                .build();
+
+
 
         auth.addConsent(consent1);
 
@@ -554,13 +584,17 @@ class AuthTest {
                 .afterColumnValue("new@example.com")
                 .updatedAt(LocalDateTime.now())
                 .build();
-
-        Consent consent = Consent.builder()
-                .id("consent-id")
-                .consentType("PRIVACY")
-                .version("1.0")
-                .agreementAt(LocalDateTime.now())
-                .build();
+	    
+	    Consent consent =
+			    Consent.builder()
+					    .id("consent-id")
+					    .consentsTable(ConsentsTable.builder()
+							    .id("consent-table-id")
+							    .required(true)
+							    .version("1.0")
+							    .consentName("PRIVACY")
+							    .build())
+					    .build();
 
         Withdraw withdraw = Withdraw.builder()
                 .withdrawReason("탈퇴 사유")

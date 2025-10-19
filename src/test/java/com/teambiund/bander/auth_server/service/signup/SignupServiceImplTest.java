@@ -5,10 +5,11 @@ import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.*;
 
 import com.teambiund.bander.auth_server.dto.request.ConsentRequest;
+import com.teambiund.bander.auth_server.dto.request.SignupRequest;
 import com.teambiund.bander.auth_server.entity.Auth;
 import com.teambiund.bander.auth_server.enums.Provider;
 import com.teambiund.bander.auth_server.enums.Status;
-import com.teambiund.bander.auth_server.event.events.CreateProfileRequest;
+import com.teambiund.bander.auth_server.event.events.CreatedUserEvent;
 import com.teambiund.bander.auth_server.event.publish.CreateProfileRequestEventPub;
 import com.teambiund.bander.auth_server.exceptions.CustomException;
 import com.teambiund.bander.auth_server.exceptions.ErrorCode.ErrorCode;
@@ -76,11 +77,16 @@ class SignupServiceImplTest {
                     .provider(Provider.SYSTEM)
                     .status(Status.ACTIVE)
                     .build();
-
-            when(signupStoreService.signup(email, password, passConfirm)).thenReturn(expectedAuth);
+	        SignupRequest req = SignupRequest.builder()
+			        .email(email)
+			        .password(password)
+			        .passwordConfirm(passConfirm)
+			        .consentReqs(consentReqs)
+                    .build();
+            when(signupStoreService.signup(email, password)).thenReturn(expectedAuth);
 
             // when
-            Auth result = signupService.signup(email, password, passConfirm, consentReqs);
+            Auth result = signupService.signup(req);
 
             // then
             assertThat(result).isNotNull();
@@ -90,8 +96,8 @@ class SignupServiceImplTest {
             // 실행 순서 검증
             var inOrder = inOrder(emailConfirm, signupStoreService, publishEvent, consentService);
             inOrder.verify(emailConfirm).checkedConfirmedEmail(email);
-            inOrder.verify(signupStoreService).signup(email, password, passConfirm);
-            inOrder.verify(publishEvent).createProfileRequestPub(any(CreateProfileRequest.class));
+            inOrder.verify(signupStoreService).signup(email, password);
+            inOrder.verify(publishEvent).createProfileRequestPub(any(CreatedUserEvent.class));
             inOrder.verify(consentService).saveConsent(expectedAuth, consentReqs);
         }
 
@@ -108,17 +114,23 @@ class SignupServiceImplTest {
                     .id("user-id-123")
                     .provider(Provider.SYSTEM)
                     .build();
+	        SignupRequest req = SignupRequest.builder()
+			        .email(email)
+			        .password(password)
+			        .passwordConfirm(passConfirm)
+			        .consentReqs(consentReqs)
+			        .build();
 
-            when(signupStoreService.signup(email, password, passConfirm)).thenReturn(expectedAuth);
+            when(signupStoreService.signup(email, password)).thenReturn(expectedAuth);
 
-            ArgumentCaptor<CreateProfileRequest> eventCaptor = ArgumentCaptor.forClass(CreateProfileRequest.class);
+            ArgumentCaptor<CreatedUserEvent> eventCaptor = ArgumentCaptor.forClass(CreatedUserEvent.class);
 
             // when
-            signupService.signup(email, password, passConfirm, consentReqs);
+            signupService.signup(req);
 
             // then
             verify(publishEvent).createProfileRequestPub(eventCaptor.capture());
-            CreateProfileRequest capturedEvent = eventCaptor.getValue();
+            CreatedUserEvent capturedEvent = eventCaptor.getValue();
             assertThat(capturedEvent.getUserId()).isEqualTo("user-id-123");
             assertThat(capturedEvent.getProvider()).isEqualTo("SYSTEM");
         }
@@ -134,13 +146,18 @@ class SignupServiceImplTest {
 
             doThrow(new CustomException(ErrorCode.NOT_CONFIRMED_EMAIL))
                     .when(emailConfirm).checkedConfirmedEmail(email);
-
+	        SignupRequest req = SignupRequest.builder()
+			        .email(email)
+			        .password(password)
+			        .passwordConfirm(passConfirm)
+			        .consentReqs(consentReqs)
+			        .build();
             // when & then
-            assertThatThrownBy(() -> signupService.signup(email, password, passConfirm, consentReqs))
+            assertThatThrownBy(() -> signupService.signup(req))
                     .isInstanceOf(CustomException.class);
 
             verify(emailConfirm).checkedConfirmedEmail(email);
-            verify(signupStoreService, never()).signup(anyString(), anyString(), anyString());
+            verify(signupStoreService, never()).signup(anyString(), anyString());
             verify(publishEvent, never()).createProfileRequestPub(any());
             verify(consentService, never()).saveConsent(any(), anyList());
         }
@@ -153,12 +170,17 @@ class SignupServiceImplTest {
             String password = "Password123!";
             String passConfirm = "Password123!";
             List<ConsentRequest> consentReqs = new ArrayList<>();
-
-            when(signupStoreService.signup(email, password, passConfirm))
+	        SignupRequest req = SignupRequest.builder()
+			        .email(email)
+			        .password(password)
+			        .passwordConfirm(passConfirm)
+			        .consentReqs(consentReqs)
+			        .build();
+            when(signupStoreService.signup(req.getEmail(), req.getPassword()))
                     .thenThrow(new CustomException(ErrorCode.EMAIL_ALREADY_EXISTS));
 
             // when & then
-            assertThatThrownBy(() -> signupService.signup(email, password, passConfirm, consentReqs))
+            assertThatThrownBy(() -> signupService.signup(req))
                     .isInstanceOf(CustomException.class);
 
             verify(publishEvent, never()).createProfileRequestPub(any());
@@ -176,16 +198,21 @@ class SignupServiceImplTest {
                     ConsentRequest.builder().consentId("test-consent-id-1").consented(true).build(),
                     ConsentRequest.builder().consentId("test-consent-id-2").consented(true).build()
             );
-
+	        SignupRequest req = SignupRequest.builder()
+			        .email(email)
+			        .password(password)
+			        .passwordConfirm(passConfirm)
+			        .consentReqs(consentReqs)
+			        .build();
             Auth expectedAuth = Auth.builder()
                     .id("user-id")
                     .provider(Provider.SYSTEM)
                     .build();
-
-            when(signupStoreService.signup(email, password, passConfirm)).thenReturn(expectedAuth);
+	        
+            when(signupStoreService.signup(email, password)).thenReturn(expectedAuth);
 
             // when
-            signupService.signup(email, password, passConfirm, consentReqs);
+            signupService.signup(req);
 
             // then
             verify(consentService).saveConsent(expectedAuth, consentReqs);
@@ -220,7 +247,7 @@ class SignupServiceImplTest {
             assertThat(result.getProvider()).isEqualTo(Provider.KAKAO);
 
             verify(signupStoreService).signupFromOtherProvider(email, provider);
-            verify(publishEvent).createProfileRequestPub(any(CreateProfileRequest.class));
+            verify(publishEvent).createProfileRequestPub(any(CreatedUserEvent.class));
         }
 
         @Test
@@ -260,14 +287,14 @@ class SignupServiceImplTest {
 
             when(signupStoreService.signupFromOtherProvider(email, provider)).thenReturn(expectedAuth);
 
-            ArgumentCaptor<CreateProfileRequest> eventCaptor = ArgumentCaptor.forClass(CreateProfileRequest.class);
+            ArgumentCaptor<CreatedUserEvent> eventCaptor = ArgumentCaptor.forClass(CreatedUserEvent.class);
 
             // when
             signupService.signupFromOtherProvider(email, provider);
 
             // then
             verify(publishEvent).createProfileRequestPub(eventCaptor.capture());
-            CreateProfileRequest capturedEvent = eventCaptor.getValue();
+            CreatedUserEvent capturedEvent = eventCaptor.getValue();
             assertThat(capturedEvent.getUserId()).isEqualTo("social-user-123");
             assertThat(capturedEvent.getProvider()).isEqualTo("KAKAO");
         }
@@ -332,11 +359,16 @@ class SignupServiceImplTest {
                     .email(email)
                     .provider(Provider.SYSTEM)
                     .build();
-
-            when(signupStoreService.signup(email, password, passConfirm)).thenReturn(expectedAuth);
+	        SignupRequest req = SignupRequest.builder()
+			        .email(email)
+			        .password(password)
+			        .passwordConfirm(passConfirm)
+			        .consentReqs(consentReqs)
+			        .build();
+            when(signupStoreService.signup(email, password)).thenReturn(expectedAuth);
 
             // when
-            Auth result = signupService.signup(email, password, passConfirm, consentReqs);
+            Auth result = signupService.signup(req);
 
             // then
             assertThat(result).isNotNull();
@@ -344,8 +376,8 @@ class SignupServiceImplTest {
 
             // 모든 컴포넌트 호출 검증
             verify(emailConfirm, times(1)).checkedConfirmedEmail(email);
-            verify(signupStoreService, times(1)).signup(email, password, passConfirm);
-            verify(publishEvent, times(1)).createProfileRequestPub(any(CreateProfileRequest.class));
+            verify(signupStoreService, times(1)).signup(email, password);
+            verify(publishEvent, times(1)).createProfileRequestPub(any(CreatedUserEvent.class));
             verify(consentService, times(1)).saveConsent(expectedAuth, consentReqs);
         }
 
@@ -374,7 +406,7 @@ class SignupServiceImplTest {
             // 소셜 로그인은 이메일 확인 및 동의 저장 안 함
             verify(emailConfirm, never()).checkedConfirmedEmail(anyString());
             verify(consentService, never()).saveConsent(any(), anyList());
-            verify(publishEvent, times(1)).createProfileRequestPub(any(CreateProfileRequest.class));
+            verify(publishEvent, times(1)).createProfileRequestPub(any(CreatedUserEvent.class));
         }
     }
 
@@ -387,13 +419,18 @@ class SignupServiceImplTest {
         void signup_nullParameters_throwsException() {
             // given
             List<ConsentRequest> consentReqs = new ArrayList<>();
-
+	        SignupRequest req = SignupRequest.builder()
+			        .email("example@tambvind.co.kr")
+			        .password("pass")
+			        .passwordConfirm("pass")
+			        .consentReqs(consentReqs)
+			        .build();
             // when & then - null 이메일
-            assertThatThrownBy(() -> signupService.signup(null, "pass", "pass", consentReqs))
+            assertThatThrownBy(() -> signupService.signup(req))
                     .isInstanceOf(Exception.class);
 
             // when & then - null 비밀번호
-            assertThatThrownBy(() -> signupService.signup("email@test.com", null, "pass", consentReqs))
+            assertThatThrownBy(() -> signupService.signup(req))
                     .isInstanceOf(Exception.class);
         }
 
@@ -407,13 +444,18 @@ class SignupServiceImplTest {
             List<ConsentRequest> consentReqs = new ArrayList<>();
 
             Auth expectedAuth = Auth.builder().id("user-id").provider(Provider.SYSTEM).build();
-
-            when(signupStoreService.signup(email, password, passConfirm)).thenReturn(expectedAuth);
+	        SignupRequest request = SignupRequest.builder()
+			        .email(email)
+			        .password(password)
+			        .passwordConfirm(passConfirm)
+			        .consentReqs(consentReqs)
+			        .build();
+            when(signupStoreService.signup(email, password)).thenReturn(expectedAuth);
             doThrow(new RuntimeException("Event publish failed"))
-                    .when(publishEvent).createProfileRequestPub(any(CreateProfileRequest.class));
+                    .when(publishEvent).createProfileRequestPub(any(CreatedUserEvent.class));
 
             // when & then
-            assertThatThrownBy(() -> signupService.signup(email, password, passConfirm, consentReqs))
+            assertThatThrownBy(() -> signupService.signup(request))
                     .isInstanceOf(RuntimeException.class)
                     .hasMessageContaining("Event publish failed");
         }
@@ -428,15 +470,20 @@ class SignupServiceImplTest {
             List<ConsentRequest> consentReqs = List.of(
                     ConsentRequest.builder().consentId("test-consent-id-1").consented(true).build()
             );
-
+			SignupRequest request = SignupRequest.builder()
+			        .email(email)
+			        .password(password)
+			        .passwordConfirm(passConfirm)
+			        .consentReqs(consentReqs)
+			        .build();
             Auth expectedAuth = Auth.builder().id("user-id").provider(Provider.SYSTEM).build();
 
-            when(signupStoreService.signup(email, password, passConfirm)).thenReturn(expectedAuth);
+            when(signupStoreService.signup(email, password)).thenReturn(expectedAuth);
             doThrow(new CustomException(ErrorCode.CONSENT_NOT_VALID))
                     .when(consentService).saveConsent(any(), anyList());
 
             // when & then
-            assertThatThrownBy(() -> signupService.signup(email, password, passConfirm, consentReqs))
+            assertThatThrownBy(() -> signupService.signup(request))
                     .isInstanceOf(CustomException.class);
         }
     }

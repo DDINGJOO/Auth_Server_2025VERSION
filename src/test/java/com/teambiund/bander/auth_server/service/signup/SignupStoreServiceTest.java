@@ -63,7 +63,6 @@ class SignupStoreServiceTest {
             // given
             String email = "test@example.com";
             String password = "Password123!";
-            String passConfirm = "Password123!";
             String userId = "user-id-12345";
             String hashedPassword = "$2a$12$hashedPassword";
 
@@ -73,7 +72,7 @@ class SignupStoreServiceTest {
             when(authRepository.save(any(Auth.class))).thenAnswer(invocation -> invocation.getArgument(0));
 
             // when
-            Auth result = signupStoreService.signup(email, password, passConfirm);
+            Auth result = signupStoreService.signup(email, password);
 
             // then
             assertThat(result).isNotNull();
@@ -96,7 +95,6 @@ class SignupStoreServiceTest {
             // given
             String email = "existing@example.com";
             String password = "Password123!";
-            String passConfirm = "Password123!";
 
             Auth existingUser = Auth.builder()
                     .id("existing-user-id")
@@ -106,7 +104,7 @@ class SignupStoreServiceTest {
             when(authRepository.findByEmail(email)).thenReturn(Optional.of(existingUser));
 
             // when & then
-            assertThatThrownBy(() -> signupStoreService.signup(email, password, passConfirm))
+            assertThatThrownBy(() -> signupStoreService.signup(email, password))
                     .isInstanceOf(CustomException.class);
 
             verify(authRepository, atLeast(1)).findByEmail(email);
@@ -121,7 +119,6 @@ class SignupStoreServiceTest {
             // given
             String email = "test@example.com";
             String password = "PlainPassword123!";
-            String passConfirm = "PlainPassword123!";
             String hashedPassword = "$2a$12$hashedPassword";
 
             when(authRepository.findByEmail(email)).thenReturn(Optional.empty());
@@ -130,7 +127,7 @@ class SignupStoreServiceTest {
             when(authRepository.save(any(Auth.class))).thenAnswer(invocation -> invocation.getArgument(0));
 
             // when
-            Auth result = signupStoreService.signup(email, password, passConfirm);
+            Auth result = signupStoreService.signup(email, password);
 
             // then
             assertThat(result.getPassword()).isNotEqualTo(password);
@@ -245,7 +242,6 @@ class SignupStoreServiceTest {
             // given
             String email = "newuser@example.com";
             String password = "SecurePassword123!";
-            String passConfirm = "SecurePassword123!";
 
             when(authRepository.findByEmail(email)).thenReturn(Optional.empty());
             when(keyProvider.generateKey()).thenReturn("new-user-id");
@@ -253,7 +249,7 @@ class SignupStoreServiceTest {
             when(authRepository.save(any(Auth.class))).thenAnswer(invocation -> invocation.getArgument(0));
 
             // when
-            Auth auth = signupStoreService.signup(email, password, passConfirm);
+            Auth auth = signupStoreService.signup(email, password);
 
             // then - 전체 필드 검증
             assertThat(auth.getId()).isNotBlank();
@@ -285,7 +281,7 @@ class SignupStoreServiceTest {
             when(authRepository.findByEmail(email)).thenReturn(Optional.of(existingAuth));
 
             // when & then - 동일 이메일로 일반 가입 시도
-            assertThatThrownBy(() -> signupStoreService.signup(email, "pass", "pass"))
+            assertThatThrownBy(() -> signupStoreService.signup(email, "pass"))
                     .isInstanceOf(CustomException.class);
 
             // when & then - 동일 이메일로 소셜 가입 시도
@@ -304,7 +300,6 @@ class SignupStoreServiceTest {
             // given
             String longEmail = "a".repeat(100) + "@example.com";
             String password = "Password123!";
-            String passConfirm = "Password123!";
 
             when(authRepository.findByEmail(longEmail)).thenReturn(Optional.empty());
             when(keyProvider.generateKey()).thenReturn("user-id");
@@ -312,7 +307,7 @@ class SignupStoreServiceTest {
             when(authRepository.save(any(Auth.class))).thenAnswer(invocation -> invocation.getArgument(0));
 
             // when
-            Auth result = signupStoreService.signup(longEmail, password, passConfirm);
+            Auth result = signupStoreService.signup(longEmail, password);
 
             // then
             assertThat(result.getEmail()).isEqualTo(longEmail);
@@ -324,7 +319,6 @@ class SignupStoreServiceTest {
             // given
             String email = "test@example.com";
             String longPassword = "A1!a" + "a".repeat(200);
-            String passConfirm = longPassword;
 
             when(authRepository.findByEmail(email)).thenReturn(Optional.empty());
             when(keyProvider.generateKey()).thenReturn("user-id");
@@ -332,7 +326,7 @@ class SignupStoreServiceTest {
             when(authRepository.save(any(Auth.class))).thenAnswer(invocation -> invocation.getArgument(0));
 
             // when
-            Auth result = signupStoreService.signup(email, longPassword, passConfirm);
+            Auth result = signupStoreService.signup(email, longPassword);
 
             // then
             assertThat(result).isNotNull();

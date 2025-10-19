@@ -33,7 +33,7 @@ public class SignupStoreService {
     this.emailCipher = emailCipher;
   }
 
-  public Auth signup(String email, String password, String passConfirm) throws CustomException {
+  public Auth signup(String email, String password) throws CustomException {
     String encryptedEmail = emailCipher.encrypt(email);
     if (authRepository.findByEmail(encryptedEmail).isPresent()
         || authRepository.findByEmail(email).isPresent()) {
@@ -74,4 +74,5 @@ public class SignupStoreService {
     authRepository.save(auth);
     return auth;
   }
+  
 }

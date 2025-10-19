@@ -8,6 +8,7 @@ import com.teambiund.bander.auth_server.entity.consentsname.ConsentsTable;
 import jakarta.validation.ConstraintValidator;
 import jakarta.validation.ConstraintValidatorContext;
 import java.util.List;
+import java.util.Objects;
 import java.util.Set;
 import java.util.stream.Collectors;
 
@@ -17,6 +18,7 @@ import java.util.stream.Collectors;
  * - consentId로 조회하며, 버전 무관하게 consentName(consentType)만 검증
  */
 public class RequiredConsentsValidator implements ConstraintValidator<RequiredConsents, List<ConsentRequest>> {
+	
 
     @Override
     public boolean isValid(List<ConsentRequest> consentRequests, ConstraintValidatorContext context) {
@@ -31,22 +33,22 @@ public class RequiredConsentsValidator implements ConstraintValidator<RequiredCo
                     ConsentsTable consent = consentsAllMaps.get(req.getConsentId());
                     return consent != null ? consent.getConsentName() : null;
                 })
-                .filter(name -> name != null)
+                .filter(Objects::nonNull)
                 .collect(Collectors.toSet());
-
-        // 모든 필수 동의항목의 consentName이 동의되었는지 확인 (버전 무관)
-        for (ConsentsTable required : requiredConsents) {
-            if (!consentedNames.contains(required.getConsentName())) {
-                // 구체적인 에러 메시지 설정
-                context.disableDefaultConstraintViolation();
-                context.buildConstraintViolationWithTemplate(
-                        String.format("필수 동의 항목 '%s'에 동의하지 않았습니다",
-                                required.getConsentName()))
-                        .addConstraintViolation();
-                return false;
-            }
-        }
-
+	    
+	    // 모든 필수 동의항목의 consentName이 동의되었는지 확인 (버전 무관)
+	    for (ConsentsTable required : requiredConsents) {
+		    if (!consentedNames.contains(required.getConsentName())) {
+			    // 구체적인 에러 메시지 설정
+			    context.disableDefaultConstraintViolation();
+			    context.buildConstraintViolationWithTemplate(
+							    String.format("필수 동의 항목 '%s'에 동의하지 않았습니다",
+									    required.getConsentName()))
+					    .addConstraintViolation();
+			    return false;
+		    }
+	    }
+		
         return true;
     }
 }

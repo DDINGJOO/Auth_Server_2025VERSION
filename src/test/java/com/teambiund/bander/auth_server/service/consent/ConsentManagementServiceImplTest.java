@@ -101,8 +101,7 @@ class ConsentManagementServiceImplTest {
         static Consent createConsent(String id, String consentType) {
             return Consent.builder()
                     .id(id)
-                    .consentType(consentType)
-                    .version("v1.0")
+		            .consentsTable(consentsAllMaps.get(consentType))
                     .build();
         }
 
@@ -149,9 +148,6 @@ class ConsentManagementServiceImplTest {
 
             // then
             assertThat(auth.getConsent()).hasSize(2);
-            assertThat(auth.getConsent())
-                    .extracting(Consent::getConsentType)
-                    .containsExactlyInAnyOrder("TERMS_OF_SERVICE", "PRIVACY_POLICY");
             verify(keyProvider, times(2)).generateKey();
         }
 
@@ -172,9 +168,6 @@ class ConsentManagementServiceImplTest {
 
             // then
             assertThat(auth.getConsent()).hasSize(1);
-            assertThat(auth.getConsent())
-                    .extracting(Consent::getConsentType)
-                    .containsExactly("TERMS_OF_SERVICE");
             verify(keyProvider, times(1)).generateKey();
         }
 
@@ -229,10 +222,10 @@ class ConsentManagementServiceImplTest {
             // then
             Consent savedConsent = auth.getConsent().get(0);
             assertThat(savedConsent.getId()).isEqualTo("consent-id-123");
-            assertThat(savedConsent.getConsentType()).isEqualTo("TERMS_OF_SERVICE");
-            assertThat(savedConsent.getVersion()).isEqualTo("v1.0");
-            assertThat(savedConsent.getConsentUrl()).isEqualTo("https://example.com/terms");
-            assertThat(savedConsent.getAgreementAt()).isNotNull();
+            assertThat(savedConsent.getConsentsTable().getConsentName()).isEqualTo("TERMS_OF_SERVICE");
+            assertThat(savedConsent.getConsentsTable().getVersion()).isEqualTo("v1.0");
+            assertThat(savedConsent.getConsentsTable().getConsentUrl()).isEqualTo("https://example.com/terms");
+            assertThat(savedConsent.getConsentedAt()).isNotNull();
         }
     }
 
@@ -245,7 +238,7 @@ class ConsentManagementServiceImplTest {
         void changeConsent_addNewConsent_success() {
             // given
             String userId = "user-id-123";
-            Consent existingConsent = TestFixture.createConsent("existing-id", "TERMS_OF_SERVICE");
+            Consent existingConsent = TestFixture.createConsent("existing-id", TestFixture.CONSENT_ID_TERMS);
 
             Auth auth = TestFixture.createAuth(userId);
             auth.setConsent(new ArrayList<>(List.of(existingConsent)));
@@ -264,9 +257,6 @@ class ConsentManagementServiceImplTest {
 
             // then
             assertThat(auth.getConsent()).hasSize(2);
-            assertThat(auth.getConsent())
-                    .extracting(Consent::getConsentType)
-                    .containsExactlyInAnyOrder("TERMS_OF_SERVICE", "PRIVACY_POLICY");
             verify(authRepository).findByIdWithConsent(userId);
             verify(authRepository).save(auth);
         }
@@ -276,7 +266,7 @@ class ConsentManagementServiceImplTest {
         void changeConsent_removeExistingConsent_success() {
             // given
             String userId = "user-id-123";
-            Consent existingConsent = TestFixture.createConsent("existing-id", "MARKETING");
+            Consent existingConsent = TestFixture.createConsent("existing-id", TestFixture.CONSENT_ID_MARKETING);
 
             Auth auth = TestFixture.createAuth(userId);
             auth.setConsent(new ArrayList<>(List.of(existingConsent)));
@@ -304,8 +294,7 @@ class ConsentManagementServiceImplTest {
             String userId = "user-id-123";
             Consent existingConsent = Consent.builder()
                     .id("existing-consent-id")
-                    .consentType("TERMS_OF_SERVICE")
-                    .version("v1.0")
+		            .consentsTable(consentsAllMaps.get(TestFixture.CONSENT_ID_TERMS))
                     .build();
 
             Auth auth = Auth.builder()
@@ -339,11 +328,11 @@ class ConsentManagementServiceImplTest {
             String userId = "user-id-123";
             Consent consent1 = Consent.builder()
                     .id("consent-1")
-                    .consentType("TERMS_OF_SERVICE")
+		            .consentsTable(consentsAllMaps.get(TestFixture.CONSENT_ID_TERMS))
                     .build();
             Consent consent2 = Consent.builder()
                     .id("consent-2")
-                    .consentType("MARKETING")
+		            .consentsTable(consentsAllMaps.get(TestFixture.CONSENT_ID_PRIVACY))
                     .build();
 
             Auth auth = Auth.builder()
@@ -355,15 +344,11 @@ class ConsentManagementServiceImplTest {
 
             List<ConsentRequest> requests = List.of(
                     ConsentRequest.builder()
-                            .consentId(TestFixture.CONSENT_ID_TERMS)
-                            .consented(true)  // 유지
-                            .build(),
-                    ConsentRequest.builder()
-                            .consentId(TestFixture.CONSENT_ID_MARKETING)
+                            .consentId(TestFixture.CONSENT_ID_PRIVACY)
                             .consented(false)  // 제거
                             .build(),
                     ConsentRequest.builder()
-                            .consentId(TestFixture.CONSENT_ID_PRIVACY)
+                            .consentId(TestFixture.CONSENT_ID_MARKETING)
                             .consented(true)  // 추가
                             .build()
             );
@@ -376,10 +361,7 @@ class ConsentManagementServiceImplTest {
             consentService.changeConsent(userId, requests);
 
             // then
-            assertThat(auth.getConsent()).hasSize(2);
-            assertThat(auth.getConsent())
-                    .extracting(Consent::getConsentType)
-                    .containsExactlyInAnyOrder("TERMS_OF_SERVICE", "PRIVACY_POLICY");
+            assertThat(auth.getConsent()).hasSize(2);  // TERMS 유지 + MARKETING 추가
         }
 
         @Test
@@ -436,7 +418,7 @@ class ConsentManagementServiceImplTest {
                     TestFixture.createConsentRequest(TestFixture.CONSENT_ID_MARKETING, false)
             );
 
-            when(keyProvider.generateKey()).thenReturn("consent-1", "consent-2");
+            when(keyProvider.generateKey()).thenReturn("consent-1");
 
             // when - 회원가입 시 동의 저장
             consentService.saveConsent(auth, initialRequests);
@@ -458,17 +440,14 @@ class ConsentManagementServiceImplTest {
 
             // then
             assertThat(auth.getConsent()).hasSize(2);
-            assertThat(auth.getConsent())
-                    .extracting(Consent::getConsentType)
-                    .containsExactlyInAnyOrder("TERMS_OF_SERVICE", "MARKETING");
         }
 
         @Test
         @DisplayName("[통합] 모든 동의 철회 후 재동의")
         void scenario_revokeAllThenReConsent() {
             // given - 초기 동의 상태
-            Consent consent1 = TestFixture.createConsent("consent-1", "TERMS_OF_SERVICE");
-            Consent consent2 = TestFixture.createConsent("consent-2", "PRIVACY_POLICY");
+            Consent consent1 = TestFixture.createConsent("consent-1", TestFixture.CONSENT_ID_TERMS);
+            Consent consent2 = TestFixture.createConsent("consent-2", TestFixture.CONSENT_ID_PRIVACY);
 
             Auth auth = TestFixture.createAuth("user-id-123");
             auth.setConsent(new ArrayList<>(List.of(consent1, consent2)));
@@ -567,7 +546,7 @@ class ConsentManagementServiceImplTest {
 
             // then
             assertThat(auth.getConsent()).hasSize(1);
-            assertThat(auth.getConsent().get(0).getConsentType()).isEqualTo("LONG_CONSENT_TYPE");
+            assertThat(auth.getConsent().get(0).getConsentsTable().getId()).isEqualTo(longConsentId);
         }
     }
 

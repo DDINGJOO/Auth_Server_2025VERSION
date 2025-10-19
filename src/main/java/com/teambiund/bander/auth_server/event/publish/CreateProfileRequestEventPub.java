@@ -1,6 +1,6 @@
 package com.teambiund.bander.auth_server.event.publish;
 
-import com.teambiund.bander.auth_server.event.events.CreateProfileRequest;
+import com.teambiund.bander.auth_server.event.events.CreatedUserEvent;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
 
@@ -11,7 +11,7 @@ public class CreateProfileRequestEventPub {
 
   private final String TOPIC = "profile-create-request";
 
-  public void createProfileRequestPub(CreateProfileRequest req) {
+  public void createProfileRequestPub(CreatedUserEvent req) {
     eventPublisher.publish(TOPIC, req);
   }
 }
