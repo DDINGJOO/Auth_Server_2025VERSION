@@ -316,7 +316,7 @@ class ConsentManagementServiceImplTest {
 
             List<ConsentRequest> requests = List.of(
                     ConsentRequest.builder()
-                            .consentId("TERMS_OF_SERVICE")
+                            .consentId(TestFixture.CONSENT_ID_TERMS)
                             .consented(true)  // 이미 동의한 항목
                             .build()
             );
@@ -355,15 +355,15 @@ class ConsentManagementServiceImplTest {
 
             List<ConsentRequest> requests = List.of(
                     ConsentRequest.builder()
-                            .consentId("TERMS_OF_SERVICE")
+                            .consentId(TestFixture.CONSENT_ID_TERMS)
                             .consented(true)  // 유지
                             .build(),
                     ConsentRequest.builder()
-                            .consentId("MARKETING")
+                            .consentId(TestFixture.CONSENT_ID_MARKETING)
                             .consented(false)  // 제거
                             .build(),
                     ConsentRequest.builder()
-                            .consentId("PRIVACY_POLICY")
+                            .consentId(TestFixture.CONSENT_ID_PRIVACY)
                             .consented(true)  // 추가
                             .build()
             );

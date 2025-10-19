@@ -58,7 +58,7 @@ public class ConsentManagementServiceImpl implements ConsentManagementService {
 
         // CascadeType.ALL로 인해 auth의 consent 컬렉션도 자동 저장됨
         // 하지만 명시적으로 save를 호출하는 것이 더 명확함
-        // authRepository.save(auth); // 이미 영속 상태라면 불필요
+         authRepository.save(auth);
     }
 
 
