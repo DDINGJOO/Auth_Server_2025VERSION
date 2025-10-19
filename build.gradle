@@ -48,6 +48,9 @@ dependencies {
     testImplementation 'org.junit.jupiter:junit-jupiter-engine'
     testImplementation 'org.assertj:assertj-core:3.24.2'
 
+    // Swagger/OpenAPI Documentation
+    implementation 'org.springdoc:springdoc-openapi-starter-webmvc-ui:2.3.0'
+
 }
 
 tasks.named('test') {
