@@ -7,7 +7,9 @@ CREATE TABLE IF NOT EXISTS consents_name
     consent_name VARCHAR(255) NULL,
     version      VARCHAR(50)  NULL,
     consent_url  TEXT         NULL,
-    required     BOOLEAN      NOT NULL DEFAULT FALSE
+    required     BOOLEAN      NOT NULL DEFAULT FALSE,
+    KEY idx_consents_name_name (consent_name(191)),
+    KEY idx_consents_name_required (required)
 ) ENGINE = InnoDB
   DEFAULT CHARSET = utf8mb4
   COLLATE = utf8mb4_general_ci;
@@ -24,7 +26,10 @@ CREATE TABLE IF NOT EXISTS auth
     status       ENUM ('ACTIVE','BLOCKED','DELETED','EXPIRED','UNCONFIRMED') NOT NULL,
     updated_at   DATETIME(6)                                                 NULL,
     version      INT                                                         NULL,
-    user_role    ENUM ('ADMIN','GUEST','PLACE_OWNER','USER')                 NOT NULL
+    user_role    ENUM ('ADMIN','GUEST','PLACE_OWNER','USER')                 NOT NULL,
+    KEY idx_auth_email (email(191)),
+    KEY idx_auth_status (status),
+    KEY idx_auth_created_at (created_at)
 ) ENGINE = InnoDB
   DEFAULT CHARSET = utf8mb4
   COLLATE = utf8mb4_general_ci;
@@ -39,7 +44,8 @@ CREATE TABLE IF NOT EXISTS history
     updated_column      VARCHAR(255) NOT NULL,
     version             INT          NULL,
     user_id             VARCHAR(255) NOT NULL,
-    CONSTRAINT fk_history_user FOREIGN KEY (user_id) REFERENCES auth (id)
+    CONSTRAINT fk_history_user FOREIGN KEY (user_id) REFERENCES auth (id),
+    KEY idx_history_user_id (user_id)
 ) ENGINE = InnoDB
   DEFAULT CHARSET = utf8mb4
   COLLATE = utf8mb4_general_ci;
@@ -66,7 +72,9 @@ CREATE TABLE IF NOT EXISTS suspend
     suspend_until DATE         NOT NULL,
     suspender     VARCHAR(255) NOT NULL,
     reason        VARCHAR(100) NOT NULL,
-    CONSTRAINT fk_suspend_user FOREIGN KEY (user_id) REFERENCES auth (id)
+    CONSTRAINT fk_suspend_user FOREIGN KEY (user_id) REFERENCES auth (id),
+    KEY idx_suspend_user_id (user_id),
+    KEY idx_suspend_until (suspend_until)
 ) ENGINE = InnoDB
   DEFAULT CHARSET = utf8mb4
   COLLATE = utf8mb4_general_ci;
@@ -79,7 +87,10 @@ CREATE TABLE IF NOT EXISTS consent
     consent_id   VARCHAR(255) NOT NULL,
     consented_at DATETIME(6)  NOT NULL,
     CONSTRAINT fk_consent_user FOREIGN KEY (user_id) REFERENCES auth (id),
-    CONSTRAINT fk_consent_table FOREIGN KEY (consent_id) REFERENCES consents_name (id)
+    CONSTRAINT fk_consent_table FOREIGN KEY (consent_id) REFERENCES consents_name (id),
+    KEY idx_consent_user_id (user_id),
+    KEY idx_consent_consent_id (consent_id),
+    KEY idx_consent_user_consent (user_id, consent_id)
 ) ENGINE = InnoDB
   DEFAULT CHARSET = utf8mb4
   COLLATE = utf8mb4_general_ci;

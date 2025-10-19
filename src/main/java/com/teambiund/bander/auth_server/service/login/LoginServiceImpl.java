@@ -117,5 +117,43 @@ public class LoginServiceImpl implements LoginService {
 
     }
 
+    @Override
+    public LoginResponse generateLoginResponse(Auth auth, String providedDeviceId) {
+        if (!auth.getStatus().equals(Status.ACTIVE)) {
+            switch (auth.getStatus()) {
+                case SLEEPING:
+                    throw new CustomException(ErrorCode.USER_IS_SLEEPING);
+                case BLOCKED:
+                    throw new CustomException(ErrorCode.USER_IS_BLOCKED);
+                case SUSPENDED:
+                    throw new CustomException(ErrorCode.USER_IS_SUSPENDED);
+                case DELETED:
+                    throw new CustomException(ErrorCode.USER_IS_DELETED);
+                default:
+                    break;
+            }
+        }
+
+        String deviceId = (providedDeviceId != null && !providedDeviceId.isEmpty())
+                ? providedDeviceId
+                : UUID.randomUUID().toString().substring(0, 4);
+
+        String accessToken = tokenUtil.generateAccessToken(auth.getId(), auth.getUserRole(), deviceId);
+        String refreshToken = tokenUtil.generateRefreshToken(auth.getId(), auth.getUserRole(), deviceId);
+
+        var response = new LoginResponse();
+        response.setAccessToken(accessToken);
+        response.setRefreshToken(refreshToken);
+        response.setDeviceId(deviceId);
+
+        LoginStatus loginStatus = LoginStatus.builder()
+                .lastLogin(LocalDateTime.now())
+                .build();
+
+        loginStatusRepository.save(loginStatus);
+
+        return response;
+    }
+
 
 }
