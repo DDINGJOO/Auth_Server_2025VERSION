@@ -1,21 +1,21 @@
 package com.teambiund.bander.auth_server.service.consent;
 
-import static com.teambiund.bander.auth_server.util.data.ConsentTableInit.consentsAllMaps;
+import static com.teambiund.bander.auth_server.auth.util.data.ConsentTableInit.consentsAllMaps;
 import static org.assertj.core.api.Assertions.*;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.*;
 
-import com.teambiund.bander.auth_server.dto.request.ConsentRequest;
-import com.teambiund.bander.auth_server.entity.Auth;
-import com.teambiund.bander.auth_server.entity.Consent;
-import com.teambiund.bander.auth_server.entity.consentsname.ConsentsTable;
-import com.teambiund.bander.auth_server.enums.Status;
-import com.teambiund.bander.auth_server.exceptions.CustomException;
-import com.teambiund.bander.auth_server.exceptions.ErrorCode.ErrorCode;
-import com.teambiund.bander.auth_server.repository.AuthRepository;
-import com.teambiund.bander.auth_server.service.consent.impl.ConsentManagementServiceImpl;
-import com.teambiund.bander.auth_server.util.generator.key.KeyProvider;
+import com.teambiund.bander.auth_server.auth.dto.request.ConsentRequest;
+import com.teambiund.bander.auth_server.auth.entity.Auth;
+import com.teambiund.bander.auth_server.auth.entity.Consent;
+import com.teambiund.bander.auth_server.auth.entity.consentsname.ConsentsTable;
+import com.teambiund.bander.auth_server.auth.enums.Status;
+import com.teambiund.bander.auth_server.auth.exception.CustomException;
+import com.teambiund.bander.auth_server.auth.exception.ErrorCode.AuthErrorCode;
+import com.teambiund.bander.auth_server.auth.repository.AuthRepository;
+import com.teambiund.bander.auth_server.auth.service.consent.impl.ConsentManagementServiceImpl;
+import com.teambiund.bander.auth_server.auth.util.generator.key.KeyProvider;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
@@ -375,10 +375,10 @@ class ConsentManagementServiceImplTest {
 
             when(authRepository.findByIdWithConsent(userId)).thenReturn(Optional.empty());
 
-            // when & then
-            assertThatThrownBy(() -> consentService.changeConsent(userId, requests))
-                    .isInstanceOf(CustomException.class)
-                    .hasFieldOrPropertyWithValue("errorcode", ErrorCode.USER_NOT_FOUND);
+      // when & then
+      assertThatThrownBy(() -> consentService.changeConsent(userId, requests))
+          .isInstanceOf(CustomException.class)
+          .hasFieldOrPropertyWithValue("errorcode", AuthErrorCode.USER_NOT_FOUND);
 
             verify(authRepository, never()).save(any());
         }

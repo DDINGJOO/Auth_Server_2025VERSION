@@ -4,17 +4,19 @@ import static org.assertj.core.api.Assertions.*;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.*;
 
-import com.teambiund.bander.auth_server.dto.request.ConsentRequest;
-import com.teambiund.bander.auth_server.dto.request.SignupRequest;
-import com.teambiund.bander.auth_server.entity.Auth;
-import com.teambiund.bander.auth_server.enums.Provider;
-import com.teambiund.bander.auth_server.enums.Status;
-import com.teambiund.bander.auth_server.event.events.CreatedUserEvent;
-import com.teambiund.bander.auth_server.event.publish.CreateProfileRequestEventPub;
-import com.teambiund.bander.auth_server.exceptions.CustomException;
-import com.teambiund.bander.auth_server.exceptions.ErrorCode.ErrorCode;
-import com.teambiund.bander.auth_server.service.consent.ConsentManagementService;
-import com.teambiund.bander.auth_server.service.update.EmailConfirm;
+import com.teambiund.bander.auth_server.auth.dto.request.ConsentRequest;
+import com.teambiund.bander.auth_server.auth.dto.request.SignupRequest;
+import com.teambiund.bander.auth_server.auth.entity.Auth;
+import com.teambiund.bander.auth_server.auth.enums.Provider;
+import com.teambiund.bander.auth_server.auth.enums.Status;
+import com.teambiund.bander.auth_server.auth.event.events.CreatedUserEvent;
+import com.teambiund.bander.auth_server.auth.event.publish.CreateProfileRequestEventPub;
+import com.teambiund.bander.auth_server.auth.exception.CustomException;
+import com.teambiund.bander.auth_server.auth.exception.ErrorCode.AuthErrorCode;
+import com.teambiund.bander.auth_server.auth.service.consent.ConsentManagementService;
+import com.teambiund.bander.auth_server.auth.service.signup.SignupServiceImpl;
+import com.teambiund.bander.auth_server.auth.service.signup.SignupStoreService;
+import com.teambiund.bander.auth_server.auth.service.update.EmailConfirm;
 import java.util.ArrayList;
 import java.util.List;
 import org.junit.jupiter.api.BeforeEach;
@@ -144,8 +146,9 @@ class SignupServiceImplTest {
             String passConfirm = "Password123!";
             List<ConsentRequest> consentReqs = new ArrayList<>();
 
-            doThrow(new CustomException(ErrorCode.NOT_CONFIRMED_EMAIL))
-                    .when(emailConfirm).checkedConfirmedEmail(email);
+      doThrow(new CustomException(AuthErrorCode.NOT_CONFIRMED_EMAIL))
+          .when(emailConfirm)
+          .checkedConfirmedEmail(email);
 	        SignupRequest req = SignupRequest.builder()
 			        .email(email)
 			        .password(password)
@@ -176,8 +179,8 @@ class SignupServiceImplTest {
 			        .passwordConfirm(passConfirm)
 			        .consentReqs(consentReqs)
 			        .build();
-            when(signupStoreService.signup(req.getEmail(), req.getPassword()))
-                    .thenThrow(new CustomException(ErrorCode.EMAIL_ALREADY_EXISTS));
+      when(signupStoreService.signup(req.getEmail(), req.getPassword()))
+          .thenThrow(new CustomException(AuthErrorCode.EMAIL_ALREADY_EXISTS));
 
             // when & then
             assertThatThrownBy(() -> signupService.signup(req))
@@ -328,8 +331,8 @@ class SignupServiceImplTest {
             String email = "social@example.com";
             Provider provider = Provider.KAKAO;
 
-            when(signupStoreService.signupFromOtherProvider(email, provider))
-                    .thenThrow(new CustomException(ErrorCode.EMAIL_ALREADY_EXISTS));
+      when(signupStoreService.signupFromOtherProvider(email, provider))
+          .thenThrow(new CustomException(AuthErrorCode.EMAIL_ALREADY_EXISTS));
 
             // when & then
             assertThatThrownBy(() -> signupService.signupFromOtherProvider(email, provider))
@@ -479,8 +482,9 @@ class SignupServiceImplTest {
             Auth expectedAuth = Auth.builder().id("user-id").provider(Provider.SYSTEM).build();
 
             when(signupStoreService.signup(email, password)).thenReturn(expectedAuth);
-            doThrow(new CustomException(ErrorCode.CONSENT_NOT_VALID))
-                    .when(consentService).saveConsent(any(), anyList());
+      doThrow(new CustomException(AuthErrorCode.CONSENT_NOT_VALID))
+          .when(consentService)
+          .saveConsent(any(), anyList());
 
             // when & then
             assertThatThrownBy(() -> signupService.signup(request))

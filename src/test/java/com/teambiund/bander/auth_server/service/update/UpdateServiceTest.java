@@ -5,14 +5,16 @@ import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.*;
 
-import com.teambiund.bander.auth_server.dto.request.HistoryRequest;
-import com.teambiund.bander.auth_server.entity.Auth;
-import com.teambiund.bander.auth_server.enums.Role;
-import com.teambiund.bander.auth_server.enums.Status;
-import com.teambiund.bander.auth_server.exceptions.CustomException;
-import com.teambiund.bander.auth_server.exceptions.ErrorCode.ErrorCode;
-import com.teambiund.bander.auth_server.repository.AuthRepository;
-import com.teambiund.bander.auth_server.util.cipher.CipherStrategy;
+import com.teambiund.bander.auth_server.auth.dto.request.HistoryRequest;
+import com.teambiund.bander.auth_server.auth.entity.Auth;
+import com.teambiund.bander.auth_server.auth.enums.Role;
+import com.teambiund.bander.auth_server.auth.enums.Status;
+import com.teambiund.bander.auth_server.auth.exception.CustomException;
+import com.teambiund.bander.auth_server.auth.exception.ErrorCode.AuthErrorCode;
+import com.teambiund.bander.auth_server.auth.repository.AuthRepository;
+import com.teambiund.bander.auth_server.auth.service.update.HistoryService;
+import com.teambiund.bander.auth_server.auth.service.update.UpdateService;
+import com.teambiund.bander.auth_server.auth.util.cipher.CipherStrategy;
 import java.util.Optional;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
@@ -89,10 +91,10 @@ class UpdateServiceTest {
 
             when(authRepository.findById(userId)).thenReturn(Optional.empty());
 
-            // when & then
-            assertThatThrownBy(() -> updateService.EmailConfirm(userId))
-                    .isInstanceOf(CustomException.class)
-                    .hasFieldOrPropertyWithValue("errorcode", ErrorCode.USER_NOT_FOUND);
+      // when & then
+      assertThatThrownBy(() -> updateService.EmailConfirm(userId))
+          .isInstanceOf(CustomException.class)
+          .hasFieldOrPropertyWithValue("errorcode", AuthErrorCode.USER_NOT_FOUND);
 
             verify(authRepository, never()).save(any());
         }

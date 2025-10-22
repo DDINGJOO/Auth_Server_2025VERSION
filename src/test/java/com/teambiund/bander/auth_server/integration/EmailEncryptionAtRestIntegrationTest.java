@@ -6,20 +6,20 @@ import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.when;
 
 import com.teambiund.bander.auth_server.AuthServerApplication;
-import com.teambiund.bander.auth_server.dto.response.LoginResponse;
-import com.teambiund.bander.auth_server.entity.Auth;
-import com.teambiund.bander.auth_server.enums.Provider;
-import com.teambiund.bander.auth_server.enums.Role;
-import com.teambiund.bander.auth_server.enums.Status;
-import com.teambiund.bander.auth_server.exceptions.CustomException;
-import com.teambiund.bander.auth_server.exceptions.ErrorCode.ErrorCode;
-import com.teambiund.bander.auth_server.repository.AuthRepository;
-import com.teambiund.bander.auth_server.service.login.LoginServiceImpl;
-import com.teambiund.bander.auth_server.service.signup.SignupStoreService;
-import com.teambiund.bander.auth_server.service.withdrawal.impl.WithdrawalManagementServiceImpl;
-import com.teambiund.bander.auth_server.util.cipher.CipherStrategy;
-import com.teambiund.bander.auth_server.util.generator.key.KeyProvider;
-import com.teambiund.bander.auth_server.util.generator.token.TokenUtil;
+import com.teambiund.bander.auth_server.auth.dto.response.LoginResponse;
+import com.teambiund.bander.auth_server.auth.entity.Auth;
+import com.teambiund.bander.auth_server.auth.enums.Provider;
+import com.teambiund.bander.auth_server.auth.enums.Role;
+import com.teambiund.bander.auth_server.auth.enums.Status;
+import com.teambiund.bander.auth_server.auth.exception.CustomException;
+import com.teambiund.bander.auth_server.auth.exception.ErrorCode.AuthErrorCode;
+import com.teambiund.bander.auth_server.auth.repository.AuthRepository;
+import com.teambiund.bander.auth_server.auth.service.login.LoginServiceImpl;
+import com.teambiund.bander.auth_server.auth.service.signup.SignupStoreService;
+import com.teambiund.bander.auth_server.auth.service.withdrawal.impl.WithdrawalManagementServiceImpl;
+import com.teambiund.bander.auth_server.auth.util.cipher.CipherStrategy;
+import com.teambiund.bander.auth_server.auth.util.generator.key.KeyProvider;
+import com.teambiund.bander.auth_server.auth.util.generator.token.TokenUtil;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
@@ -91,10 +91,10 @@ public class EmailEncryptionAtRestIntegrationTest {
         // and: 부수 의존성 목 설정
         when(keyProvider.generateKey()).thenReturn("new-user-id");
 
-        // when & then: 평문 이메일로 가입 시도하면 중복으로 예외
-        assertThatThrownBy(() -> signupStoreService.signup(plainEmail, "NewPass123!"))
-                .isInstanceOf(CustomException.class)
-                .hasMessageContaining(ErrorCode.EMAIL_ALREADY_EXISTS.name());
+    // when & then: 평문 이메일로 가입 시도하면 중복으로 예외
+    assertThatThrownBy(() -> signupStoreService.signup(plainEmail, "NewPass123!"))
+        .isInstanceOf(CustomException.class)
+        .hasMessageContaining(AuthErrorCode.EMAIL_ALREADY_EXISTS.name());
     }
 
 

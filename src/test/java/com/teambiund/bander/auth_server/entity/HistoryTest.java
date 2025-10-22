@@ -2,9 +2,11 @@ package com.teambiund.bander.auth_server.entity;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
-import com.teambiund.bander.auth_server.enums.Provider;
-import com.teambiund.bander.auth_server.enums.Role;
-import com.teambiund.bander.auth_server.enums.Status;
+import com.teambiund.bander.auth_server.auth.entity.Auth;
+import com.teambiund.bander.auth_server.auth.entity.History;
+import com.teambiund.bander.auth_server.auth.enums.Provider;
+import com.teambiund.bander.auth_server.auth.enums.Role;
+import com.teambiund.bander.auth_server.auth.enums.Status;
 import java.time.LocalDateTime;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;

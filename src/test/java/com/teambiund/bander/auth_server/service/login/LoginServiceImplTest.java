@@ -5,18 +5,19 @@ import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.*;
 
-import com.teambiund.bander.auth_server.dto.response.LoginResponse;
-import com.teambiund.bander.auth_server.entity.Auth;
-import com.teambiund.bander.auth_server.enums.Provider;
-import com.teambiund.bander.auth_server.enums.Role;
-import com.teambiund.bander.auth_server.enums.Status;
-import com.teambiund.bander.auth_server.exceptions.CustomException;
-import com.teambiund.bander.auth_server.exceptions.ErrorCode.ErrorCode;
-import com.teambiund.bander.auth_server.repository.AuthRepository;
-import com.teambiund.bander.auth_server.repository.LoginStatusRepository;
-import com.teambiund.bander.auth_server.util.cipher.CipherStrategy;
-import com.teambiund.bander.auth_server.util.generator.key.KeyProvider;
-import com.teambiund.bander.auth_server.util.generator.token.TokenUtil;
+import com.teambiund.bander.auth_server.auth.dto.response.LoginResponse;
+import com.teambiund.bander.auth_server.auth.entity.Auth;
+import com.teambiund.bander.auth_server.auth.enums.Provider;
+import com.teambiund.bander.auth_server.auth.enums.Role;
+import com.teambiund.bander.auth_server.auth.enums.Status;
+import com.teambiund.bander.auth_server.auth.exception.CustomException;
+import com.teambiund.bander.auth_server.auth.exception.ErrorCode.AuthErrorCode;
+import com.teambiund.bander.auth_server.auth.repository.AuthRepository;
+import com.teambiund.bander.auth_server.auth.repository.LoginStatusRepository;
+import com.teambiund.bander.auth_server.auth.service.login.LoginServiceImpl;
+import com.teambiund.bander.auth_server.auth.util.cipher.CipherStrategy;
+import com.teambiund.bander.auth_server.auth.util.generator.key.KeyProvider;
+import com.teambiund.bander.auth_server.auth.util.generator.token.TokenUtil;
 import java.util.Optional;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
@@ -155,10 +156,10 @@ class LoginServiceImplTest {
             when(authRepository.findByEmail(encryptedEmail)).thenReturn(Optional.empty());
             when(authRepository.findByEmail(email)).thenReturn(Optional.empty());
 
-            // when & then
-            assertThatThrownBy(() -> loginService.login(email, password))
-                    .isInstanceOf(CustomException.class)
-                    .hasFieldOrPropertyWithValue("errorcode", ErrorCode.USER_NOT_FOUND);
+      // when & then
+      assertThatThrownBy(() -> loginService.login(email, password))
+          .isInstanceOf(CustomException.class)
+          .hasFieldOrPropertyWithValue("errorcode", AuthErrorCode.USER_NOT_FOUND);
 
             verify(passwordEncoder, never()).matches(anyString(), anyString());
             verify(tokenUtil, never()).generateAccessToken(anyString(), any(), anyString());
@@ -184,10 +185,10 @@ class LoginServiceImplTest {
             when(authRepository.findByEmail(encryptedEmail)).thenReturn(Optional.of(auth));
             when(passwordEncoder.matches(password, hashedPassword)).thenReturn(false);
 
-            // when & then
-            assertThatThrownBy(() -> loginService.login(email, password))
-                    .isInstanceOf(CustomException.class)
-                    .hasFieldOrPropertyWithValue("errorcode", ErrorCode.PASSWORD_MISMATCH);
+      // when & then
+      assertThatThrownBy(() -> loginService.login(email, password))
+          .isInstanceOf(CustomException.class)
+          .hasFieldOrPropertyWithValue("errorcode", AuthErrorCode.PASSWORD_MISMATCH);
 
             verify(tokenUtil, never()).generateAccessToken(anyString(), any(), anyString());
         }
@@ -251,10 +252,10 @@ class LoginServiceImplTest {
             when(authRepository.findByEmail(encryptedEmail)).thenReturn(Optional.of(auth));
             when(passwordEncoder.matches(password, "hashedPassword")).thenReturn(true);
 
-            // when & then
-            assertThatThrownBy(() -> loginService.login(email, password))
-                    .isInstanceOf(CustomException.class)
-                    .hasFieldOrPropertyWithValue("errorcode", ErrorCode.USER_IS_SLEEPING);
+      // when & then
+      assertThatThrownBy(() -> loginService.login(email, password))
+          .isInstanceOf(CustomException.class)
+          .hasFieldOrPropertyWithValue("errorcode", AuthErrorCode.USER_IS_SLEEPING);
 
             verify(tokenUtil, never()).generateAccessToken(anyString(), any(), anyString());
         }
@@ -386,10 +387,10 @@ class LoginServiceImplTest {
 
             when(tokenUtil.isValid(refreshToken)).thenReturn(false);
 
-            // when & then
-            assertThatThrownBy(() -> loginService.refreshToken(refreshToken, deviceId))
-                    .isInstanceOf(CustomException.class)
-                    .hasFieldOrPropertyWithValue("errorcode", ErrorCode.EXPIRED_TOKEN);
+      // when & then
+      assertThatThrownBy(() -> loginService.refreshToken(refreshToken, deviceId))
+          .isInstanceOf(CustomException.class)
+          .hasFieldOrPropertyWithValue("errorcode", AuthErrorCode.EXPIRED_TOKEN);
 
             verify(tokenUtil, never()).extractUserId(anyString());
             verify(authRepository, never()).findById(anyString());
@@ -406,10 +407,10 @@ class LoginServiceImplTest {
             when(tokenUtil.extractUserId(refreshToken)).thenReturn(null);
             when(tokenUtil.extractDeviceId(refreshToken)).thenReturn(deviceId);
 
-            // when & then
-            assertThatThrownBy(() -> loginService.refreshToken(refreshToken, deviceId))
-                    .isInstanceOf(CustomException.class)
-                    .hasFieldOrPropertyWithValue("errorcode", ErrorCode.INVALID_TOKEN);
+      // when & then
+      assertThatThrownBy(() -> loginService.refreshToken(refreshToken, deviceId))
+          .isInstanceOf(CustomException.class)
+          .hasFieldOrPropertyWithValue("errorcode", AuthErrorCode.INVALID_TOKEN);
 
             verify(authRepository, never()).findById(anyString());
         }
@@ -426,10 +427,10 @@ class LoginServiceImplTest {
             when(tokenUtil.extractUserId(refreshToken)).thenReturn("user-id");
             when(tokenUtil.extractDeviceId(refreshToken)).thenReturn(tokenDeviceId);
 
-            // when & then
-            assertThatThrownBy(() -> loginService.refreshToken(refreshToken, deviceId))
-                    .isInstanceOf(CustomException.class)
-                    .hasFieldOrPropertyWithValue("errorcode", ErrorCode.INVALID_DEVICE_ID);
+      // when & then
+      assertThatThrownBy(() -> loginService.refreshToken(refreshToken, deviceId))
+          .isInstanceOf(CustomException.class)
+          .hasFieldOrPropertyWithValue("errorcode", AuthErrorCode.INVALID_DEVICE_ID);
 
             verify(authRepository, never()).findById(anyString());
         }
@@ -447,10 +448,10 @@ class LoginServiceImplTest {
             when(tokenUtil.extractDeviceId(refreshToken)).thenReturn(deviceId);
             when(authRepository.findById(userId)).thenReturn(Optional.empty());
 
-            // when & then
-            assertThatThrownBy(() -> loginService.refreshToken(refreshToken, deviceId))
-                    .isInstanceOf(CustomException.class)
-                    .hasFieldOrPropertyWithValue("errorcode", ErrorCode.USER_NOT_FOUND);
+      // when & then
+      assertThatThrownBy(() -> loginService.refreshToken(refreshToken, deviceId))
+          .isInstanceOf(CustomException.class)
+          .hasFieldOrPropertyWithValue("errorcode", AuthErrorCode.USER_NOT_FOUND);
 
             verify(tokenUtil, never()).generateAccessToken(anyString(), any(), anyString());
         }

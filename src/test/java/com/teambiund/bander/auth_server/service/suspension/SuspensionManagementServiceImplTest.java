@@ -4,16 +4,16 @@ import static org.assertj.core.api.Assertions.*;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.*;
 
-import com.teambiund.bander.auth_server.entity.Auth;
-import com.teambiund.bander.auth_server.entity.Suspend;
-import com.teambiund.bander.auth_server.enums.Role;
-import com.teambiund.bander.auth_server.enums.Status;
-import com.teambiund.bander.auth_server.exceptions.CustomException;
-import com.teambiund.bander.auth_server.exceptions.ErrorCode.ErrorCode;
-import com.teambiund.bander.auth_server.repository.AuthRepository;
-import com.teambiund.bander.auth_server.repository.SuspendRepository;
-import com.teambiund.bander.auth_server.service.suspension.impl.SuspensionManagementServiceImpl;
-import com.teambiund.bander.auth_server.util.generator.key.KeyProvider;
+import com.teambiund.bander.auth_server.auth.entity.Auth;
+import com.teambiund.bander.auth_server.auth.entity.Suspend;
+import com.teambiund.bander.auth_server.auth.enums.Role;
+import com.teambiund.bander.auth_server.auth.enums.Status;
+import com.teambiund.bander.auth_server.auth.exception.CustomException;
+import com.teambiund.bander.auth_server.auth.exception.ErrorCode.AuthErrorCode;
+import com.teambiund.bander.auth_server.auth.repository.AuthRepository;
+import com.teambiund.bander.auth_server.auth.repository.SuspendRepository;
+import com.teambiund.bander.auth_server.auth.service.suspension.impl.SuspensionManagementServiceImpl;
+import com.teambiund.bander.auth_server.auth.util.generator.key.KeyProvider;
 import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.Optional;
@@ -100,10 +100,10 @@ class SuspensionManagementServiceImplTest {
 
             when(authRepository.findById(userId)).thenReturn(Optional.empty());
 
-            // when & then
-            assertThatThrownBy(() -> suspensionService.release(userId))
-                    .isInstanceOf(CustomException.class)
-                    .hasFieldOrPropertyWithValue("errorcode", ErrorCode.USER_NOT_FOUND);
+      // when & then
+      assertThatThrownBy(() -> suspensionService.release(userId))
+          .isInstanceOf(CustomException.class)
+          .hasFieldOrPropertyWithValue("errorcode", AuthErrorCode.USER_NOT_FOUND);
 
             verify(authRepository, never()).save(any());
         }
@@ -122,10 +122,10 @@ class SuspensionManagementServiceImplTest {
 
             when(authRepository.findById(userId)).thenReturn(Optional.of(auth));
 
-            // when & then
-            assertThatThrownBy(() -> suspensionService.release(userId))
-                    .isInstanceOf(CustomException.class)
-                    .hasFieldOrPropertyWithValue("errorcode", ErrorCode.USER_NOT_SUSPENDED);
+      // when & then
+      assertThatThrownBy(() -> suspensionService.release(userId))
+          .isInstanceOf(CustomException.class)
+          .hasFieldOrPropertyWithValue("errorcode", AuthErrorCode.USER_NOT_SUSPENDED);
 
             verify(authRepository, never()).save(any());
         }
@@ -305,10 +305,10 @@ class SuspensionManagementServiceImplTest {
 
             when(authRepository.findById(userId)).thenReturn(Optional.empty());
 
-            // when & then
-            assertThatThrownBy(() -> suspensionService.suspend(userId, "사유", suspenderUserId, 7L))
-                    .isInstanceOf(CustomException.class)
-                    .hasFieldOrPropertyWithValue("errorcode", ErrorCode.USER_NOT_FOUND);
+      // when & then
+      assertThatThrownBy(() -> suspensionService.suspend(userId, "사유", suspenderUserId, 7L))
+          .isInstanceOf(CustomException.class)
+          .hasFieldOrPropertyWithValue("errorcode", AuthErrorCode.USER_NOT_FOUND);
 
             verify(authRepository, never()).save(any());
         }
@@ -328,10 +328,10 @@ class SuspensionManagementServiceImplTest {
             when(authRepository.findById(userId)).thenReturn(Optional.of(user));
             when(authRepository.findById(suspenderUserId)).thenReturn(Optional.empty());
 
-            // when & then
-            assertThatThrownBy(() -> suspensionService.suspend(userId, "사유", suspenderUserId, 7L))
-                    .isInstanceOf(CustomException.class)
-                    .hasFieldOrPropertyWithValue("errorcode", ErrorCode.USER_NOT_FOUND);
+      // when & then
+      assertThatThrownBy(() -> suspensionService.suspend(userId, "사유", suspenderUserId, 7L))
+          .isInstanceOf(CustomException.class)
+          .hasFieldOrPropertyWithValue("errorcode", AuthErrorCode.USER_NOT_FOUND);
 
             verify(authRepository, never()).save(any());
         }
@@ -356,10 +356,10 @@ class SuspensionManagementServiceImplTest {
             when(authRepository.findById(userId)).thenReturn(Optional.of(user));
             when(authRepository.findById(suspenderUserId)).thenReturn(Optional.of(regularUser));
 
-            // when & then
-            assertThatThrownBy(() -> suspensionService.suspend(userId, "사유", suspenderUserId, 7L))
-                    .isInstanceOf(CustomException.class)
-                    .hasFieldOrPropertyWithValue("errorcode", ErrorCode.NOT_ADMIN);
+      // when & then
+      assertThatThrownBy(() -> suspensionService.suspend(userId, "사유", suspenderUserId, 7L))
+          .isInstanceOf(CustomException.class)
+          .hasFieldOrPropertyWithValue("errorcode", AuthErrorCode.NOT_ADMIN);
 
             verify(keyProvider, never()).generateKey();
             verify(authRepository, never()).save(any());
@@ -385,10 +385,10 @@ class SuspensionManagementServiceImplTest {
             when(authRepository.findById(userId)).thenReturn(Optional.of(user));
             when(authRepository.findById(suspenderUserId)).thenReturn(Optional.of(admin));
 
-            // when & then
-            assertThatThrownBy(() -> suspensionService.suspend(userId, "사유", suspenderUserId, 7L))
-                    .isInstanceOf(CustomException.class)
-                    .hasFieldOrPropertyWithValue("errorcode", ErrorCode.USER_ALREADY_BLOCKED);
+      // when & then
+      assertThatThrownBy(() -> suspensionService.suspend(userId, "사유", suspenderUserId, 7L))
+          .isInstanceOf(CustomException.class)
+          .hasFieldOrPropertyWithValue("errorcode", AuthErrorCode.USER_ALREADY_BLOCKED);
 
             verify(keyProvider, never()).generateKey();
             verify(authRepository, never()).save(any());
@@ -559,10 +559,10 @@ class SuspensionManagementServiceImplTest {
             when(authRepository.findById(userId)).thenReturn(Optional.of(user));
             when(authRepository.findById(suspenderUserId)).thenReturn(Optional.of(exAdmin));
 
-            // when & then
-            assertThatThrownBy(() -> suspensionService.suspend(userId, "사유", suspenderUserId, 7L))
-                    .isInstanceOf(CustomException.class)
-                    .hasFieldOrPropertyWithValue("errorcode", ErrorCode.NOT_ADMIN);
+      // when & then
+      assertThatThrownBy(() -> suspensionService.suspend(userId, "사유", suspenderUserId, 7L))
+          .isInstanceOf(CustomException.class)
+          .hasFieldOrPropertyWithValue("errorcode", AuthErrorCode.NOT_ADMIN);
         }
     }
 
@@ -614,10 +614,10 @@ class SuspensionManagementServiceImplTest {
             when(authRepository.findById(userId)).thenReturn(Optional.of(user));
             when(authRepository.findById(suspenderUserId)).thenReturn(Optional.of(regularUser));
 
-            // when & then
-            assertThatThrownBy(() -> suspensionService.suspend(userId, "사유", suspenderUserId, 7L))
-                    .isInstanceOf(CustomException.class)
-                    .hasFieldOrPropertyWithValue("errorcode", ErrorCode.NOT_ADMIN);
+      // when & then
+      assertThatThrownBy(() -> suspensionService.suspend(userId, "사유", suspenderUserId, 7L))
+          .isInstanceOf(CustomException.class)
+          .hasFieldOrPropertyWithValue("errorcode", AuthErrorCode.NOT_ADMIN);
 
             // given - GUEST 역할
             Auth guest = Auth.builder()
@@ -627,10 +627,10 @@ class SuspensionManagementServiceImplTest {
 
             when(authRepository.findById(suspenderUserId)).thenReturn(Optional.of(guest));
 
-            // when & then
-            assertThatThrownBy(() -> suspensionService.suspend(userId, "사유", suspenderUserId, 7L))
-                    .isInstanceOf(CustomException.class)
-                    .hasFieldOrPropertyWithValue("errorcode", ErrorCode.NOT_ADMIN);
+      // when & then
+      assertThatThrownBy(() -> suspensionService.suspend(userId, "사유", suspenderUserId, 7L))
+          .isInstanceOf(CustomException.class)
+          .hasFieldOrPropertyWithValue("errorcode", AuthErrorCode.NOT_ADMIN);
         }
 
         @Test

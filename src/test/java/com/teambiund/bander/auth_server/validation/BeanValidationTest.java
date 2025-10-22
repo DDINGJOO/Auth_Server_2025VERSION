@@ -2,11 +2,11 @@ package com.teambiund.bander.auth_server.validation;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
-import com.teambiund.bander.auth_server.dto.request.ConsentRequest;
-import com.teambiund.bander.auth_server.dto.request.LoginRequest;
-import com.teambiund.bander.auth_server.dto.request.SignupRequest;
-import com.teambiund.bander.auth_server.dto.request.SuspendRequest;
-import com.teambiund.bander.auth_server.dto.request.TokenRefreshRequest;
+import com.teambiund.bander.auth_server.auth.dto.request.ConsentRequest;
+import com.teambiund.bander.auth_server.auth.dto.request.LoginRequest;
+import com.teambiund.bander.auth_server.auth.dto.request.SignupRequest;
+import com.teambiund.bander.auth_server.auth.dto.request.SuspendRequest;
+import com.teambiund.bander.auth_server.auth.dto.request.TokenRefreshRequest;
 import jakarta.validation.ConstraintViolation;
 import jakarta.validation.Validation;
 import jakarta.validation.Validator;
