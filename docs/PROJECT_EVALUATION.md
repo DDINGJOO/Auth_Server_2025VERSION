@@ -11,7 +11,8 @@
 
 ### 1.1 프로젝트 목적
 
-실무 수준의 인증 서버 구축을 목표로 하는 Spring Boot 기반의 백엔드 프로젝트. 사용자 인증 및 회원 정보 관리에 집중하며, 세밀한 인증/인가 정책은 API Gateway에서 담당하는 MSA 아키텍처 구조로 설계되었다.
+실무 수준의 인증 서버 구축을 목표로 하는 Spring Boot 기반의 백엔드 프로젝트. 사용자 인증 및 회원 정보 관리에 집중하며, 세밀한 인증/인가 정책은 API Gateway에서 담당하는 MSA 아키텍처 구조로
+설계되었다.
 
 ### 1.2 기술 스택
 
@@ -114,57 +115,57 @@
 #### 3.1.1 보안 개선 (Critical → Completed)
 
 1. **이메일 암호화 구현** ✅
-   - AES-256 암호화 알고리즘 적용
-   - 같은 이메일이라도 다른 암호문 생성 (IV 랜덤 생성)
-   - 복호화 가능한 양방향 암호화
-   - 성능 검증 완료 (PR #56)
+	- AES-256 암호화 알고리즘 적용
+	- 같은 이메일이라도 다른 암호문 생성 (IV 랜덤 생성)
+	- 복호화 가능한 양방향 암호화
+	- 성능 검증 완료 (PR #56)
 
 2. **소셜 로그인 구현** ✅
-   - 카카오 OAuth 2.0 연동 완료
-   - Apple Sign In 연동 완료
-   - Provider 기반 사용자 관리 (SYSTEM, KAKAO, APPLE)
-   - 소셜 로그인 비즈니스 로직 리팩토링 (PR #65, #66)
+	- 카카오 OAuth 2.0 연동 완료
+	- Apple Sign In 연동 완료
+	- Provider 기반 사용자 관리 (SYSTEM, KAKAO, APPLE)
+	- 소셜 로그인 비즈니스 로직 리팩토링 (PR #65, #66)
 
 #### 3.1.2 코드 품질 개선 (High → Completed)
 
 1. **네이밍 오류 일괄 수정** ✅
-   - `LonginController` → `LoginController`
-   - `vailidator` → `validator`
-   - `key_gerneratre` → `key_generator`
-   - `statictics` → `statistics`
-   - `consents_name` → `consentsname`
-   - `ConsentTable_init` → `ConsentTableInit`
-   - `healthCheckController` → `HealthCheckController`
-   - 총 10개 파일, 네이밍 컨벤션 위반 수정 (PR #63)
+	- `LonginController` → `LoginController`
+	- `vailidator` → `validator`
+	- `key_gerneratre` → `key_generator`
+	- `statictics` → `statistics`
+	- `consents_name` → `consentsname`
+	- `ConsentTable_init` → `ConsentTableInit`
+	- `healthCheckController` → `HealthCheckController`
+	- 총 10개 파일, 네이밍 컨벤션 위반 수정 (PR #63)
 
 2. **Bean Validation 적용** ✅
-   - @Valid, @NotNull, @NotBlank, @Email 등 선언적 검증 추가
-   - 커스텀 Validator 구현 (PasswordMatchesValidator, PhoneNumberValidator, RequiredConsentsValidator)
-   - 수동 검증 로직 제거 및 표준화 (PR #57)
+	- @Valid, @NotNull, @NotBlank, @Email 등 선언적 검증 추가
+	- 커스텀 Validator 구현 (PasswordMatchesValidator, PhoneNumberValidator, RequiredConsentsValidator)
+	- 수동 검증 로직 제거 및 표준화 (PR #57)
 
 3. **예외 처리 개선** ✅
-   - GlobalExceptionHandler 체계화
-   - ErrorCode enum 도입으로 표준화된 에러 코드 관리
-   - 일관된 에러 응답 포맷
+	- GlobalExceptionHandler 체계화
+	- ErrorCode enum 도입으로 표준화된 에러 코드 관리
+	- 일관된 에러 응답 포맷
 
 #### 3.1.3 테스트 개선 (Medium → Completed)
 
 1. **테스트 커버리지 측정 환경 구축** ✅
-   - 테스트 코드 대폭 확장
-   - TestFixture 패턴 적용으로 테스트 코드 모듈화
-   - Repository, Service 레이어 테스트 강화 (PR #58)
+	- 테스트 코드 대폭 확장
+	- TestFixture 패턴 적용으로 테스트 코드 모듈화
+	- Repository, Service 레이어 테스트 강화 (PR #58)
 
 #### 3.1.4 비즈니스 로직 개선
 
 1. **동의 로직 리팩토링** ✅
-   - 문서 번호 기반 검증에서 ConsentId 기반 검증으로 전환
-   - 데이터 정합성 향상
-   - 요구사항 변경 반영 (PR #62)
+	- 문서 번호 기반 검증에서 ConsentId 기반 검증으로 전환
+	- 데이터 정합성 향상
+	- 요구사항 변경 반영 (PR #62)
 
 2. **엔티티 및 스키마 정합성 개선** ✅
-   - DB 스키마와 JPA 엔티티 매핑 정합성 수정
-   - 편의 메서드 개선
-   - 테스트 데이터 정합성 수정 (PR #64)
+	- DB 스키마와 JPA 엔티티 매핑 정합성 수정
+	- 편의 메서드 개선
+	- 테스트 데이터 정합성 수정 (PR #64)
 
 #### 3.1.5 문서화 개선 (Medium → Completed)
 
@@ -186,18 +187,18 @@
 #### 3.2.1 메시징 안정성 (Medium)
 
 1. **Outbox 패턴**:
-   - 이벤트 발행 실패 시 재시도 메커니즘 부재
-   - 메시지 전송 보장 필요
+	- 이벤트 발행 실패 시 재시도 메커니즘 부재
+	- 메시지 전송 보장 필요
 
 #### 3.2.2 성능 및 최적화 (Low)
 
 1. **Redis 메모리 관리**:
-   - 일일 통계 DB 백업 스케줄러 미구현
-   - 메모리 누수 가능성
+	- 일일 통계 DB 백업 스케줄러 미구현
+	- 메모리 누수 가능성
 
 2. **성능 최적화**:
-   - N+1 쿼리 문제 검토 필요
-   - 인덱스 전략 최적화 필요
+	- N+1 쿼리 문제 검토 필요
+	- 인덱스 전략 최적화 필요
 
 ## 4. 코드 품질 현황 분석
 
@@ -365,9 +366,11 @@
 
 ### 8.1 프로젝트 발전 요약
 
-본 프로젝트는 2025-10-18 평가 이후 단 하루 만에 **눈에 띄는 개선**을 이루었습니다. 특히 **보안, 코드 품질, 테스트** 영역에서 큰 발전이 있었으며, **아키텍처 설계 완성도**가 최고 수준에 도달했습니다.
+본 프로젝트는 2025-10-18 평가 이후 단 하루 만에 **눈에 띄는 개선**을 이루었습니다. 특히 **보안, 코드 품질, 테스트** 영역에서 큰 발전이 있었으며, **아키텍처 설계 완성도**가 최고 수준에
+도달했습니다.
 
 **주요 성과:**
+
 - 이메일 AES-256 암호화 구현으로 개인정보 보호 강화
 - 카카오, 애플 소셜 로그인 구현으로 사용자 편의성 증대
 - Java 네이밍 컨벤션 전면 준수로 코드 가독성 및 유지보수성 향상
@@ -379,6 +382,7 @@
 ### 8.2 아키텍처 결정 사항
 
 **중요한 아키텍처 변경 사항**이 있습니다:
+
 - **기존 계획**: Auth Server에 Spring Security 통합
 - **변경된 방향**: API Gateway에서 인증/인가 정책 처리
 - **Auth Server의 역할**: 사용자 인증 및 JWT 토큰 발급에 집중

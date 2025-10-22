@@ -17,35 +17,33 @@ import org.springframework.transaction.annotation.Transactional;
 @Service
 @RequiredArgsConstructor
 public class SignupClientService implements SignupClientInterface {
-    private final SignupStoreService signupStoreService;
-    private final UpdateService updateService;
-    private final WithdrawalManagementService withdrawService;
-    private final ConsentManagementService consentService;
+  private final SignupStoreService signupStoreService;
+  private final UpdateService updateService;
+  private final WithdrawalManagementService withdrawService;
+  private final ConsentManagementService consentService;
 
-    @Override
-    @Transactional
-    public void signup(SignupRequest request) throws CustomException {
-        Auth auth = signupStoreService.signup(request.getEmail(), request.getPassword());
-        consentService.saveConsent(auth, request.getConsentReqs());
+  @Override
+  @Transactional
+  public void signup(SignupRequest request) throws CustomException {
+    Auth auth = signupStoreService.signup(request.getEmail(), request.getPassword());
+    consentService.saveConsent(auth, request.getConsentReqs());
+  }
 
-    }
+  @Override
+  @Transactional
+  public void passwordChange(String email, String newPassword, String newPasswordConfirm)
+      throws CustomException {
+    updateService.changePassword(email, newPassword, newPasswordConfirm);
+  }
 
-    @Override
-    @Transactional
-    public void passwordChange(String email, String newPassword, String newPasswordConfirm) throws CustomException {
-        updateService.changePassword(email, newPassword, newPasswordConfirm);
+  @Override
+  @Transactional
+  public void withdraw(String userId, String withdrawReason) throws CustomException {
+    withdrawService.withdraw(userId, withdrawReason);
+  }
 
-    }
-
-    @Override
-    @Transactional
-    public void withdraw(String userId, String withdrawReason) throws CustomException {
-        withdrawService.withdraw(userId, withdrawReason);
-
-    }
-
-    @Override
-    public void changeConsent(String userId, List<ConsentRequest> req) throws CustomException {
-        consentService.changeConsent(userId, req);
-    }
+  @Override
+  public void changeConsent(String userId, List<ConsentRequest> req) throws CustomException {
+    consentService.changeConsent(userId, req);
+  }
 }

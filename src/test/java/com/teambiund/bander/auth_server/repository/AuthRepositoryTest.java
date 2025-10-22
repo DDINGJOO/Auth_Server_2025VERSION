@@ -34,10 +34,8 @@ import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.jdbc.Sql;
 
 /**
- * AuthRepository 테스트
- * - @DataJpaTest: JPA 컴포넌트만 로드 (Service, Controller 제외)
- * - TestEntityManager: 순수 JPA 작업을 위한 헬퍼
- * - 모든 테스트는 자동으로 롤백됨 (@Transactional)
+ * AuthRepository 테스트 - @DataJpaTest: JPA 컴포넌트만 로드 (Service, Controller 제외) - TestEntityManager: 순수
+ * JPA 작업을 위한 헬퍼 - 모든 테스트는 자동으로 롤백됨 (@Transactional)
  */
 @DataJpaTest
 @AutoConfigureTestDatabase(replace = AutoConfigureTestDatabase.Replace.ANY)
@@ -46,769 +44,784 @@ import org.springframework.test.context.jdbc.Sql;
 @ActiveProfiles("test")
 @DisplayName("AuthRepository 테스트")
 public class AuthRepositoryTest {
-	
-    @Autowired
-    private TestEntityManager em;
-    @Autowired
-    private AuthRepository authRepository;
 
-    @Test
-    @DisplayName("[성공] save - 새로운 Auth 저장")
-    void saveNewAuth() {
-        // given
-        Auth auth = createTestAuth("save@example.com");
+  @Autowired private TestEntityManager em;
+  @Autowired private AuthRepository authRepository;
 
-        // when
-        Auth saved = authRepository.save(auth);
-        em.flush();
-        em.clear();
+  @Test
+  @DisplayName("[성공] save - 새로운 Auth 저장")
+  void saveNewAuth() {
+    // given
+    Auth auth = createTestAuth("save@example.com");
 
-        // then
-        assertThat(saved.getId()).isNotNull();
-        Optional<Auth> found = authRepository.findById(saved.getId());
-        assertThat(found).isPresent();
-        assertThat(found.get().getEmail()).isEqualTo("save@example.com");
-    }
+    // when
+    Auth saved = authRepository.save(auth);
+    em.flush();
+    em.clear();
+
+    // then
+    assertThat(saved.getId()).isNotNull();
+    Optional<Auth> found = authRepository.findById(saved.getId());
+    assertThat(found).isPresent();
+    assertThat(found.get().getEmail()).isEqualTo("save@example.com");
+  }
 
   // ===== 기본 CRUD 테스트 =====
 
   @Test
   @DisplayName("[성공] findById - 존재하는 ID로 조회")
   void findByIdSuccess() {
-        // given
-        Auth auth = createTestAuth("findid@example.com");
-        em.persist(auth);
-        em.flush();
-        em.clear();
+    // given
+    Auth auth = createTestAuth("findid@example.com");
+    em.persist(auth);
+    em.flush();
+    em.clear();
 
-        // when
-        Optional<Auth> found = authRepository.findById(auth.getId());
+    // when
+    Optional<Auth> found = authRepository.findById(auth.getId());
 
-        // then
-        assertThat(found).isPresent();
-        assertThat(found.get().getEmail()).isEqualTo("findid@example.com");
-    }
+    // then
+    assertThat(found).isPresent();
+    assertThat(found.get().getEmail()).isEqualTo("findid@example.com");
+  }
 
-    @Test
-    @DisplayName("[실패] findById - 존재하지 않는 ID로 조회")
-    void findByIdNotFound() {
-        // when
-        Optional<Auth> found = authRepository.findById("non-existent-id");
+  @Test
+  @DisplayName("[실패] findById - 존재하지 않는 ID로 조회")
+  void findByIdNotFound() {
+    // when
+    Optional<Auth> found = authRepository.findById("non-existent-id");
 
-        // then
-        assertThat(found).isEmpty();
-    }
+    // then
+    assertThat(found).isEmpty();
+  }
 
-    @Test
-    @DisplayName("[성공] findByEmail - 존재하는 이메일로 조회")
-    void findByEmailSuccess() {
-        // given
-        Auth auth = createTestAuth("findmail@example.com");
-        em.persist(auth);
-        em.flush();
+  @Test
+  @DisplayName("[성공] findByEmail - 존재하는 이메일로 조회")
+  void findByEmailSuccess() {
+    // given
+    Auth auth = createTestAuth("findmail@example.com");
+    em.persist(auth);
+    em.flush();
 
-        // when
-        Optional<Auth> found = authRepository.findByEmail("findmail@example.com");
+    // when
+    Optional<Auth> found = authRepository.findByEmail("findmail@example.com");
 
-        // then
-        assertThat(found).isPresent();
-        assertThat(found.get().getEmail()).isEqualTo("findmail@example.com");
-    }
+    // then
+    assertThat(found).isPresent();
+    assertThat(found.get().getEmail()).isEqualTo("findmail@example.com");
+  }
 
-    @Test
-    @DisplayName("[실패] findByEmail - 존재하지 않는 이메일로 조회")
-    void findByEmailNotFound() {
-        // when
-        Optional<Auth> found = authRepository.findByEmail("notfound@example.com");
+  @Test
+  @DisplayName("[실패] findByEmail - 존재하지 않는 이메일로 조회")
+  void findByEmailNotFound() {
+    // when
+    Optional<Auth> found = authRepository.findByEmail("notfound@example.com");
 
-        // then
-        assertThat(found).isEmpty();
-    }
+    // then
+    assertThat(found).isEmpty();
+  }
 
-    @Test
-    @DisplayName("[성공] existsByEmail - 존재하는 이메일")
-    void existsByEmailTrue() {
-        // given
-        Auth auth = createTestAuth("exists@example.com");
-        em.persist(auth);
-        em.flush();
+  @Test
+  @DisplayName("[성공] existsByEmail - 존재하는 이메일")
+  void existsByEmailTrue() {
+    // given
+    Auth auth = createTestAuth("exists@example.com");
+    em.persist(auth);
+    em.flush();
 
-        // when
-        boolean exists = authRepository.existsByEmail("exists@example.com");
+    // when
+    boolean exists = authRepository.existsByEmail("exists@example.com");
 
-        // then
-        assertThat(exists).isTrue();
-    }
+    // then
+    assertThat(exists).isTrue();
+  }
 
-    @Test
-    @DisplayName("[실패] existsByEmail - 존재하지 않는 이메일")
-    void existsByEmailFalse() {
-        // when
-        boolean exists = authRepository.existsByEmail("notexists@example.com");
+  @Test
+  @DisplayName("[실패] existsByEmail - 존재하지 않는 이메일")
+  void existsByEmailFalse() {
+    // when
+    boolean exists = authRepository.existsByEmail("notexists@example.com");
 
-        // then
-        assertThat(exists).isFalse();
-    }
+    // then
+    assertThat(exists).isFalse();
+  }
 
-    @Test
-    @DisplayName("[성공] update - Auth 업데이트")
-    void updateAuth() {
-        // given
-        Auth auth = createTestAuth("update@example.com");
-        em.persist(auth);
-        em.flush();
-        em.clear();
+  @Test
+  @DisplayName("[성공] update - Auth 업데이트")
+  void updateAuth() {
+    // given
+    Auth auth = createTestAuth("update@example.com");
+    em.persist(auth);
+    em.flush();
+    em.clear();
 
-        // when
-        Auth found = authRepository.findById(auth.getId()).orElseThrow();
-        found.setStatus(Status.SUSPENDED);
-        found.setUpdatedAt(LocalDateTime.now());
-        authRepository.save(found);
-        em.flush();
-        em.clear();
+    // when
+    Auth found = authRepository.findById(auth.getId()).orElseThrow();
+    found.setStatus(Status.SUSPENDED);
+    found.setUpdatedAt(LocalDateTime.now());
+    authRepository.save(found);
+    em.flush();
+    em.clear();
 
-        // then
-        Auth updated = authRepository.findById(auth.getId()).orElseThrow();
-        assertThat(updated.getStatus()).isEqualTo(Status.SUSPENDED);
-        assertThat(updated.getUpdatedAt()).isNotNull();
-    }
+    // then
+    Auth updated = authRepository.findById(auth.getId()).orElseThrow();
+    assertThat(updated.getStatus()).isEqualTo(Status.SUSPENDED);
+    assertThat(updated.getUpdatedAt()).isNotNull();
+  }
 
-    @Test
-    @DisplayName("[성공] delete - Auth 삭제")
-    void deleteAuth() {
-        // given
-        Auth auth = createTestAuth("delete@example.com");
-        em.persist(auth);
-        em.flush();
-        String authId = auth.getId();
+  @Test
+  @DisplayName("[성공] delete - Auth 삭제")
+  void deleteAuth() {
+    // given
+    Auth auth = createTestAuth("delete@example.com");
+    em.persist(auth);
+    em.flush();
+    String authId = auth.getId();
 
-        // when
-        authRepository.delete(auth);
-        em.flush();
+    // when
+    authRepository.delete(auth);
+    em.flush();
 
-        // then
-        Optional<Auth> deleted = authRepository.findById(authId);
-        assertThat(deleted).isEmpty();
-    }
+    // then
+    Optional<Auth> deleted = authRepository.findById(authId);
+    assertThat(deleted).isEmpty();
+  }
 
-    @Test
-    @DisplayName("[성공] findAll - 모든 Auth 조회")
-    void findAllAuths() {
-        // given
-        Auth auth1 = createTestAuth("user1@example.com");
-        Auth auth2 = createTestAuth("user2@example.com");
-        Auth auth3 = createTestAuth("user3@example.com");
-        em.persist(auth1);
-        em.persist(auth2);
-        em.persist(auth3);
-        em.flush();
+  @Test
+  @DisplayName("[성공] findAll - 모든 Auth 조회")
+  void findAllAuths() {
+    // given
+    Auth auth1 = createTestAuth("user1@example.com");
+    Auth auth2 = createTestAuth("user2@example.com");
+    Auth auth3 = createTestAuth("user3@example.com");
+    em.persist(auth1);
+    em.persist(auth2);
+    em.persist(auth3);
+    em.flush();
 
-        // when
-        List<Auth> all = authRepository.findAll();
+    // when
+    List<Auth> all = authRepository.findAll();
 
-        // then
-        assertThat(all).hasSizeGreaterThanOrEqualTo(3);
-        assertThat(all).extracting(Auth::getEmail)
-                .contains("user1@example.com", "user2@example.com", "user3@example.com");
-    }
+    // then
+    assertThat(all).hasSizeGreaterThanOrEqualTo(3);
+    assertThat(all)
+        .extracting(Auth::getEmail)
+        .contains("user1@example.com", "user2@example.com", "user3@example.com");
+  }
 
-    @Test
-    @DisplayName("[성공] count - Auth 개수 확인")
-    void countAuths() {
-        // given
-        Auth auth1 = createTestAuth("count1@example.com");
-        Auth auth2 = createTestAuth("count2@example.com");
-        em.persist(auth1);
-        em.persist(auth2);
-        em.flush();
+  @Test
+  @DisplayName("[성공] count - Auth 개수 확인")
+  void countAuths() {
+    // given
+    Auth auth1 = createTestAuth("count1@example.com");
+    Auth auth2 = createTestAuth("count2@example.com");
+    em.persist(auth1);
+    em.persist(auth2);
+    em.flush();
 
-        // when
-        long count = authRepository.count();
+    // when
+    long count = authRepository.count();
 
-        // then
-        assertThat(count).isGreaterThanOrEqualTo(2);
-    }
+    // then
+    assertThat(count).isGreaterThanOrEqualTo(2);
+  }
 
-    @Test
-    @DisplayName("[성공] Auth와 History Cascade 저장")
-    void saveAuthWithHistoryCascade() {
-        // given
-        Auth auth = createTestAuth("cascade@example.com");
+  @Test
+  @DisplayName("[성공] Auth와 History Cascade 저장")
+  void saveAuthWithHistoryCascade() {
+    // given
+    Auth auth = createTestAuth("cascade@example.com");
 
-        History history = History.builder()
-                .id("history-1")
-                .updatedColumn("email")
-                .beforeColumnValue("old@example.com")
-                .afterColumnValue("cascade@example.com")
-                .updatedAt(LocalDateTime.now())
-                .build();
+    History history =
+        History.builder()
+            .id("history-1")
+            .updatedColumn("email")
+            .beforeColumnValue("old@example.com")
+            .afterColumnValue("cascade@example.com")
+            .updatedAt(LocalDateTime.now())
+            .build();
 
-        auth.addHistory(history);
+    auth.addHistory(history);
 
-        // when
-        authRepository.save(auth);
-        em.flush();
-        em.clear();
+    // when
+    authRepository.save(auth);
+    em.flush();
+    em.clear();
 
-        // then
-        Auth saved = authRepository.findById(auth.getId()).orElseThrow();
-        assertThat(saved.getHistory()).hasSize(1);
-        assertThat(saved.getHistory().get(0).getUpdatedColumn()).isEqualTo("email");
-        assertThat(saved.getHistory().get(0).getUser()).isEqualTo(saved);
-    }
+    // then
+    Auth saved = authRepository.findById(auth.getId()).orElseThrow();
+    assertThat(saved.getHistory()).hasSize(1);
+    assertThat(saved.getHistory().get(0).getUpdatedColumn()).isEqualTo("email");
+    assertThat(saved.getHistory().get(0).getUser()).isEqualTo(saved);
+  }
 
   // ===== Cascade 및 연관관계 테스트 =====
 
   @Test
   @DisplayName("[성공] Auth와 Consent Cascade 저장")
   void saveAuthWithConsentCascade() {
-        // given
-        Auth auth = createTestAuth("consent@example.com");
+    // given
+    Auth auth = createTestAuth("consent@example.com");
 
-        // ConsentsTable은 먼저 영속화해야 함 (참조 무결성)
-        ConsentsTable consentTable1 = ConsentsTable.builder()
-                .id("consent-table-1")
-		    .consentName("Privacy Policy")
-		    .consentUrl("https://example.com/privacy")
-		    .version("1.0")
-		    .required(true)
-		    .build();
-        em.persist(consentTable1);
+    // ConsentsTable은 먼저 영속화해야 함 (참조 무결성)
+    ConsentsTable consentTable1 =
+        ConsentsTable.builder()
+            .id("consent-table-1")
+            .consentName("Privacy Policy")
+            .consentUrl("https://example.com/privacy")
+            .version("1.0")
+            .required(true)
+            .build();
+    em.persist(consentTable1);
 
-	  ConsentsTable consentTable2 = ConsentsTable.builder()
-                .id("consent-table-2")
-			  .consentName("Terms of Service")
-			  .consentUrl("https://example.com/terms")
-			  .version("1.0")
-			  .required(true)
-			  .build();
-        em.persist(consentTable2);
+    ConsentsTable consentTable2 =
+        ConsentsTable.builder()
+            .id("consent-table-2")
+            .consentName("Terms of Service")
+            .consentUrl("https://example.com/terms")
+            .version("1.0")
+            .required(true)
+            .build();
+    em.persist(consentTable2);
 
-        Consent consent1 = Consent.builder()
-                .id("consent-1")
-		        .consentsTable(consentTable1)
-		        .consentedAt(LocalDateTime.now())
-                .build();
+    Consent consent1 =
+        Consent.builder()
+            .id("consent-1")
+            .consentsTable(consentTable1)
+            .consentedAt(LocalDateTime.now())
+            .build();
 
-        Consent consent2 = Consent.builder()
-                .id("consent-2")
-		        .consentsTable(consentTable2)
-		        .consentedAt(LocalDateTime.now())
-                .build();
+    Consent consent2 =
+        Consent.builder()
+            .id("consent-2")
+            .consentsTable(consentTable2)
+            .consentedAt(LocalDateTime.now())
+            .build();
 
-        auth.addConsent(consent1);
-        auth.addConsent(consent2);
+    auth.addConsent(consent1);
+    auth.addConsent(consent2);
 
-        // when
-        authRepository.save(auth);
-        em.flush();
-        em.clear();
+    // when
+    authRepository.save(auth);
+    em.flush();
+    em.clear();
 
-        // then
-        Auth saved = authRepository.findById(auth.getId()).orElseThrow();
-        assertThat(saved.getConsent()).hasSize(2);
-        assertThat(saved.getConsent()).extracting(Consent::getId)
-		        .contains("consent-1", "consent-2");
-    }
+    // then
+    Auth saved = authRepository.findById(auth.getId()).orElseThrow();
+    assertThat(saved.getConsent()).hasSize(2);
+    assertThat(saved.getConsent()).extracting(Consent::getId).contains("consent-1", "consent-2");
+  }
 
-    @Test
-    @DisplayName("[성공] Consent OrphanRemoval 테스트")
-    void consentOrphanRemoval() {
-        // given
-        Auth auth = createTestAuth("orphan@example.com");
+  @Test
+  @DisplayName("[성공] Consent OrphanRemoval 테스트")
+  void consentOrphanRemoval() {
+    // given
+    Auth auth = createTestAuth("orphan@example.com");
 
-        // ConsentsTable 먼저 영속화
-	    ConsentsTable consentTable1 = ConsentsTable.builder()
-                .id("consent-table-orphan-1")
-			    .consentName("Privacy Policy")
-			    .consentUrl("https://example.com/privacy")
-			    .version("1.0")
-			    .required(true)
-			    .build();
-        em.persist(consentTable1);
+    // ConsentsTable 먼저 영속화
+    ConsentsTable consentTable1 =
+        ConsentsTable.builder()
+            .id("consent-table-orphan-1")
+            .consentName("Privacy Policy")
+            .consentUrl("https://example.com/privacy")
+            .version("1.0")
+            .required(true)
+            .build();
+    em.persist(consentTable1);
 
-	    Consent consent1 = Consent.builder()
-			    .id("consent-1")
-			    .consentsTable(consentTable1)
-			    .consentedAt(LocalDateTime.now())
-			    .build();
+    Consent consent1 =
+        Consent.builder()
+            .id("consent-1")
+            .consentsTable(consentTable1)
+            .consentedAt(LocalDateTime.now())
+            .build();
 
+    auth.addConsent(consent1);
 
-	    auth.addConsent(consent1);
+    authRepository.save(auth);
+    em.flush();
+    em.clear();
 
-        authRepository.save(auth);
-        em.flush();
-        em.clear();
+    // when
+    Auth found = authRepository.findById(auth.getId()).orElseThrow();
+    Consent toRemove = found.getConsent().get(0);
+    found.removeConsent(toRemove);
+    authRepository.save(found);
+    em.flush();
+    em.clear();
 
-        // when
-        Auth found = authRepository.findById(auth.getId()).orElseThrow();
-        Consent toRemove = found.getConsent().get(0);
-        found.removeConsent(toRemove);
-        authRepository.save(found);
-        em.flush();
-        em.clear();
+    // then
+    Auth result = authRepository.findById(auth.getId()).orElseThrow();
+    assertThat(result.getConsent()).isEmpty(); // 제거되어야 하므로 0개
+  }
 
-        // then
-        Auth result = authRepository.findById(auth.getId()).orElseThrow();
-        assertThat(result.getConsent()).isEmpty();  // 제거되어야 하므로 0개
-    }
+  @Test
+  @DisplayName("[성공] Auth와 Withdraw Cascade 저장")
+  void saveAuthWithWithdrawCascade() {
+    // given
+    Auth auth = createTestAuth("withdraw@example.com");
 
-    @Test
-    @DisplayName("[성공] Auth와 Withdraw Cascade 저장")
-    void saveAuthWithWithdrawCascade() {
-        // given
-        Auth auth = createTestAuth("withdraw@example.com");
+    Withdraw withdraw =
+        Withdraw.builder().withdrawReason("테스트 탈퇴").withdrawAt(LocalDateTime.now()).build();
 
-        Withdraw withdraw = Withdraw.builder()
-                .withdrawReason("테스트 탈퇴")
-                .withdrawAt(LocalDateTime.now())
-                .build();
+    auth.setWithdraw(withdraw);
+    auth.setStatus(Status.DELETED);
+    auth.setDeletedAt(LocalDateTime.now());
 
-        auth.setWithdraw(withdraw);
-        auth.setStatus(Status.DELETED);
-        auth.setDeletedAt(LocalDateTime.now());
+    // when
+    authRepository.save(auth);
+    em.flush();
+    em.clear();
 
-        // when
-        authRepository.save(auth);
-        em.flush();
-        em.clear();
+    // then
+    Auth saved = authRepository.findById(auth.getId()).orElseThrow();
+    assertThat(saved.getWithdraw()).isNotNull();
+    assertThat(saved.getWithdraw().getWithdrawReason()).isEqualTo("테스트 탈퇴");
+    assertThat(saved.getWithdraw().getUser()).isEqualTo(saved);
+  }
 
-        // then
-        Auth saved = authRepository.findById(auth.getId()).orElseThrow();
-        assertThat(saved.getWithdraw()).isNotNull();
-        assertThat(saved.getWithdraw().getWithdrawReason()).isEqualTo("테스트 탈퇴");
-        assertThat(saved.getWithdraw().getUser()).isEqualTo(saved);
-    }
+  @Test
+  @DisplayName("[성공] markAsDeleted 편의 메서드")
+  void markAsDeletedMethod() {
+    // given
+    Auth auth = createTestAuth("markas@example.com");
+    authRepository.save(auth);
+    em.flush();
+    em.clear();
 
-    @Test
-    @DisplayName("[성공] markAsDeleted 편의 메서드")
-    void markAsDeletedMethod() {
-        // given
-        Auth auth = createTestAuth("markas@example.com");
-        authRepository.save(auth);
-        em.flush();
-        em.clear();
+    // when
+    Auth found = authRepository.findById(auth.getId()).orElseThrow();
+    found.markAsDeleted("서비스 불만족");
+    authRepository.save(found);
+    em.flush();
+    em.clear();
 
-        // when
-        Auth found = authRepository.findById(auth.getId()).orElseThrow();
-        found.markAsDeleted("서비스 불만족");
-        authRepository.save(found);
-        em.flush();
-        em.clear();
-
-        // then
-        Auth result = authRepository.findById(auth.getId()).orElseThrow();
-        assertThat(result.getStatus()).isEqualTo(Status.DELETED);
-        assertThat(result.getDeletedAt()).isNotNull();
-        assertThat(result.getWithdraw()).isNotNull();
-        assertThat(result.getWithdraw().getWithdrawReason()).isEqualTo("서비스 불만족");
-    }
+    // then
+    Auth result = authRepository.findById(auth.getId()).orElseThrow();
+    assertThat(result.getStatus()).isEqualTo(Status.DELETED);
+    assertThat(result.getDeletedAt()).isNotNull();
+    assertThat(result.getWithdraw()).isNotNull();
+    assertThat(result.getWithdraw().getWithdrawReason()).isEqualTo("서비스 불만족");
+  }
 
   // ===== 편의 메서드 테스트 =====
 
   @Test
   @DisplayName("[성공] cancelWithdrawal 편의 메서드")
   void cancelWithdrawalMethod() {
-        // given
-        Auth auth = createTestAuth("cancel@example.com");
-        auth.markAsDeleted("테스트");
-        authRepository.save(auth);
-        em.flush();
-        em.clear();
+    // given
+    Auth auth = createTestAuth("cancel@example.com");
+    auth.markAsDeleted("테스트");
+    authRepository.save(auth);
+    em.flush();
+    em.clear();
 
-        // when
-        Auth found = authRepository.findById(auth.getId()).orElseThrow();
-        found.cancelWithdrawal();
-        authRepository.save(found);
-        em.flush();
-        em.clear();
+    // when
+    Auth found = authRepository.findById(auth.getId()).orElseThrow();
+    found.cancelWithdrawal();
+    authRepository.save(found);
+    em.flush();
+    em.clear();
 
-        // then
-        Auth result = authRepository.findById(auth.getId()).orElseThrow();
-        assertThat(result.getStatus()).isEqualTo(Status.ACTIVE);
-        assertThat(result.getDeletedAt()).isNull();
-        assertThat(result.getWithdraw()).isNull();
-    }
+    // then
+    Auth result = authRepository.findById(auth.getId()).orElseThrow();
+    assertThat(result.getStatus()).isEqualTo(Status.ACTIVE);
+    assertThat(result.getDeletedAt()).isNull();
+    assertThat(result.getWithdraw()).isNull();
+  }
 
-    @Test
-    @DisplayName("[성공] findByEmailWithHistory - History 있음")
-    void findByEmailWithHistoryWithData() {
-        // given
-        Auth auth = createTestAuth("history@example.com");
+  @Test
+  @DisplayName("[성공] findByEmailWithHistory - History 있음")
+  void findByEmailWithHistoryWithData() {
+    // given
+    Auth auth = createTestAuth("history@example.com");
 
-        History history = History.builder()
-                .id("history-1")
-                .updatedColumn("password")
-                .beforeColumnValue("old")
-                .afterColumnValue("new")
-                .updatedAt(LocalDateTime.now())
-                .build();
+    History history =
+        History.builder()
+            .id("history-1")
+            .updatedColumn("password")
+            .beforeColumnValue("old")
+            .afterColumnValue("new")
+            .updatedAt(LocalDateTime.now())
+            .build();
 
-        auth.addHistory(history);
-        authRepository.save(auth);
-        em.flush();
-        em.clear();
+    auth.addHistory(history);
+    authRepository.save(auth);
+    em.flush();
+    em.clear();
 
-        // when
-        Optional<Auth> result = authRepository.findByEmailWithHistory("history@example.com");
+    // when
+    Optional<Auth> result = authRepository.findByEmailWithHistory("history@example.com");
 
-        // then
-        assertThat(result).isPresent();
-        assertThat(result.get().getHistory()).hasSize(1);
-        assertThat(result.get().getHistory().get(0).getUpdatedColumn()).isEqualTo("password");
-    }
+    // then
+    assertThat(result).isPresent();
+    assertThat(result.get().getHistory()).hasSize(1);
+    assertThat(result.get().getHistory().get(0).getUpdatedColumn()).isEqualTo("password");
+  }
 
   // ===== Custom Query 메서드 테스트 =====
 
   @Test
   @DisplayName("[성공] findByEmailWithHistory - History 없음")
   void findByEmailWithHistoryEmpty() {
-        // given
-        Auth auth = createTestAuth("nohistory@example.com");
-        authRepository.save(auth);
-        em.flush();
-        em.clear();
+    // given
+    Auth auth = createTestAuth("nohistory@example.com");
+    authRepository.save(auth);
+    em.flush();
+    em.clear();
 
-        // when
-        Optional<Auth> result = authRepository.findByEmailWithHistory("nohistory@example.com");
+    // when
+    Optional<Auth> result = authRepository.findByEmailWithHistory("nohistory@example.com");
 
-        // then
-        assertThat(result).isPresent();
-        assertThat(result.get().getHistory()).isEmpty();
-    }
+    // then
+    assertThat(result).isPresent();
+    assertThat(result.get().getHistory()).isEmpty();
+  }
 
-    @Test
-    @DisplayName("[성공] findByEmailWithConsent - Consent 있음")
-    void findByEmailWithConsentWithData() {
-        // given
-        Auth auth = createTestAuth("withconsent@example.com");
+  @Test
+  @DisplayName("[성공] findByEmailWithConsent - Consent 있음")
+  void findByEmailWithConsentWithData() {
+    // given
+    Auth auth = createTestAuth("withconsent@example.com");
 
-        // ConsentsTable 먼저 영속화
-	    ConsentsTable consentTable1 = ConsentsTable.builder()
-                .id("consent-table-with-1")
-			    .consentName("Privacy Policy")
-			    .consentUrl("https://example.com/privacy")
-			    .version("1.0")
-			    .required(true)
-			    .build();
-        em.persist(consentTable1);
+    // ConsentsTable 먼저 영속화
+    ConsentsTable consentTable1 =
+        ConsentsTable.builder()
+            .id("consent-table-with-1")
+            .consentName("Privacy Policy")
+            .consentUrl("https://example.com/privacy")
+            .version("1.0")
+            .required(true)
+            .build();
+    em.persist(consentTable1);
 
-	    ConsentsTable consentTable2 = ConsentsTable.builder()
-                .id("consent-table-with-2")
-			    .consentName("Terms of Service")
-			    .consentUrl("https://example.com/terms")
-			    .version("1.0")
-			    .required(true)
-			    .build();
-        em.persist(consentTable2);
+    ConsentsTable consentTable2 =
+        ConsentsTable.builder()
+            .id("consent-table-with-2")
+            .consentName("Terms of Service")
+            .consentUrl("https://example.com/terms")
+            .version("1.0")
+            .required(true)
+            .build();
+    em.persist(consentTable2);
 
-	    Consent consent1 = Consent.builder()
-			    .id("consent-1")
-			    .consentsTable(consentTable1)
-			    .consentedAt(LocalDateTime.now())
-			    .build();
+    Consent consent1 =
+        Consent.builder()
+            .id("consent-1")
+            .consentsTable(consentTable1)
+            .consentedAt(LocalDateTime.now())
+            .build();
 
-	    Consent consent2 = Consent.builder()
-			    .id("consent-2")
-			    .consentsTable(consentTable2)
-			    .consentedAt(LocalDateTime.now())
-			    .build();
+    Consent consent2 =
+        Consent.builder()
+            .id("consent-2")
+            .consentsTable(consentTable2)
+            .consentedAt(LocalDateTime.now())
+            .build();
 
-	    auth.addConsent(consent1);
+    auth.addConsent(consent1);
 
-        authRepository.save(auth);
-        em.flush();
-        em.clear();
+    authRepository.save(auth);
+    em.flush();
+    em.clear();
 
-        // when
-        Optional<Auth> result = authRepository.findByEmailWithConsent("withconsent@example.com");
+    // when
+    Optional<Auth> result = authRepository.findByEmailWithConsent("withconsent@example.com");
 
-        // then
-        assertThat(result).isPresent();
-        assertThat(result.get().getConsent()).hasSize(1);
-		assertThat(result.get().getConsent().get(0).getConsentedAt()).isEqualTo(consent1.getConsentedAt());
-	    assertThat(result.get().getConsent().get(0).getConsentsTable().getConsentName()).isEqualTo(consent1.getConsentsTable().getConsentName());
-		
-    }
+    // then
+    assertThat(result).isPresent();
+    assertThat(result.get().getConsent()).hasSize(1);
+    assertThat(result.get().getConsent().get(0).getConsentedAt())
+        .isEqualTo(consent1.getConsentedAt());
+    assertThat(result.get().getConsent().get(0).getConsentsTable().getConsentName())
+        .isEqualTo(consent1.getConsentsTable().getConsentName());
+  }
 
-    @Test
-    @DisplayName("[성공] findByEmailWithConsent - Consent 없음")
-    void findByEmailWithConsentEmpty() {
-        // given
-        Auth auth = createTestAuth("noconsent@example.com");
-        authRepository.save(auth);
-        em.flush();
-        em.clear();
+  @Test
+  @DisplayName("[성공] findByEmailWithConsent - Consent 없음")
+  void findByEmailWithConsentEmpty() {
+    // given
+    Auth auth = createTestAuth("noconsent@example.com");
+    authRepository.save(auth);
+    em.flush();
+    em.clear();
 
-        // when
-        Optional<Auth> result = authRepository.findByEmailWithConsent("noconsent@example.com");
+    // when
+    Optional<Auth> result = authRepository.findByEmailWithConsent("noconsent@example.com");
 
-        // then
-        assertThat(result).isPresent();
-        assertThat(result.get().getConsent()).isEmpty();
-    }
+    // then
+    assertThat(result).isPresent();
+    assertThat(result.get().getConsent()).isEmpty();
+  }
 
-    @Test
-    @DisplayName("[성공] findByIdWithConsent")
-    void findByIdWithConsent() {
-        // given
-	    Auth auth = createTestAuth("withconsent@example.com");
+  @Test
+  @DisplayName("[성공] findByIdWithConsent")
+  void findByIdWithConsent() {
+    // given
+    Auth auth = createTestAuth("withconsent@example.com");
 
-        // ConsentsTable 먼저 영속화
-	    ConsentsTable consentTable1 = ConsentsTable.builder()
-                .id("consent-table-findbyid")
-			    .consentName("Privacy Policy")
-			    .consentUrl("https://example.com/privacy")
-			    .version("1.0")
-			    .required(true)
-			    .build();
-        em.persist(consentTable1);
+    // ConsentsTable 먼저 영속화
+    ConsentsTable consentTable1 =
+        ConsentsTable.builder()
+            .id("consent-table-findbyid")
+            .consentName("Privacy Policy")
+            .consentUrl("https://example.com/privacy")
+            .version("1.0")
+            .required(true)
+            .build();
+    em.persist(consentTable1);
 
-	    Consent consent1 = Consent.builder()
-			    .id("consent-1")
-			    .consentsTable(consentTable1)
-			    .consentedAt(LocalDateTime.now())
-			    .build();
+    Consent consent1 =
+        Consent.builder()
+            .id("consent-1")
+            .consentsTable(consentTable1)
+            .consentedAt(LocalDateTime.now())
+            .build();
 
+    auth.addConsent(consent1);
+    authRepository.save(auth);
+    em.flush();
+    em.clear();
 
-        auth.addConsent(consent1);
-        authRepository.save(auth);
-        em.flush();
-        em.clear();
+    // when
+    Optional<Auth> result = authRepository.findByIdWithConsent(auth.getId());
 
-        // when
-        Optional<Auth> result = authRepository.findByIdWithConsent(auth.getId());
+    // then
+    assertThat(result).isPresent();
+    assertThat(result.get().getConsent()).hasSize(1);
+    assertThat(result.get().getConsent().get(0).getConsentsTable().getVersion()).isEqualTo("1.0");
+  }
 
-        // then
-        assertThat(result).isPresent();
-        assertThat(result.get().getConsent()).hasSize(1);
-        assertThat(result.get().getConsent().get(0).getConsentsTable().getVersion()).isEqualTo("1.0");
-    }
+  @Test
+  @DisplayName("[성공] deleteByDeletedAtBefore - 조건 충족")
+  void deleteByDeletedAtBeforeMatch() {
+    // given
+    Auth oldAuth = createTestAuth("old@example.com");
+    oldAuth.setDeletedAt(LocalDateTime.now().minusYears(4));
+    authRepository.save(oldAuth);
 
-    @Test
-    @DisplayName("[성공] deleteByDeletedAtBefore - 조건 충족")
-    void deleteByDeletedAtBeforeMatch() {
-        // given
-        Auth oldAuth = createTestAuth("old@example.com");
-        oldAuth.setDeletedAt(LocalDateTime.now().minusYears(4));
-        authRepository.save(oldAuth);
+    Auth recentAuth = createTestAuth("recent@example.com");
+    recentAuth.setDeletedAt(LocalDateTime.now().minusDays(1));
+    authRepository.save(recentAuth);
 
-        Auth recentAuth = createTestAuth("recent@example.com");
-        recentAuth.setDeletedAt(LocalDateTime.now().minusDays(1));
-        authRepository.save(recentAuth);
+    em.flush();
 
-        em.flush();
+    // when
+    authRepository.deleteByDeletedAtBefore(LocalDateTime.now().minusYears(3));
+    em.flush();
 
-        // when
-        authRepository.deleteByDeletedAtBefore(LocalDateTime.now().minusYears(3));
-        em.flush();
+    // then
+    assertThat(authRepository.existsByEmail("old@example.com")).isFalse();
+    assertThat(authRepository.existsByEmail("recent@example.com")).isTrue();
+  }
 
-        // then
-        assertThat(authRepository.existsByEmail("old@example.com")).isFalse();
-        assertThat(authRepository.existsByEmail("recent@example.com")).isTrue();
-    }
+  @Test
+  @DisplayName("[성공] deleteByDeletedAtBefore - 조건 미충족")
+  void deleteByDeletedAtBeforeNoMatch() {
+    // given
+    Auth auth = createTestAuth("nodelete@example.com");
+    auth.setDeletedAt(LocalDateTime.now().minusDays(1));
+    authRepository.save(auth);
+    em.flush();
+    long beforeCount = authRepository.count();
 
-    @Test
-    @DisplayName("[성공] deleteByDeletedAtBefore - 조건 미충족")
-    void deleteByDeletedAtBeforeNoMatch() {
-        // given
-        Auth auth = createTestAuth("nodelete@example.com");
-        auth.setDeletedAt(LocalDateTime.now().minusDays(1));
-        authRepository.save(auth);
-        em.flush();
-        long beforeCount = authRepository.count();
+    // when
+    authRepository.deleteByDeletedAtBefore(LocalDateTime.now().minusYears(10));
+    em.flush();
 
-        // when
-        authRepository.deleteByDeletedAtBefore(LocalDateTime.now().minusYears(10));
-        em.flush();
+    // then
+    long afterCount = authRepository.count();
+    assertThat(afterCount).isEqualTo(beforeCount);
+  }
 
-        // then
-        long afterCount = authRepository.count();
-        assertThat(afterCount).isEqualTo(beforeCount);
-    }
+  @Test
+  @DisplayName("[통합] 회원 가입부터 탈퇴까지 전체 흐름")
+  void fullUserLifecycle() {
+    // 1. 회원 가입
+    Auth auth = createTestAuth("lifecycle@example.com");
+    Auth saved = authRepository.save(auth);
+    em.flush();
+    em.clear();
+    assertThat(authRepository.existsByEmail("lifecycle@example.com")).isTrue();
 
-    @Test
-    @DisplayName("[통합] 회원 가입부터 탈퇴까지 전체 흐름")
-    void fullUserLifecycle() {
-        // 1. 회원 가입
-        Auth auth = createTestAuth("lifecycle@example.com");
-        Auth saved = authRepository.save(auth);
-        em.flush();
-        em.clear();
-        assertThat(authRepository.existsByEmail("lifecycle@example.com")).isTrue();
+    // ConsentsTable 먼저 영속화
+    ConsentsTable consentsTable =
+        ConsentsTable.builder()
+            .id("consent-table-lifecycle")
+            .consentName("PRIVACY")
+            .consentUrl("https://example.com/privacy")
+            .version("1.0")
+            .required(false)
+            .build();
+    em.persist(consentsTable);
 
-        // ConsentsTable 먼저 영속화
-		ConsentsTable consentsTable = ConsentsTable.builder()
-				.id("consent-table-lifecycle")
-				.consentName("PRIVACY")
-				.consentUrl("https://example.com/privacy")
-				.version("1.0")
-				.required(false)
-				.build();
-        em.persist(consentsTable);
+    // 2. 동의서 추가
+    auth = authRepository.findById(saved.getId()).orElseThrow();
+    Consent consent =
+        Consent.builder()
+            .id("consent-lifecycle")
+            .consentsTable(consentsTable)
+            .consentedAt(LocalDateTime.now())
+            .build();
+    auth.addConsent(consent);
+    authRepository.save(auth);
+    em.flush();
+    em.clear();
 
-        // 2. 동의서 추가
-        auth = authRepository.findById(saved.getId()).orElseThrow();
-        Consent consent = Consent.builder()
-                .id("consent-lifecycle")
-		        .consentsTable(consentsTable)
-		        .consentedAt(LocalDateTime.now())
-                .build();
-        auth.addConsent(consent);
-        authRepository.save(auth);
-        em.flush();
-        em.clear();
+    // 3. 정보 변경 및 이력 생성
+    auth = authRepository.findById(saved.getId()).orElseThrow();
+    History history =
+        History.builder()
+            .id("history-lifecycle")
+            .updatedColumn("email")
+            .beforeColumnValue("lifecycle@example.com")
+            .afterColumnValue("newlifecycle@example.com")
+            .updatedAt(LocalDateTime.now())
+            .build();
+    auth.addHistory(history);
+    auth.setEmail("newlifecycle@example.com");
+    authRepository.save(auth);
+    em.flush();
+    em.clear();
 
-        // 3. 정보 변경 및 이력 생성
-        auth = authRepository.findById(saved.getId()).orElseThrow();
-        History history = History.builder()
-                .id("history-lifecycle")
-                .updatedColumn("email")
-                .beforeColumnValue("lifecycle@example.com")
-                .afterColumnValue("newlifecycle@example.com")
-                .updatedAt(LocalDateTime.now())
-                .build();
-        auth.addHistory(history);
-        auth.setEmail("newlifecycle@example.com");
-        authRepository.save(auth);
-        em.flush();
-        em.clear();
+    // 4. 계정 정지
+    auth = authRepository.findById(saved.getId()).orElseThrow();
+    auth.setStatus(Status.SUSPENDED);
+    authRepository.save(auth);
+    em.flush();
+    em.clear();
 
-        // 4. 계정 정지
-        auth = authRepository.findById(saved.getId()).orElseThrow();
-        auth.setStatus(Status.SUSPENDED);
-        authRepository.save(auth);
-        em.flush();
-        em.clear();
+    // 5. 정지 해제
+    auth = authRepository.findById(saved.getId()).orElseThrow();
+    auth.setStatus(Status.ACTIVE);
+    authRepository.save(auth);
+    em.flush();
+    em.clear();
 
-        // 5. 정지 해제
-        auth = authRepository.findById(saved.getId()).orElseThrow();
-        auth.setStatus(Status.ACTIVE);
-        authRepository.save(auth);
-        em.flush();
-        em.clear();
+    // 6. 회원 탈퇴
+    auth = authRepository.findById(saved.getId()).orElseThrow();
+    auth.markAsDeleted("테스트 종료");
+    authRepository.save(auth);
+    em.flush();
+    em.clear();
 
-        // 6. 회원 탈퇴
-        auth = authRepository.findById(saved.getId()).orElseThrow();
-        auth.markAsDeleted("테스트 종료");
-        authRepository.save(auth);
-        em.flush();
-        em.clear();
-
-        // 최종 확인
-        Auth finalAuth = authRepository.findById(saved.getId()).orElseThrow();
-        assertThat(finalAuth.getStatus()).isEqualTo(Status.DELETED);
-        assertThat(finalAuth.getWithdraw()).isNotNull();
-        assertThat(finalAuth.getHistory()).hasSize(1);
-        assertThat(finalAuth.getConsent()).hasSize(1);
-    }
+    // 최종 확인
+    Auth finalAuth = authRepository.findById(saved.getId()).orElseThrow();
+    assertThat(finalAuth.getStatus()).isEqualTo(Status.DELETED);
+    assertThat(finalAuth.getWithdraw()).isNotNull();
+    assertThat(finalAuth.getHistory()).hasSize(1);
+    assertThat(finalAuth.getConsent()).hasSize(1);
+  }
 
   // ===== 복합 시나리오 테스트 =====
 
   @Test
   @DisplayName("[경계 케이스] 대량의 History와 함께 저장 및 조회")
   void saveAndFindAuthWithManyHistories() {
-        // given
-        Auth auth = createTestAuth("manyhistories@example.com");
+    // given
+    Auth auth = createTestAuth("manyhistories@example.com");
 
-        for (int i = 0; i < 50; i++) {
-            History history = History.builder()
-                    .id("history-" + i)
-                    .updatedColumn("column-" + i)
-                    .beforeColumnValue("before-" + i)
-                    .afterColumnValue("after-" + i)
-                    .updatedAt(LocalDateTime.now())
-                    .build();
-            auth.addHistory(history);
-        }
-
-        // when
-        authRepository.save(auth);
-        em.flush();
-        em.clear();
-
-        // then
-        Optional<Auth> result = authRepository.findByEmailWithHistory("manyhistories@example.com");
-        assertThat(result).isPresent();
-        assertThat(result.get().getHistory()).hasSize(50);
+    for (int i = 0; i < 50; i++) {
+      History history =
+          History.builder()
+              .id("history-" + i)
+              .updatedColumn("column-" + i)
+              .beforeColumnValue("before-" + i)
+              .afterColumnValue("after-" + i)
+              .updatedAt(LocalDateTime.now())
+              .build();
+      auth.addHistory(history);
     }
 
-    @Test
-    @DisplayName("[경계 케이스] 대량의 Consent와 함께 저장 및 조회")
-    void saveAndFindAuthWithManyConsents() {
-        // given
-        Auth auth = createTestAuth("manyconsents@example.com");
+    // when
+    authRepository.save(auth);
+    em.flush();
+    em.clear();
 
-        for (int i = 0; i < 30; i++) {
-            // ConsentsTable 먼저 영속화
-			ConsentsTable consentsTable = ConsentsTable.builder()
-					.id("consent-table-" + i)
-					.consentName("PRIVACY")
-					.consentUrl("https://example.com/privacy")
-					.version("1.0")
-					.required(false)
-					.build();
-            em.persist(consentsTable);
+    // then
+    Optional<Auth> result = authRepository.findByEmailWithHistory("manyhistories@example.com");
+    assertThat(result).isPresent();
+    assertThat(result.get().getHistory()).hasSize(50);
+  }
 
-            Consent consent = Consent.builder()
-                    .id("consent-" + i)
-		            .consentsTable(consentsTable)
-		            .consentedAt(LocalDateTime.now())
-                    .build();
-            auth.addConsent(consent);
-        }
+  @Test
+  @DisplayName("[경계 케이스] 대량의 Consent와 함께 저장 및 조회")
+  void saveAndFindAuthWithManyConsents() {
+    // given
+    Auth auth = createTestAuth("manyconsents@example.com");
 
-        // when
-        authRepository.save(auth);
-        em.flush();
-        em.clear();
+    for (int i = 0; i < 30; i++) {
+      // ConsentsTable 먼저 영속화
+      ConsentsTable consentsTable =
+          ConsentsTable.builder()
+              .id("consent-table-" + i)
+              .consentName("PRIVACY")
+              .consentUrl("https://example.com/privacy")
+              .version("1.0")
+              .required(false)
+              .build();
+      em.persist(consentsTable);
 
-        // then
-        Optional<Auth> result = authRepository.findByEmailWithConsent("manyconsents@example.com");
-        assertThat(result).isPresent();
-        assertThat(result.get().getConsent()).hasSize(30);
+      Consent consent =
+          Consent.builder()
+              .id("consent-" + i)
+              .consentsTable(consentsTable)
+              .consentedAt(LocalDateTime.now())
+              .build();
+      auth.addConsent(consent);
     }
 
-    @Test
-    @DisplayName("[엣지 케이스] 중복 이메일로 여러 Auth 저장")
-    void saveDuplicateEmail() {
-        // given
-        Auth auth1 = createTestAuth("duplicate@example.com");
-        Auth auth2 = Auth.builder()
-                .id("different-id")
-                .email("duplicate@example.com")
-                .password("password")
-                .provider(Provider.GOOGLE)
-                .status(Status.ACTIVE)
-                .userRole(Role.USER)
-                .createdAt(LocalDateTime.now())
-                .build();
+    // when
+    authRepository.save(auth);
+    em.flush();
+    em.clear();
 
-        // when
-        authRepository.save(auth1);
-        authRepository.save(auth2);
-        em.flush();
+    // then
+    Optional<Auth> result = authRepository.findByEmailWithConsent("manyconsents@example.com");
+    assertThat(result).isPresent();
+    assertThat(result.get().getConsent()).hasSize(30);
+  }
 
-        // then - 중복 허용됨 (DB 제약이 없다면)
-        List<Auth> all = authRepository.findAll();
-        long duplicateCount = all.stream()
-                .filter(a -> "duplicate@example.com".equals(a.getEmail()))
-                .count();
-        assertThat(duplicateCount).isGreaterThanOrEqualTo(1);
-    }
+  @Test
+  @DisplayName("[엣지 케이스] 중복 이메일로 여러 Auth 저장")
+  void saveDuplicateEmail() {
+    // given
+    Auth auth1 = createTestAuth("duplicate@example.com");
+    Auth auth2 =
+        Auth.builder()
+            .id("different-id")
+            .email("duplicate@example.com")
+            .password("password")
+            .provider(Provider.GOOGLE)
+            .status(Status.ACTIVE)
+            .userRole(Role.USER)
+            .createdAt(LocalDateTime.now())
+            .build();
 
-    // Helper method
-    private Auth createTestAuth(String email) {
-        return Auth.builder()
-                .id("user-" + email.hashCode())
-                .email(email)
-                .password("encoded-password")
-                .provider(Provider.SYSTEM)
-                .status(Status.ACTIVE)
-                .userRole(Role.USER)
-                .createdAt(LocalDateTime.now())
-                .build();
-    }
+    // when
+    authRepository.save(auth1);
+    authRepository.save(auth2);
+    em.flush();
+
+    // then - 중복 허용됨 (DB 제약이 없다면)
+    List<Auth> all = authRepository.findAll();
+    long duplicateCount =
+        all.stream().filter(a -> "duplicate@example.com".equals(a.getEmail())).count();
+    assertThat(duplicateCount).isGreaterThanOrEqualTo(1);
+  }
+
+  // Helper method
+  private Auth createTestAuth(String email) {
+    return Auth.builder()
+        .id("user-" + email.hashCode())
+        .email(email)
+        .password("encoded-password")
+        .provider(Provider.SYSTEM)
+        .status(Status.ACTIVE)
+        .userRole(Role.USER)
+        .createdAt(LocalDateTime.now())
+        .build();
+  }
 
   @TestConfiguration
   static class TestConfig {

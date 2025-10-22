@@ -10,14 +10,12 @@ import org.springframework.stereotype.Component;
 @RequiredArgsConstructor
 public class ApiRequestStat {
 
-    private final RedisTemplate<String, String> redisTemplate;
-    private final KeyProvider keyProvider;
+  private final RedisTemplate<String, String> redisTemplate;
+  private final KeyProvider keyProvider;
 
-    public void increment(String apiName) {
-        String key = apiName + "-" + LocalDate.now();
-        Long offset = keyProvider.generateLongKey() % 10000L;
-        redisTemplate.opsForValue().setBit(key, offset, true);
-    }
-
-
+  public void increment(String apiName) {
+    String key = apiName + "-" + LocalDate.now();
+    Long offset = keyProvider.generateLongKey() % 10000L;
+    redisTemplate.opsForValue().setBit(key, offset, true);
+  }
 }

@@ -13,14 +13,16 @@ import org.springframework.transaction.annotation.Transactional;
 @Service
 @RequiredArgsConstructor
 public class CleanupService {
-    private final AuthRepository authRepository;
+  private final AuthRepository authRepository;
 
-
-    @Scheduled(cron = "0 0 4 * * *", zone = "Asia/Seoul")
-    @SchedulerLock(name = "deleteWithdrawUserAfterThreeYears", lockAtMostFor = "10m", lockAtLeastFor = "1m")
-    @Transactional
-    public void deleteWithdrawUserAfterThreeYears() {
-        log.info("스케쥴 권한 휙득 탈퇴 유저 정리르 시작합니다. ");
-        authRepository.deleteByDeletedAtBefore((LocalDateTime.now()));
-    }
+  @Scheduled(cron = "0 0 4 * * *", zone = "Asia/Seoul")
+  @SchedulerLock(
+      name = "deleteWithdrawUserAfterThreeYears",
+      lockAtMostFor = "10m",
+      lockAtLeastFor = "1m")
+  @Transactional
+  public void deleteWithdrawUserAfterThreeYears() {
+    log.info("스케쥴 권한 휙득 탈퇴 유저 정리르 시작합니다. ");
+    authRepository.deleteByDeletedAtBefore((LocalDateTime.now()));
+  }
 }

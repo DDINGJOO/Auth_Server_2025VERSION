@@ -7,9 +7,9 @@ import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 
 @Repository
-public interface SuspendRepository  extends JpaRepository<Suspend, String> {
+public interface SuspendRepository extends JpaRepository<Suspend, String> {
 
-    List<Suspend> findAllBySuspendUntilIsBefore(LocalDate suspendUntilBefore);
+  List<Suspend> findAllBySuspendUntilIsBefore(LocalDate suspendUntilBefore);
 
-    List<Suspend> findAllBySuspendedUserId(String suspendedUserId);
+  List<Suspend> findAllBySuspendedUserId(String suspendedUserId);
 }

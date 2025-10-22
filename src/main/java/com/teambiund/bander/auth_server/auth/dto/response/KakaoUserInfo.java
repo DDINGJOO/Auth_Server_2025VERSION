@@ -16,6 +16,13 @@ public class KakaoUserInfo {
   @JsonProperty("kakao_account")
   private KakaoAccount kakaoAccount;
 
+  public String getEmail() {
+    if (kakaoAccount != null && kakaoAccount.getEmail() != null) {
+      return kakaoAccount.getEmail();
+    }
+    return null;
+  }
+
   @Getter
   @Setter
   @NoArgsConstructor
@@ -31,12 +38,5 @@ public class KakaoUserInfo {
 
     @JsonProperty("is_email_verified")
     private Boolean isEmailVerified;
-  }
-
-  public String getEmail() {
-    if (kakaoAccount != null && kakaoAccount.getEmail() != null) {
-      return kakaoAccount.getEmail();
-    }
-    return null;
   }
 }

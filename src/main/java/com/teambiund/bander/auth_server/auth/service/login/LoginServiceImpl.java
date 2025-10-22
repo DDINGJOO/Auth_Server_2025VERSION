@@ -18,32 +18,31 @@ import org.springframework.stereotype.Service;
 
 @Service
 public class LoginServiceImpl implements LoginService {
-    private final LoginStatusRepository loginStatusRepository;
-    private final AuthRepository authRepository;
-    private final KeyProvider keyProvider;
-    private final CipherStrategy passwordEncoder;
-    private final TokenUtil tokenUtil;
-    private final CipherStrategy emailCipher;
+  private final LoginStatusRepository loginStatusRepository;
+  private final AuthRepository authRepository;
+  private final KeyProvider keyProvider;
+  private final CipherStrategy passwordEncoder;
+  private final TokenUtil tokenUtil;
+  private final CipherStrategy emailCipher;
 
-    public LoginServiceImpl(
-            LoginStatusRepository loginStatusRepository,
-            AuthRepository authRepository,
-            KeyProvider keyProvider,
-            @Qualifier("pbkdf2CipherStrategy") CipherStrategy passwordEncoder,
-            TokenUtil tokenUtil,
-            @Qualifier("aesCipherStrategy") CipherStrategy emailCipher
-    ) {
-        this.loginStatusRepository = loginStatusRepository;
-        this.authRepository = authRepository;
-        this.keyProvider = keyProvider;
-        this.passwordEncoder = passwordEncoder;
-        this.tokenUtil = tokenUtil;
-        this.emailCipher = emailCipher;
-    }
+  public LoginServiceImpl(
+      LoginStatusRepository loginStatusRepository,
+      AuthRepository authRepository,
+      KeyProvider keyProvider,
+      @Qualifier("pbkdf2CipherStrategy") CipherStrategy passwordEncoder,
+      TokenUtil tokenUtil,
+      @Qualifier("aesCipherStrategy") CipherStrategy emailCipher) {
+    this.loginStatusRepository = loginStatusRepository;
+    this.authRepository = authRepository;
+    this.keyProvider = keyProvider;
+    this.passwordEncoder = passwordEncoder;
+    this.tokenUtil = tokenUtil;
+    this.emailCipher = emailCipher;
+  }
 
-    @Override
-    public LoginResponse login(String email, String password) {
-        String encryptedEmail = emailCipher.encrypt(email);
+  @Override
+  public LoginResponse login(String email, String password) {
+    String encryptedEmail = emailCipher.encrypt(email);
     Auth auth =
         authRepository
             .findByEmail(encryptedEmail)
@@ -52,95 +51,89 @@ public class LoginServiceImpl implements LoginService {
                     authRepository.findByEmail(
                         email)) // Backward-compatibility for legacy plaintext rows
             .orElseThrow(() -> new CustomException(AuthErrorCode.USER_NOT_FOUND));
-        if (!passwordEncoder.matches(password, auth.getPassword())) {
+    if (!passwordEncoder.matches(password, auth.getPassword())) {
       throw new CustomException(AuthErrorCode.PASSWORD_MISMATCH);
-        }
-        return generateResponse(auth);
+    }
+    return generateResponse(auth);
+  }
+
+  @Override
+  public LoginResponse refreshToken(String refreshToken, String deviceId) {
+    if (!tokenUtil.isValid(refreshToken)) {
+      throw new CustomException(AuthErrorCode.EXPIRED_TOKEN);
+    }
+    String userId = tokenUtil.extractUserId(refreshToken);
+    String deviceIdFromToken = tokenUtil.extractDeviceId(refreshToken);
+    if (userId == null || deviceIdFromToken == null) {
+      throw new CustomException(AuthErrorCode.INVALID_TOKEN);
     }
 
-    @Override
-    public LoginResponse refreshToken(String refreshToken, String deviceId) {
-        if (!tokenUtil.isValid(refreshToken)) {
-      throw new CustomException(AuthErrorCode.EXPIRED_TOKEN);
-        }
-        String userId = tokenUtil.extractUserId(refreshToken);
-        String deviceIdFromToken = tokenUtil.extractDeviceId(refreshToken);
-        if (userId == null || deviceIdFromToken == null) {
-      throw new CustomException(AuthErrorCode.INVALID_TOKEN);
-        }
-
-        if (!deviceId.equals(deviceIdFromToken)) {
+    if (!deviceId.equals(deviceIdFromToken)) {
       throw new CustomException(AuthErrorCode.INVALID_DEVICE_ID);
-        }
+    }
 
     Auth auth =
         authRepository
             .findById(userId)
             .orElseThrow(() -> new CustomException(AuthErrorCode.USER_NOT_FOUND));
-        return generateResponse(auth);
+    return generateResponse(auth);
+  }
 
-    }
+  private LoginResponse generateResponse(Auth auth) {
 
-    private LoginResponse generateResponse(Auth auth) {
-
-        if (!auth.getStatus().equals(Status.ACTIVE)) {
-            switch (auth.getStatus()) {
-                case SLEEPING:
+    if (!auth.getStatus().equals(Status.ACTIVE)) {
+      switch (auth.getStatus()) {
+        case SLEEPING:
           throw new CustomException(AuthErrorCode.USER_IS_SLEEPING);
-                case BLOCKED:
+        case BLOCKED:
           throw new CustomException(AuthErrorCode.USER_IS_BLOCKED);
-                case SUSPENDED:
+        case SUSPENDED:
           throw new CustomException(AuthErrorCode.USER_IS_SUSPENDED);
-                case DELETED:
+        case DELETED:
           throw new CustomException(AuthErrorCode.USER_IS_DELETED);
-                default:
-                    break;
-            }
-        }
-
-        String deviceId = UUID.randomUUID().toString().substring(0, 4);
-        String accessToken = tokenUtil.generateAccessToken(auth.getId(), auth.getUserRole(), deviceId);
-        String refreshToken = tokenUtil.generateRefreshToken(auth.getId(), auth.getUserRole(), deviceId);
-
-        var response = new LoginResponse();
-        response.setAccessToken(accessToken);
-        response.setRefreshToken(refreshToken);
-        response.setDeviceId(deviceId);
-
-
-        // LoginStatus 생성 또는 업데이트
-        LoginStatus loginStatus = LoginStatus.builder()
-                .lastLogin(LocalDateTime.now())
-                .build();
-
-        // 편의 메서드 사용 - 양방향 연관관계 설정
-        auth.setLoginStatus(loginStatus);
-
-        // CascadeType.ALL로 인해 auth만 save하면 loginStatus도 자동 저장됨
-        authRepository.save(auth);
-
-        return response;
-
+        default:
+          break;
+      }
     }
+
+    String deviceId = UUID.randomUUID().toString().substring(0, 4);
+    String accessToken = tokenUtil.generateAccessToken(auth.getId(), auth.getUserRole(), deviceId);
+    String refreshToken =
+        tokenUtil.generateRefreshToken(auth.getId(), auth.getUserRole(), deviceId);
+
+    var response = new LoginResponse();
+    response.setAccessToken(accessToken);
+    response.setRefreshToken(refreshToken);
+    response.setDeviceId(deviceId);
+
+    // LoginStatus 생성 또는 업데이트
+    LoginStatus loginStatus = LoginStatus.builder().lastLogin(LocalDateTime.now()).build();
+
+    // 편의 메서드 사용 - 양방향 연관관계 설정
+    auth.setLoginStatus(loginStatus);
+
+    // CascadeType.ALL로 인해 auth만 save하면 loginStatus도 자동 저장됨
+    authRepository.save(auth);
+
+    return response;
+  }
 
   @Override
   public LoginResponse generateLoginResponse(Auth auth) {
-        if (!auth.getStatus().equals(Status.ACTIVE)) {
-            switch (auth.getStatus()) {
-                case SLEEPING:
+    if (!auth.getStatus().equals(Status.ACTIVE)) {
+      switch (auth.getStatus()) {
+        case SLEEPING:
           throw new CustomException(AuthErrorCode.USER_IS_SLEEPING);
-                case BLOCKED:
+        case BLOCKED:
           throw new CustomException(AuthErrorCode.USER_IS_BLOCKED);
-                case SUSPENDED:
+        case SUSPENDED:
           throw new CustomException(AuthErrorCode.USER_IS_SUSPENDED);
-                case DELETED:
+        case DELETED:
           throw new CustomException(AuthErrorCode.USER_IS_DELETED);
-                default:
-                    break;
-            }
-        }
-    return generateResponse(auth);
+        default:
+          break;
+      }
     }
-
-
+    return generateResponse(auth);
+  }
 }

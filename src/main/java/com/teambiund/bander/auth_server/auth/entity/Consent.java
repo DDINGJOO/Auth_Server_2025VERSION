@@ -18,12 +18,11 @@ public class Consent {
   @ManyToOne
   @JoinColumn(name = "user_id")
   private Auth user;
-  
+
   @ManyToOne
   @JoinColumn(name = "consent_id")
   private ConsentsTable consentsTable;
+
   @Column(name = "consented_at")
   private LocalDateTime consentedAt;
-  
-	
 }

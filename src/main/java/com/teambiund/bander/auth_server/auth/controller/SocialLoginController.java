@@ -31,42 +31,40 @@ public class SocialLoginController {
 
   @Operation(
       summary = "카카오 로그인",
-      description = "카카오 OAuth Access Token으로 로그인하여 JWT 토큰을 발급받습니다. " +
-          "신규 사용자인 경우 자동으로 회원가입됩니다."
-  )
-  @ApiResponses(value = {
-      @ApiResponse(
-          responseCode = "200",
-          description = "소셜 로그인 성공",
-          content = @Content(
-              mediaType = "application/json",
-              schema = @Schema(implementation = LoginResponse.class)
-          )
-      ),
-      @ApiResponse(
-          responseCode = "401",
-          description = "유효하지 않은 카카오 Access Token",
-          content = @Content(mediaType = "application/json")
-      )
-  })
+      description = "카카오 OAuth Access Token으로 로그인하여 JWT 토큰을 발급받습니다. " + "신규 사용자인 경우 자동으로 회원가입됩니다.")
+  @ApiResponses(
+      value = {
+        @ApiResponse(
+            responseCode = "200",
+            description = "소셜 로그인 성공",
+            content =
+                @Content(
+                    mediaType = "application/json",
+                    schema = @Schema(implementation = LoginResponse.class))),
+        @ApiResponse(
+            responseCode = "401",
+            description = "유효하지 않은 카카오 Access Token",
+            content = @Content(mediaType = "application/json"))
+      })
   @PostMapping("/kakao")
   public ResponseEntity<LoginResponse> kakaoLogin(
       @io.swagger.v3.oas.annotations.parameters.RequestBody(
-          description = "카카오 OAuth Access Token",
-          required = true,
-          content = @Content(
-              schema = @Schema(implementation = SocialLoginRequest.class),
-              examples = @ExampleObject(
-                  value = """
+              description = "카카오 OAuth Access Token",
+              required = true,
+              content =
+                  @Content(
+                      schema = @Schema(implementation = SocialLoginRequest.class),
+                      examples =
+                          @ExampleObject(
+                              value =
+                                  """
                       {
                         "accessToken": "kakao_oauth_access_token_here"
                       }
-                      """
-              )
-          )
-      )
-      @Valid @RequestBody SocialLoginRequest request
-  ) {
+                      """)))
+          @Valid
+          @RequestBody
+          SocialLoginRequest request) {
     log.info("카카오 로그인 요청");
     LoginResponse response = socialLoginService.kakaoLogin(request.getAccessToken());
     return new ResponseEntity<>(response, HttpStatus.OK);
@@ -74,42 +72,41 @@ public class SocialLoginController {
 
   @Operation(
       summary = "애플 로그인",
-      description = "Apple Sign In Identity Token으로 로그인하여 JWT 토큰을 발급받습니다. " +
-          "신규 사용자인 경우 자동으로 회원가입됩니다."
-  )
-  @ApiResponses(value = {
-      @ApiResponse(
-          responseCode = "200",
-          description = "소셜 로그인 성공",
-          content = @Content(
-              mediaType = "application/json",
-              schema = @Schema(implementation = LoginResponse.class)
-          )
-      ),
-      @ApiResponse(
-          responseCode = "401",
-          description = "유효하지 않은 Apple Identity Token",
-          content = @Content(mediaType = "application/json")
-      )
-  })
+      description =
+          "Apple Sign In Identity Token으로 로그인하여 JWT 토큰을 발급받습니다. " + "신규 사용자인 경우 자동으로 회원가입됩니다.")
+  @ApiResponses(
+      value = {
+        @ApiResponse(
+            responseCode = "200",
+            description = "소셜 로그인 성공",
+            content =
+                @Content(
+                    mediaType = "application/json",
+                    schema = @Schema(implementation = LoginResponse.class))),
+        @ApiResponse(
+            responseCode = "401",
+            description = "유효하지 않은 Apple Identity Token",
+            content = @Content(mediaType = "application/json"))
+      })
   @PostMapping("/apple")
   public ResponseEntity<LoginResponse> appleLogin(
       @io.swagger.v3.oas.annotations.parameters.RequestBody(
-          description = "Apple Sign In Identity Token",
-          required = true,
-          content = @Content(
-              schema = @Schema(implementation = SocialLoginRequest.class),
-              examples = @ExampleObject(
-                  value = """
+              description = "Apple Sign In Identity Token",
+              required = true,
+              content =
+                  @Content(
+                      schema = @Schema(implementation = SocialLoginRequest.class),
+                      examples =
+                          @ExampleObject(
+                              value =
+                                  """
                       {
                         "accessToken": "apple_identity_token_here"
                       }
-                      """
-              )
-          )
-      )
-      @Valid @RequestBody SocialLoginRequest request
-  ) {
+                      """)))
+          @Valid
+          @RequestBody
+          SocialLoginRequest request) {
     log.info("애플 로그인 요청");
     LoginResponse response = socialLoginService.appleLogin(request.getAccessToken());
     return new ResponseEntity<>(response, HttpStatus.OK);

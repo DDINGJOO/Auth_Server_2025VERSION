@@ -26,28 +26,25 @@ public class ConsentsController {
 
   @Operation(
       summary = "동의서 목록 조회",
-      description = "시스템에서 사용 가능한 동의서 목록을 조회합니다. " +
-          "필수 동의서만 조회하거나 모든 동의서를 조회할 수 있습니다."
-  )
-  @ApiResponses(value = {
-      @ApiResponse(
-          responseCode = "200",
-          description = "조회 성공",
-          content = @Content(
-              mediaType = "application/json",
-              schema = @Schema(implementation = Map.class)
-          )
-      )
-  })
+      description = "시스템에서 사용 가능한 동의서 목록을 조회합니다. " + "필수 동의서만 조회하거나 모든 동의서를 조회할 수 있습니다.")
+  @ApiResponses(
+      value = {
+        @ApiResponse(
+            responseCode = "200",
+            description = "조회 성공",
+            content =
+                @Content(
+                    mediaType = "application/json",
+                    schema = @Schema(implementation = Map.class)))
+      })
   @GetMapping("/consents")
   public ResponseEntity<Map<String, ConsentsTable>> getAllConsents(
       @Parameter(
-          description = "모든 동의서 조회 여부 (true: 전체, false: 필수만)",
-          required = true,
-          example = "false"
-      )
-      @RequestParam(name = "all") Boolean value
-  ) {
+              description = "모든 동의서 조회 여부 (true: 전체, false: 필수만)",
+              required = true,
+              example = "false")
+          @RequestParam(name = "all")
+          Boolean value) {
     if (value) {
       return new ResponseEntity<>(consentsAllMaps, HttpStatus.OK);
     } else {

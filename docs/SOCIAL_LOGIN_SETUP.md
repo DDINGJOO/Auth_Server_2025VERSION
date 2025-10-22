@@ -12,8 +12,8 @@
 2. 클라이언트가 Auth Server에 Token과 함께 로그인 요청
 3. Auth Server가 해당 플랫폼 API로 사용자 정보 조회
 4. 이메일 기반으로 기존 사용자 확인
-   - 신규 사용자: 회원가입 처리 후 로그인
-   - 기존 사용자: 로그인 처리
+	- 신규 사용자: 회원가입 처리 후 로그인
+	- 기존 사용자: 로그인 처리
 5. JWT Access Token 및 Refresh Token 발급
 
 ### 구조
@@ -35,29 +35,29 @@ SocialLoginService
 ### 1. 카카오 개발자 콘솔 설정
 
 1. Kakao Developers 접속
-   - https://developers.kakao.com/
+	- https://developers.kakao.com/
 
 2. 애플리케이션 추가
-   - 내 애플리케이션 → 애플리케이션 추가하기
-   - 앱 이름, 사업자명 입력
+	- 내 애플리케이션 → 애플리케이션 추가하기
+	- 앱 이름, 사업자명 입력
 
 3. 플랫폼 설정
-   - 플랫폼 → Web 플랫폼 등록
-   - 사이트 도메인 입력 (예: https://yourdomain.com)
+	- 플랫폼 → Web 플랫폼 등록
+	- 사이트 도메인 입력 (예: https://yourdomain.com)
 
 4. 카카오 로그인 활성화
-   - 제품 설정 → 카카오 로그인
-   - 카카오 로그인 활성화 ON
-   - Redirect URI 등록 (예: https://yourdomain.com/oauth/kakao/callback)
+	- 제품 설정 → 카카오 로그인
+	- 카카오 로그인 활성화 ON
+	- Redirect URI 등록 (예: https://yourdomain.com/oauth/kakao/callback)
 
 5. 동의항목 설정
-   - 제품 설정 → 카카오 로그인 → 동의항목
-   - 이메일 (필수 동의)
-   - 프로필 정보 (선택 동의)
+	- 제품 설정 → 카카오 로그인 → 동의항목
+	- 이메일 (필수 동의)
+	- 프로필 정보 (선택 동의)
 
 6. REST API 키 확인
-   - 앱 설정 → 앱 키
-   - REST API 키 복사 (클라이언트에서 사용)
+	- 앱 설정 → 앱 키
+	- REST API 키 복사 (클라이언트에서 사용)
 
 ### 2. 환경 변수 설정
 
@@ -85,29 +85,29 @@ Content-Type: application/json
 ### 1. Apple Developer 설정
 
 1. Apple Developer 접속
-   - https://developer.apple.com/account/
+	- https://developer.apple.com/account/
 
 2. Certificates, Identifiers & Profiles 접근
-   - Identifiers → App IDs 선택
-   - 새 App ID 등록 또는 기존 App ID 선택
+	- Identifiers → App IDs 선택
+	- 새 App ID 등록 또는 기존 App ID 선택
 
 3. Sign in with Apple 활성화
-   - App ID 편집
-   - Capabilities → Sign in with Apple 체크
+	- App ID 편집
+	- Capabilities → Sign in with Apple 체크
 
 4. Services ID 생성
-   - Identifiers → Services IDs
-   - 새 Services ID 등록
-   - Sign in with Apple 활성화
-   - Domains and Subdomains 입력
-   - Return URLs 입력 (예: https://yourdomain.com/oauth/apple/callback)
+	- Identifiers → Services IDs
+	- 새 Services ID 등록
+	- Sign in with Apple 활성화
+	- Domains and Subdomains 입력
+	- Return URLs 입력 (예: https://yourdomain.com/oauth/apple/callback)
 
 5. Key 생성
-   - Keys → 새 Key 등록
-   - Sign in with Apple 선택
-   - Configure 클릭하여 Primary App ID 선택
-   - Key 다운로드 (.p8 파일)
-   - Key ID 확인
+	- Keys → 새 Key 등록
+	- Sign in with Apple 선택
+	- Configure 클릭하여 Primary App ID 선택
+	- Key 다운로드 (.p8 파일)
+	- Key ID 확인
 
 ### 2. 환경 변수 설정
 
@@ -139,6 +139,7 @@ POST /api/auth/social/kakao
 ```
 
 #### Request Body
+
 ```json
 {
   "accessToken": "string (required) - 카카오 Access Token",
@@ -147,6 +148,7 @@ POST /api/auth/social/kakao
 ```
 
 #### Response
+
 ```json
 {
   "accessToken": "string - JWT Access Token",
@@ -156,6 +158,7 @@ POST /api/auth/social/kakao
 ```
 
 #### Error Response
+
 - `400 SOCIAL_LOGIN_FAILED`: 소셜 로그인 실패
 - `400 EMAIL_ALREADY_EXISTS`: 이미 다른 방식으로 가입된 이메일
 - `401 UNAUTHORIZED`: 유효하지 않은 Access Token
@@ -167,6 +170,7 @@ POST /api/auth/social/apple
 ```
 
 #### Request Body
+
 ```json
 {
   "accessToken": "string (required) - 애플 Identity Token",
@@ -175,6 +179,7 @@ POST /api/auth/social/apple
 ```
 
 #### Response
+
 ```json
 {
   "accessToken": "string - JWT Access Token",
@@ -184,6 +189,7 @@ POST /api/auth/social/apple
 ```
 
 #### Error Response
+
 - `400 SOCIAL_LOGIN_FAILED`: 소셜 로그인 실패
 - `400 EMAIL_ALREADY_EXISTS`: 이미 다른 방식으로 가입된 이메일
 - `401 UNAUTHORIZED`: 유효하지 않은 Identity Token
@@ -199,13 +205,13 @@ POST /api/auth/social/apple
 ### Provider 정책
 
 1. 동일한 이메일로 다른 Provider로 가입할 수 없습니다
-   - 예: kakao@email.com으로 카카오 가입 후, 동일 이메일로 애플 로그인 불가
-   - `EMAIL_ALREADY_EXISTS` 에러 반환
+	- 예: kakao@email.com으로 카카오 가입 후, 동일 이메일로 애플 로그인 불가
+	- `EMAIL_ALREADY_EXISTS` 에러 반환
 
 2. 신규 사용자는 자동으로 회원가입 처리됩니다
-   - Provider 정보와 이메일만 저장됩니다
-   - 비밀번호는 저장되지 않습니다
-   - 프로필 생성 이벤트가 발행됩니다
+	- Provider 정보와 이메일만 저장됩니다
+	- 비밀번호는 저장되지 않습니다
+	- 프로필 생성 이벤트가 발행됩니다
 
 ### 테스트
 
@@ -220,39 +226,42 @@ POST /api/auth/social/apple
 **증상**: `SOCIAL_LOGIN_FAILED` 에러 발생
 
 **원인 및 해결**:
+
 1. Access Token 만료
-   - 카카오 SDK에서 새로운 Token 재발급
+	- 카카오 SDK에서 새로운 Token 재발급
 
 2. 카카오 API 호출 실패
-   - 네트워크 연결 확인
-   - 카카오 서버 상태 확인 (https://status.kakao.com/)
+	- 네트워크 연결 확인
+	- 카카오 서버 상태 확인 (https://status.kakao.com/)
 
 3. 이메일 정보 없음
-   - 카카오 개발자 콘솔에서 이메일 동의항목 필수로 설정
-   - 사용자에게 이메일 제공 동의 요청
+	- 카카오 개발자 콘솔에서 이메일 동의항목 필수로 설정
+	- 사용자에게 이메일 제공 동의 요청
 
 ### 애플 로그인 실패
 
 **증상**: `SOCIAL_LOGIN_FAILED` 에러 발생
 
 **원인 및 해결**:
+
 1. Identity Token 형식 오류
-   - JWT 형식 확인 (header.payload.signature)
-   - Base64 URL 인코딩 확인
+	- JWT 형식 확인 (header.payload.signature)
+	- Base64 URL 인코딩 확인
 
 2. Identity Token 파싱 실패
-   - Token 만료 여부 확인
-   - 애플 SDK 설정 확인
+	- Token 만료 여부 확인
+	- 애플 SDK 설정 확인
 
 3. 이메일 또는 sub 정보 없음
-   - 애플 Developer 콘솔에서 Sign in with Apple 설정 확인
-   - 클라이언트 요청 시 scope에 email 포함 확인
+	- 애플 Developer 콘솔에서 Sign in with Apple 설정 확인
+	- 클라이언트 요청 시 scope에 email 포함 확인
 
 ### Provider 불일치 에러
 
 **증상**: `EMAIL_ALREADY_EXISTS` 에러 발생
 
 **해결**:
+
 1. 사용자에게 기존 가입 방식 안내
 2. 기존 계정으로 로그인 유도
 3. 필요 시 계정 연동 기능 구현 고려

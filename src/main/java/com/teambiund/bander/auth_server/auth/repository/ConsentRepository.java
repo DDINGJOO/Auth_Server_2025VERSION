@@ -8,6 +8,5 @@ import org.springframework.stereotype.Repository;
 @Repository
 public interface ConsentRepository extends JpaRepository<Consent, String> {
 
-    List<Consent> findByUserId(String userId);
-
+  List<Consent> findByUserId(String userId);
 }

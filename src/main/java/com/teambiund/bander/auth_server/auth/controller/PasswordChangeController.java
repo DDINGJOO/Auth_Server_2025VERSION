@@ -25,40 +25,37 @@ public class PasswordChangeController {
 
   @Operation(
       summary = "비밀번호 변경",
-      description = "사용자의 비밀번호를 변경합니다. " +
-          "새 비밀번호와 확인 비밀번호가 일치해야 하며, 비밀번호 정책을 만족해야 합니다."
-  )
-  @ApiResponses(value = {
-      @ApiResponse(
-          responseCode = "200",
-          description = "비밀번호 변경 성공",
-          content = @Content(
-              mediaType = "application/json",
-              schema = @Schema(implementation = Boolean.class),
-              examples = @ExampleObject(value = "true")
-          )
-      ),
-      @ApiResponse(
-          responseCode = "400",
-          description = "잘못된 요청 (비밀번호 불일치, 정책 위반 등)",
-          content = @Content(mediaType = "application/json")
-      ),
-      @ApiResponse(
-          responseCode = "404",
-          description = "사용자를 찾을 수 없음",
-          content = @Content(mediaType = "application/json")
-      )
-  })
+      description = "사용자의 비밀번호를 변경합니다. " + "새 비밀번호와 확인 비밀번호가 일치해야 하며, 비밀번호 정책을 만족해야 합니다.")
+  @ApiResponses(
+      value = {
+        @ApiResponse(
+            responseCode = "200",
+            description = "비밀번호 변경 성공",
+            content =
+                @Content(
+                    mediaType = "application/json",
+                    schema = @Schema(implementation = Boolean.class),
+                    examples = @ExampleObject(value = "true"))),
+        @ApiResponse(
+            responseCode = "400",
+            description = "잘못된 요청 (비밀번호 불일치, 정책 위반 등)",
+            content = @Content(mediaType = "application/json")),
+        @ApiResponse(
+            responseCode = "404",
+            description = "사용자를 찾을 수 없음",
+            content = @Content(mediaType = "application/json"))
+      })
   @PostMapping("/changePassword")
   // TODO : CHANGE REQUEST PARAM TO OBJECT
   public ResponseEntity<Boolean> changePassword(
       @Parameter(description = "사용자 이메일", required = true, example = "user@example.com")
-      @RequestParam String email,
-      @Parameter(description = "새 비밀번호", required = true, example = "newPassword123")
-      @RequestParam String newPassword,
-      @Parameter(description = "비밀번호 확인", required = true, example = "newPassword123")
-      @RequestParam String passConfirm
-  ) throws Exception {
+          @RequestParam
+          String email,
+      @Parameter(description = "새 비밀번호", required = true, example = "newPassword123") @RequestParam
+          String newPassword,
+      @Parameter(description = "비밀번호 확인", required = true, example = "newPassword123") @RequestParam
+          String passConfirm)
+      throws Exception {
     updateService.changePassword(email, newPassword, passConfirm);
     return ResponseEntity.ok(true);
   }

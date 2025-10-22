@@ -74,5 +74,4 @@ public class SignupStoreService {
     authRepository.save(auth);
     return auth;
   }
-  
 }

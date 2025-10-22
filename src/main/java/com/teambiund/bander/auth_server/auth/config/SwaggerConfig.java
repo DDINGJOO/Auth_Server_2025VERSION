@@ -15,27 +15,29 @@ import org.springframework.context.annotation.Configuration;
 @Configuration
 public class SwaggerConfig {
 
-    @Bean
-    public OpenAPI openAPI() {
-        return new OpenAPI()
-                .info(apiInfo())
-                .servers(List.of(
-                        new Server().url("http://localhost:9010").description("로컬 개발 서버 (Nginx Load Balancer)"),
-                        new Server().url("http://localhost:8080").description("로컬 개발 서버 (Auth Server #1)")
-                ))
-                .components(new Components()
-                        .addSecuritySchemes("Bearer Authentication",
-                                new SecurityScheme()
-                                        .type(SecurityScheme.Type.HTTP)
-                                        .scheme("bearer")
-                                        .bearerFormat("JWT")
-                                        .description("JWT 토큰을 입력하세요 (Bearer 접두사 제외)")
-                        )
-                )
-                .addSecurityItem(new SecurityRequirement().addList("Bearer Authentication"));
-    }
+  @Bean
+  public OpenAPI openAPI() {
+    return new OpenAPI()
+        .info(apiInfo())
+        .servers(
+            List.of(
+                new Server()
+                    .url("http://localhost:9010")
+                    .description("로컬 개발 서버 (Nginx Load Balancer)"),
+                new Server().url("http://localhost:8080").description("로컬 개발 서버 (Auth Server #1)")))
+        .components(
+            new Components()
+                .addSecuritySchemes(
+                    "Bearer Authentication",
+                    new SecurityScheme()
+                        .type(SecurityScheme.Type.HTTP)
+                        .scheme("bearer")
+                        .bearerFormat("JWT")
+                        .description("JWT 토큰을 입력하세요 (Bearer 접두사 제외)")))
+        .addSecurityItem(new SecurityRequirement().addList("Bearer Authentication"));
+  }
 
-    private Info apiInfo() {
+  private Info apiInfo() {
     return new Info()
         .title("Bander Auth Server API")
         .description(
@@ -57,5 +59,5 @@ public class SwaggerConfig {
         .version("0.0.3_proto")
         .contact(new Contact().name("Bander Development Team").email("ddingsha9@teambind.co,kr"))
         .license(new License().name("MIT License").url("https://opensource.org/licenses/MIT"));
-    }
+  }
 }
