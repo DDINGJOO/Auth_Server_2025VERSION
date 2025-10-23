@@ -23,7 +23,7 @@ import org.springframework.web.bind.annotation.RestController;
 @Tag(name = "소셜 로그인", description = "카카오, 애플 소셜 로그인 API")
 @Slf4j
 @RestController
-@RequestMapping("/api/auth/social")
+@RequestMapping("/api/v1/auth/social")
 @RequiredArgsConstructor
 public class SocialLoginController {
 

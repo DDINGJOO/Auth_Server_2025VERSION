@@ -18,7 +18,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 @Tag(name = "비밀번호 변경", description = "사용자 비밀번호 변경 API")
 @RestController
-@RequestMapping("/api/auth/passwordChange")
+@RequestMapping("/api/v1/auth/password")
 @RequiredArgsConstructor
 public class PasswordChangeController {
   private final UpdateService updateService;
@@ -45,7 +45,7 @@ public class PasswordChangeController {
             description = "사용자를 찾을 수 없음",
             content = @Content(mediaType = "application/json"))
       })
-  @PostMapping("/changePassword")
+  @PostMapping("")
   // TODO : CHANGE REQUEST PARAM TO OBJECT
   public ResponseEntity<Boolean> changePassword(
       @Parameter(description = "사용자 이메일", required = true, example = "user@example.com")

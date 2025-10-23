@@ -16,7 +16,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 @Tag(name = "사용자 정지 (관리자)", description = "관리자 전용 사용자 정지/해제 API")
-@RequestMapping("/api/admin/auth/suspend")
+@RequestMapping("/api/admin/v1/auth/suspend")
 @RestController
 @RequiredArgsConstructor
 public class SuspendController {

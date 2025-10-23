@@ -18,7 +18,7 @@ import org.springframework.web.bind.annotation.*;
 
 @Tag(name = "동의 관리", description = "사용자 동의서 관리 API")
 @RestController
-@RequestMapping("/api/auth/consent")
+@RequestMapping("/api/v1/auth/consent")
 @RequiredArgsConstructor
 public class ConsentController {
   private final ConsentManagementService consentService;

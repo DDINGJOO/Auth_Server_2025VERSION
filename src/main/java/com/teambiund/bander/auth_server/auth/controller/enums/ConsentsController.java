@@ -21,7 +21,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 @Tag(name = "동의서 정보 조회", description = "동의서 목록 및 정보 조회 API")
 @RestController
-@RequestMapping("/api/auth/enums")
+@RequestMapping("/api/v1/auth")
 public class ConsentsController {
 
   @Operation(
