@@ -116,3 +116,14 @@ CREATE TABLE IF NOT EXISTS shedlock
 ) ENGINE = InnoDB
   DEFAULT CHARSET = utf8mb4
   COLLATE = utf8mb4_0900_ai_ci;
+
+
+INSERT INTO consents_name (id, consent_name, version, consent_url, required)
+VALUES ('TERMS_OF_SERVICE', '서비스 이용약관 동의', 'v1.0', 'https://teambinc.cok.kr', TRUE),
+       ('PRIVACY_THIRD_PARTY', '개인정보 제3자 정보 제공 동의', 'v1.0', 'https://naver.com', TRUE);
+
+-- 선택 동의
+INSERT INTO consents_name (id, consent_name, version, consent_url, required)
+VALUES ('MARKETING_CONSENT', '마케팅 정보 수신 동의', 'v1.0', 'https://www.notion.so/Team-Bind-24a7b25b471a80dc9d6ddb2b62f7143d',
+        FALSE),
+       ('LOCATION_BASED_SERVICE', '위치기반 서비스 이용약관 동의', 'v1.0', 'https://google.com', FALSE);
