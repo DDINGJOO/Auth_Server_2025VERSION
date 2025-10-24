@@ -39,7 +39,7 @@ public class WithdrawController {
             description = "사용자를 찾을 수 없음",
             content = @Content(mediaType = "application/json"))
       })
-  @PostMapping("/withdraw/{userId}")
+  @PostMapping("/{userId}")
   public ResponseEntity<Boolean> withdraw(
       @Parameter(description = "탈퇴할 사용자 ID", required = true, example = "12345")
           @PathVariable(name = "userId")

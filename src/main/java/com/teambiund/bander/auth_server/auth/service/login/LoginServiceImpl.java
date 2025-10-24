@@ -2,7 +2,6 @@ package com.teambiund.bander.auth_server.auth.service.login;
 
 import com.teambiund.bander.auth_server.auth.dto.response.LoginResponse;
 import com.teambiund.bander.auth_server.auth.entity.Auth;
-import com.teambiund.bander.auth_server.auth.entity.LoginStatus;
 import com.teambiund.bander.auth_server.auth.enums.Status;
 import com.teambiund.bander.auth_server.auth.exception.CustomException;
 import com.teambiund.bander.auth_server.auth.exception.ErrorCode.AuthErrorCode;
@@ -107,10 +106,9 @@ public class LoginServiceImpl implements LoginService {
     response.setDeviceId(deviceId);
 
     // LoginStatus 생성 또는 업데이트
-    LoginStatus loginStatus = LoginStatus.builder().lastLogin(LocalDateTime.now()).build();
+	  auth.getLoginStatus().setLastLogin(LocalDateTime.now());
 
     // 편의 메서드 사용 - 양방향 연관관계 설정
-    auth.setLoginStatus(loginStatus);
 
     // CascadeType.ALL로 인해 auth만 save하면 loginStatus도 자동 저장됨
     authRepository.save(auth);
