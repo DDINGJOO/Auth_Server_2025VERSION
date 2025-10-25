@@ -27,6 +27,8 @@ public class ConsentManagementServiceImpl implements ConsentManagementService {
   /**
    * 회원가입 시 동의 정보 저장 - consentId로 ConsentsTable 조회 - Auth 엔티티의 편의 메서드를 사용하여 양방향 연관관계 설정 - Cascade
    * 설정으로 Consent 엔티티 자동 저장
+   *
+   * <p>NOTE: Auth는 이미 영속성 컨텍스트에 관리되는 상태이므로, Consent를 추가하면 트랜잭션 커밋 시 자동으로 저장됨 (dirty checking)
    */
   public void saveConsent(Auth auth, List<ConsentRequest> requests) throws CustomException {
     List<ConsentRequest> consents = requests.stream().filter(ConsentRequest::isConsented).toList();
@@ -41,9 +43,8 @@ public class ConsentManagementServiceImpl implements ConsentManagementService {
       auth.addConsentWithTable(keyProvider.generateKey(), consentTable, LocalDateTime.now());
     }
 
-    // CascadeType.ALL로 인해 auth의 consent 컬렉션도 자동 저장됨
-    // 하지만 명시적으로 save를 호출하는 것이 더 명확함
-    authRepository.save(auth);
+    // CascadeType.ALL과 dirty checking으로 인해 auth의 consent 컬렉션 자동 저장됨
+    // authRepository.save(auth) 호출 시 중복 merge로 인한 NonUniqueObjectException 발생 방지
   }
 
   /**

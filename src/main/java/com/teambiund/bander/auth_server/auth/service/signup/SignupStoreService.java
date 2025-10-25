@@ -1,6 +1,7 @@
 package com.teambiund.bander.auth_server.auth.service.signup;
 
 import com.teambiund.bander.auth_server.auth.entity.Auth;
+import com.teambiund.bander.auth_server.auth.entity.LoginStatus;
 import com.teambiund.bander.auth_server.auth.enums.Provider;
 import com.teambiund.bander.auth_server.auth.enums.Role;
 import com.teambiund.bander.auth_server.auth.enums.Status;
@@ -51,6 +52,10 @@ public class SignupStoreService {
             .userRole(Role.USER)
             .build();
 
+    // LoginStatus 생성 및 양방향 관계 설정
+    LoginStatus loginStatus = LoginStatus.builder().build();
+    auth.setLoginStatus(loginStatus);
+
     authRepository.save(auth);
     return auth;
   }
@@ -71,6 +76,11 @@ public class SignupStoreService {
             .status(Status.ACTIVE)
             .userRole(Role.USER)
             .build();
+
+    // LoginStatus 생성 및 양방향 관계 설정
+    LoginStatus loginStatus = LoginStatus.builder().build();
+    auth.setLoginStatus(loginStatus);
+
     authRepository.save(auth);
     return auth;
   }

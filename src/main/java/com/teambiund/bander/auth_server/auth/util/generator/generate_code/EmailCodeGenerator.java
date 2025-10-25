@@ -58,7 +58,7 @@ public class EmailCodeGenerator {
     int ttl = CODE_EXPIRE_TIME > 0 ? CODE_EXPIRE_TIME : DEFAULT_EXPIRE_SECONDS;
     Duration expireSeconds = Duration.ofSeconds(ttl);
     redisTemplate.opsForValue().set(CODE_PREFIX + email, result, expireSeconds);
-	log.info("이메일 확인 코드 레디스 저장 완료 , key : {}, value : {}", CODE_PREFIX + email, result);
+    log.info("이메일 확인 코드 레디스 저장 완료 , key : {}, value : {}", CODE_PREFIX + email, result);
     return result;
   }
 
@@ -66,11 +66,11 @@ public class EmailCodeGenerator {
     if (code.equals("confirmed")) {
       String expect = redisTemplate.opsForValue().get(CODE_PREFIX + email);
       if (expect == null) {
-		  log.info("이메일이 확인되지 않은 유저입니다 : {}", email);
+        log.info("이메일이 확인되지 않은 유저입니다 : {}", email);
         throw new CustomException(AuthErrorCode.NOT_CONFIRMED_EMAIL);
       }
       if (!expect.equals("confirmed")) {
-	      log.info("이메일 확인 작업을 하지 않은 유저입니다 : {}", email);
+        log.info("이메일 확인 작업을 하지 않은 유저입니다 : {}", email);
         throw new CustomException(AuthErrorCode.NOT_CONFIRMED_EMAIL);
       }
       redisTemplate.delete(CODE_PREFIX + email);
