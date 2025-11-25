@@ -29,10 +29,11 @@ public class SuspendRelease {
   @Transactional
   public void release() {
     log.info("스케쥴 권한 획득 정지기간이 지난 유저 정지 해제를 시작합니다. ");
+    // Fetch Join을 사용하여 Auth와 suspensions를 한 번에 조회 (N+1 문제 해결)
     List<Suspend> suspends =
-        suspendRepository.findAllBySuspendUntilIsBefore((LocalDate.now().minusDays(1)));
+        suspendRepository.findAllWithAuthAndSuspensions(LocalDate.now().minusDays(1));
 
-    // Suspend 엔티티에서 직접 Auth를 가져와서 처리 (N+1 문제 해결)
+    // 이미 Auth와 suspensions가 로드되어 있어 추가 쿼리 발생 없음
     suspends.forEach(
         suspend -> {
           var auth = suspend.getSuspendedUser();

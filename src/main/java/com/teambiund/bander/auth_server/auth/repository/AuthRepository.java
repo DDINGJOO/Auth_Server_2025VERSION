@@ -23,6 +23,17 @@ public interface AuthRepository extends JpaRepository<Auth, String> {
   @Query("select a from Auth a left join fetch a.consent c where a.id = :id")
   Optional<Auth> findByIdWithConsent(@Param("id") String id);
 
+  // LoginService를 위한 메서드 - LoginStatus와 함께 조회
+  @Query("select a from Auth a left join fetch a.loginStatus where a.email = :email")
+  Optional<Auth> findByEmailWithLoginStatus(@Param("email") String email);
+
+  @Query("select a from Auth a left join fetch a.loginStatus where a.id = :id")
+  Optional<Auth> findByIdWithLoginStatus(@Param("id") String id);
+
+  // WithdrawalService를 위한 메서드 - Withdraw와 함께 조회
+  @Query("select a from Auth a left join fetch a.withdraw where a.email = :email")
+  Optional<Auth> findByEmailWithWithdraw(@Param("email") String email);
+
   void deleteByDeletedAtBefore(LocalDateTime deletedAtBefore);
 
   boolean existsByEmail(String email);

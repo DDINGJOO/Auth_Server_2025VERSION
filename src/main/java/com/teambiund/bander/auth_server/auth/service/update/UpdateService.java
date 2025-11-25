@@ -31,17 +31,6 @@ public class UpdateService {
     this.emailCipher = emailCipher;
   }
 
-  // 2025-09-21 기존 로직 백업 용
-  public void EmailConfirm(String userId) throws CustomException {
-    Auth auth =
-        authRepository
-            .findById(userId)
-            .orElseThrow(() -> new CustomException(AuthErrorCode.USER_NOT_FOUND));
-    auth.setStatus(Status.ACTIVE);
-    auth.setUserRole(Role.USER);
-    authRepository.save(auth);
-  }
-
   public void updateEmail(String userId, String newEmail) throws CustomException {
     Auth auth =
         authRepository

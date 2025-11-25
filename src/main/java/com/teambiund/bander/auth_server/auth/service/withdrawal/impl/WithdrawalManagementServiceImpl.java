@@ -40,8 +40,8 @@ public class WithdrawalManagementServiceImpl implements WithdrawalManagementServ
     String encryptedEmail = emailCipher.encrypt(email);
     var auth =
         authRepository
-            .findByEmail(encryptedEmail)
-            .or(() -> authRepository.findByEmail(email))
+            .findByEmailWithWithdraw(encryptedEmail)
+            .or(() -> authRepository.findByEmailWithWithdraw(email))
             .orElseThrow(() -> new CustomException(AuthErrorCode.USER_NOT_FOUND));
 
     if (auth.getWithdraw() == null) {

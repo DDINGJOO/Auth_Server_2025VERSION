@@ -45,10 +45,10 @@ public class LoginServiceImpl implements LoginService {
     String encryptedEmail = emailCipher.encrypt(email);
     Auth auth =
         authRepository
-            .findByEmail(encryptedEmail)
+            .findByEmailWithLoginStatus(encryptedEmail)
             .or(
                 () ->
-                    authRepository.findByEmail(
+                    authRepository.findByEmailWithLoginStatus(
                         email)) // Backward-compatibility for legacy plaintext rows
             .orElseThrow(() -> new CustomException(AuthErrorCode.USER_NOT_FOUND));
     if (!passwordEncoder.matches(password, auth.getPassword())) {
@@ -74,7 +74,7 @@ public class LoginServiceImpl implements LoginService {
 
     Auth auth =
         authRepository
-            .findById(userId)
+            .findByIdWithLoginStatus(userId)
             .orElseThrow(() -> new CustomException(AuthErrorCode.USER_NOT_FOUND));
     return generateResponse(auth);
   }
