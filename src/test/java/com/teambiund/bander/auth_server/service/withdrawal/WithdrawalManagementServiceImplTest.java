@@ -190,7 +190,7 @@ class WithdrawalManagementServiceImplTest {
       withdraw.setUser(auth);
 
       when(emailCipher.encrypt(email)).thenReturn(encryptedEmail);
-      when(authRepository.findByEmail(encryptedEmail)).thenReturn(Optional.of(auth));
+      when(authRepository.findByEmailWithWithdraw(encryptedEmail)).thenReturn(Optional.of(auth));
       when(authRepository.save(any(Auth.class)))
           .thenAnswer(invocation -> invocation.getArgument(0));
 
@@ -202,7 +202,7 @@ class WithdrawalManagementServiceImplTest {
       assertThat(auth.getWithdraw()).isNull();
 
       verify(emailCipher).encrypt(email);
-      verify(authRepository).findByEmail(encryptedEmail);
+      verify(authRepository).findByEmailWithWithdraw(encryptedEmail);
       verify(authRepository).save(auth);
     }
 
@@ -225,8 +225,8 @@ class WithdrawalManagementServiceImplTest {
       withdraw.setUser(auth);
 
       when(emailCipher.encrypt(email)).thenReturn(encryptedEmail);
-      when(authRepository.findByEmail(encryptedEmail)).thenReturn(Optional.empty());
-      when(authRepository.findByEmail(email)).thenReturn(Optional.of(auth));
+      when(authRepository.findByEmailWithWithdraw(encryptedEmail)).thenReturn(Optional.empty());
+      when(authRepository.findByEmailWithWithdraw(email)).thenReturn(Optional.of(auth));
       when(authRepository.save(any(Auth.class)))
           .thenAnswer(invocation -> invocation.getArgument(0));
 
@@ -235,8 +235,8 @@ class WithdrawalManagementServiceImplTest {
 
       // then
       assertThat(auth.getStatus()).isEqualTo(Status.ACTIVE);
-      verify(authRepository).findByEmail(encryptedEmail);
-      verify(authRepository).findByEmail(email);
+      verify(authRepository).findByEmailWithWithdraw(encryptedEmail);
+      verify(authRepository).findByEmailWithWithdraw(email);
     }
 
     @Test
@@ -258,7 +258,7 @@ class WithdrawalManagementServiceImplTest {
       withdraw.setUser(auth);
 
       when(emailCipher.encrypt(email)).thenReturn(encryptedEmail);
-      when(authRepository.findByEmail(encryptedEmail)).thenReturn(Optional.of(auth));
+      when(authRepository.findByEmailWithWithdraw(encryptedEmail)).thenReturn(Optional.of(auth));
       when(authRepository.save(any(Auth.class)))
           .thenAnswer(invocation -> invocation.getArgument(0));
 
@@ -278,8 +278,8 @@ class WithdrawalManagementServiceImplTest {
       String encryptedEmail = "encrypted-nonexistent";
 
       when(emailCipher.encrypt(email)).thenReturn(encryptedEmail);
-      when(authRepository.findByEmail(encryptedEmail)).thenReturn(Optional.empty());
-      when(authRepository.findByEmail(email)).thenReturn(Optional.empty());
+      when(authRepository.findByEmailWithWithdraw(encryptedEmail)).thenReturn(Optional.empty());
+      when(authRepository.findByEmailWithWithdraw(email)).thenReturn(Optional.empty());
 
       // when & then
       assertThatThrownBy(() -> withdrawalService.withdrawRetraction(email))
@@ -304,7 +304,7 @@ class WithdrawalManagementServiceImplTest {
               .build();
 
       when(emailCipher.encrypt(email)).thenReturn(encryptedEmail);
-      when(authRepository.findByEmail(encryptedEmail)).thenReturn(Optional.of(auth));
+      when(authRepository.findByEmailWithWithdraw(encryptedEmail)).thenReturn(Optional.of(auth));
 
       // when & then
       assertThatThrownBy(() -> withdrawalService.withdrawRetraction(email))
@@ -332,7 +332,7 @@ class WithdrawalManagementServiceImplTest {
       withdraw.setUser(auth);
 
       when(emailCipher.encrypt(email)).thenReturn(encryptedEmail);
-      when(authRepository.findByEmail(encryptedEmail)).thenReturn(Optional.of(auth));
+      when(authRepository.findByEmailWithWithdraw(encryptedEmail)).thenReturn(Optional.of(auth));
       when(authRepository.save(any(Auth.class)))
           .thenAnswer(invocation -> invocation.getArgument(0));
 
@@ -373,7 +373,7 @@ class WithdrawalManagementServiceImplTest {
 
       // given - 철회
       when(emailCipher.encrypt(email)).thenReturn(encryptedEmail);
-      when(authRepository.findByEmail(encryptedEmail)).thenReturn(Optional.of(auth));
+      when(authRepository.findByEmailWithWithdraw(encryptedEmail)).thenReturn(Optional.of(auth));
 
       // when - 철회
       withdrawalService.withdrawRetraction(email);
@@ -466,7 +466,7 @@ class WithdrawalManagementServiceImplTest {
       withdraw.setUser(auth);
 
       when(emailCipher.encrypt(email)).thenReturn(encryptedEmail);
-      when(authRepository.findByEmail(encryptedEmail)).thenReturn(Optional.of(auth));
+      when(authRepository.findByEmailWithWithdraw(encryptedEmail)).thenReturn(Optional.of(auth));
       when(authRepository.save(any(Auth.class))).thenReturn(auth);
 
       // when
@@ -474,7 +474,7 @@ class WithdrawalManagementServiceImplTest {
 
       // then
       verify(emailCipher).encrypt(email);
-      verify(authRepository).findByEmail(encryptedEmail);
+      verify(authRepository).findByEmailWithWithdraw(encryptedEmail);
     }
   }
 }

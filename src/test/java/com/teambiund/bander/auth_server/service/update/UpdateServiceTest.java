@@ -44,53 +44,6 @@ class UpdateServiceTest {
     updateService = new UpdateService(authRepository, historyService, passwordEncoder, emailCipher);
   }
 
-  @Nested
-  @DisplayName("이메일 확인 테스트")
-  class EmailConfirmTests {
-
-    @Test
-    @DisplayName("[성공] 이메일 확인 시 사용자 활성화")
-    void emailConfirm_validUser_activatesUser() {
-      // given
-      String userId = "user-id-123";
-      Auth auth =
-          Auth.builder()
-              .id(userId)
-              .email("test@example.com")
-              .status(Status.UNCONFIRMED)
-              .userRole(Role.GUEST)
-              .build();
-
-      when(authRepository.findById(userId)).thenReturn(Optional.of(auth));
-      when(authRepository.save(any(Auth.class))).thenReturn(auth);
-
-      // when
-      updateService.EmailConfirm(userId);
-
-      // then
-      assertThat(auth.getStatus()).isEqualTo(Status.ACTIVE);
-      assertThat(auth.getUserRole()).isEqualTo(Role.USER);
-
-      verify(authRepository).findById(userId);
-      verify(authRepository).save(auth);
-    }
-
-    @Test
-    @DisplayName("[실패] 존재하지 않는 사용자")
-    void emailConfirm_userNotFound_throwsException() {
-      // given
-      String userId = "non-existent-user";
-
-      when(authRepository.findById(userId)).thenReturn(Optional.empty());
-
-      // when & then
-      assertThatThrownBy(() -> updateService.EmailConfirm(userId))
-          .isInstanceOf(CustomException.class)
-          .hasFieldOrPropertyWithValue("errorcode", AuthErrorCode.USER_NOT_FOUND);
-
-      verify(authRepository, never()).save(any());
-    }
-  }
 
   @Nested
   @DisplayName("이메일 변경 테스트")
@@ -402,8 +355,8 @@ class UpdateServiceTest {
   class IntegrationScenarioTests {
 
     @Test
-    @DisplayName("[통합] 이메일 변경 후 확인")
-    void scenario_changeEmailThenConfirm() {
+    @DisplayName("[통합] 이메일 변경 시나리오")
+    void scenario_changeEmail() {
       // given - 이메일 변경
       String userId = "user-id-123";
       String newEmail = "newemail@example.com";
@@ -425,15 +378,13 @@ class UpdateServiceTest {
       // when - 이메일 변경
       updateService.updateEmail(userId, newEmail);
 
-      // then
+      // then - 이메일 변경 후 상태 확인
+      assertThat(auth.getEmail()).isEqualTo(encryptedEmail);
       assertThat(auth.getStatus()).isEqualTo(Status.UNCONFIRMED);
 
-      // when - 이메일 확인
-      updateService.EmailConfirm(userId);
-
-      // then
-      assertThat(auth.getStatus()).isEqualTo(Status.ACTIVE);
-      assertThat(auth.getUserRole()).isEqualTo(Role.USER);
+      verify(authRepository).findById(userId);
+      verify(authRepository).save(auth);
+      verify(historyService).createHistory(any(HistoryRequest.class));
     }
 
     @Test
@@ -472,13 +423,6 @@ class UpdateServiceTest {
   @Nested
   @DisplayName("예외 상황 테스트")
   class ExceptionTests {
-
-    @Test
-    @DisplayName("[예외] null userId로 이메일 확인")
-    void emailConfirm_nullUserId_throwsException() {
-      // when & then
-      assertThatThrownBy(() -> updateService.EmailConfirm(null)).isInstanceOf(Exception.class);
-    }
 
     @Test
     @DisplayName("[예외] null 파라미터로 이메일 변경")

@@ -82,7 +82,7 @@ class LoginServiceImplTest {
               .build();
 
       when(emailCipher.encrypt(email)).thenReturn(encryptedEmail);
-      when(authRepository.findByEmail(encryptedEmail)).thenReturn(Optional.of(auth));
+      when(authRepository.findByEmailWithLoginStatus(encryptedEmail)).thenReturn(Optional.of(auth));
       when(passwordEncoder.matches(password, hashedPassword)).thenReturn(true);
       when(tokenUtil.generateAccessToken(anyString(), any(Role.class), anyString()))
           .thenReturn("access-token");
@@ -100,7 +100,7 @@ class LoginServiceImplTest {
       assertThat(response.getDeviceId()).isNotNull();
 
       verify(emailCipher).encrypt(email);
-      verify(authRepository).findByEmail(encryptedEmail);
+      verify(authRepository).findByEmailWithLoginStatus(encryptedEmail);
       verify(passwordEncoder).matches(password, hashedPassword);
       verify(tokenUtil).generateAccessToken(eq("user-id-123"), eq(Role.USER), anyString());
       verify(tokenUtil).generateRefreshToken(eq("user-id-123"), eq(Role.USER), anyString());
@@ -126,8 +126,8 @@ class LoginServiceImplTest {
               .build();
 
       when(emailCipher.encrypt(email)).thenReturn(encryptedEmail);
-      when(authRepository.findByEmail(encryptedEmail)).thenReturn(Optional.empty());
-      when(authRepository.findByEmail(email)).thenReturn(Optional.of(auth));
+      when(authRepository.findByEmailWithLoginStatus(encryptedEmail)).thenReturn(Optional.empty());
+      when(authRepository.findByEmailWithLoginStatus(email)).thenReturn(Optional.of(auth));
       when(passwordEncoder.matches(password, hashedPassword)).thenReturn(true);
       when(tokenUtil.generateAccessToken(anyString(), any(Role.class), anyString()))
           .thenReturn("access-token");
@@ -140,8 +140,8 @@ class LoginServiceImplTest {
 
       // then
       assertThat(response).isNotNull();
-      verify(authRepository).findByEmail(encryptedEmail);
-      verify(authRepository).findByEmail(email);
+      verify(authRepository).findByEmailWithLoginStatus(encryptedEmail);
+      verify(authRepository).findByEmailWithLoginStatus(email);
     }
 
     @Test
@@ -153,8 +153,8 @@ class LoginServiceImplTest {
       String encryptedEmail = "encrypted-email";
 
       when(emailCipher.encrypt(email)).thenReturn(encryptedEmail);
-      when(authRepository.findByEmail(encryptedEmail)).thenReturn(Optional.empty());
-      when(authRepository.findByEmail(email)).thenReturn(Optional.empty());
+      when(authRepository.findByEmailWithLoginStatus(encryptedEmail)).thenReturn(Optional.empty());
+      when(authRepository.findByEmailWithLoginStatus(email)).thenReturn(Optional.empty());
 
       // when & then
       assertThatThrownBy(() -> loginService.login(email, password))
@@ -183,7 +183,7 @@ class LoginServiceImplTest {
               .build();
 
       when(emailCipher.encrypt(email)).thenReturn(encryptedEmail);
-      when(authRepository.findByEmail(encryptedEmail)).thenReturn(Optional.of(auth));
+      when(authRepository.findByEmailWithLoginStatus(encryptedEmail)).thenReturn(Optional.of(auth));
       when(passwordEncoder.matches(password, hashedPassword)).thenReturn(false);
 
       // when & then
@@ -212,7 +212,7 @@ class LoginServiceImplTest {
               .build();
 
       when(emailCipher.encrypt(email)).thenReturn(encryptedEmail);
-      when(authRepository.findByEmail(encryptedEmail)).thenReturn(Optional.of(auth));
+      when(authRepository.findByEmailWithLoginStatus(encryptedEmail)).thenReturn(Optional.of(auth));
       when(passwordEncoder.matches(password, "hashedPassword")).thenReturn(true);
       when(tokenUtil.generateAccessToken(anyString(), any(Role.class), anyString()))
           .thenReturn("access-token");
@@ -255,7 +255,7 @@ class LoginServiceImplTest {
               .build();
 
       when(emailCipher.encrypt(email)).thenReturn(encryptedEmail);
-      when(authRepository.findByEmail(encryptedEmail)).thenReturn(Optional.of(auth));
+      when(authRepository.findByEmailWithLoginStatus(encryptedEmail)).thenReturn(Optional.of(auth));
       when(passwordEncoder.matches(password, "hashedPassword")).thenReturn(true);
 
       // when & then
@@ -284,7 +284,7 @@ class LoginServiceImplTest {
               .build();
 
       when(emailCipher.encrypt(email)).thenReturn(encryptedEmail);
-      when(authRepository.findByEmail(encryptedEmail)).thenReturn(Optional.of(auth));
+      when(authRepository.findByEmailWithLoginStatus(encryptedEmail)).thenReturn(Optional.of(auth));
       when(passwordEncoder.matches(password, "hashedPassword")).thenReturn(true);
 
       // when & then
@@ -310,7 +310,7 @@ class LoginServiceImplTest {
               .build();
 
       when(emailCipher.encrypt(email)).thenReturn(encryptedEmail);
-      when(authRepository.findByEmail(encryptedEmail)).thenReturn(Optional.of(auth));
+      when(authRepository.findByEmailWithLoginStatus(encryptedEmail)).thenReturn(Optional.of(auth));
       when(passwordEncoder.matches(password, "hashedPassword")).thenReturn(true);
 
       // when & then
@@ -336,7 +336,7 @@ class LoginServiceImplTest {
               .build();
 
       when(emailCipher.encrypt(email)).thenReturn(encryptedEmail);
-      when(authRepository.findByEmail(encryptedEmail)).thenReturn(Optional.of(auth));
+      when(authRepository.findByEmailWithLoginStatus(encryptedEmail)).thenReturn(Optional.of(auth));
       when(passwordEncoder.matches(password, "hashedPassword")).thenReturn(true);
 
       // when & then
@@ -368,7 +368,7 @@ class LoginServiceImplTest {
       when(tokenUtil.isValid(refreshToken)).thenReturn(true);
       when(tokenUtil.extractUserId(refreshToken)).thenReturn(userId);
       when(tokenUtil.extractDeviceId(refreshToken)).thenReturn(deviceId);
-      when(authRepository.findById(userId)).thenReturn(Optional.of(auth));
+      when(authRepository.findByIdWithLoginStatus(userId)).thenReturn(Optional.of(auth));
       when(tokenUtil.generateAccessToken(anyString(), any(Role.class), anyString()))
           .thenReturn("new-access-token");
       when(tokenUtil.generateRefreshToken(anyString(), any(Role.class), anyString()))
@@ -387,7 +387,7 @@ class LoginServiceImplTest {
       verify(tokenUtil).isValid(refreshToken);
       verify(tokenUtil).extractUserId(refreshToken);
       verify(tokenUtil).extractDeviceId(refreshToken);
-      verify(authRepository).findById(userId);
+      verify(authRepository).findByIdWithLoginStatus(userId);
     }
 
     @Test
@@ -405,7 +405,7 @@ class LoginServiceImplTest {
           .hasFieldOrPropertyWithValue("errorcode", AuthErrorCode.EXPIRED_TOKEN);
 
       verify(tokenUtil, never()).extractUserId(anyString());
-      verify(authRepository, never()).findById(anyString());
+      verify(authRepository, never()).findByIdWithLoginStatus(anyString());
     }
 
     @Test
@@ -424,7 +424,7 @@ class LoginServiceImplTest {
           .isInstanceOf(CustomException.class)
           .hasFieldOrPropertyWithValue("errorcode", AuthErrorCode.INVALID_TOKEN);
 
-      verify(authRepository, never()).findById(anyString());
+      verify(authRepository, never()).findByIdWithLoginStatus(anyString());
     }
 
     @Test
@@ -444,7 +444,7 @@ class LoginServiceImplTest {
           .isInstanceOf(CustomException.class)
           .hasFieldOrPropertyWithValue("errorcode", AuthErrorCode.INVALID_DEVICE_ID);
 
-      verify(authRepository, never()).findById(anyString());
+      verify(authRepository, never()).findByIdWithLoginStatus(anyString());
     }
 
     @Test
@@ -458,7 +458,7 @@ class LoginServiceImplTest {
       when(tokenUtil.isValid(refreshToken)).thenReturn(true);
       when(tokenUtil.extractUserId(refreshToken)).thenReturn(userId);
       when(tokenUtil.extractDeviceId(refreshToken)).thenReturn(deviceId);
-      when(authRepository.findById(userId)).thenReturn(Optional.empty());
+      when(authRepository.findByIdWithLoginStatus(userId)).thenReturn(Optional.empty());
 
       // when & then
       assertThatThrownBy(() -> loginService.refreshToken(refreshToken, deviceId))
@@ -487,7 +487,7 @@ class LoginServiceImplTest {
       when(tokenUtil.isValid(refreshToken)).thenReturn(true);
       when(tokenUtil.extractUserId(refreshToken)).thenReturn(userId);
       when(tokenUtil.extractDeviceId(refreshToken)).thenReturn(deviceId);
-      when(authRepository.findById(userId)).thenReturn(Optional.of(auth));
+      when(authRepository.findByIdWithLoginStatus(userId)).thenReturn(Optional.of(auth));
       when(tokenUtil.generateAccessToken(anyString(), any(Role.class), anyString()))
           .thenReturn("new-access-token");
       when(tokenUtil.generateRefreshToken(anyString(), any(Role.class), anyString()))
@@ -528,7 +528,7 @@ class LoginServiceImplTest {
               .build();
 
       when(emailCipher.encrypt(email)).thenReturn(encryptedEmail);
-      when(authRepository.findByEmail(encryptedEmail)).thenReturn(Optional.of(auth));
+      when(authRepository.findByEmailWithLoginStatus(encryptedEmail)).thenReturn(Optional.of(auth));
       when(passwordEncoder.matches(password, "hashedPassword")).thenReturn(true);
       when(tokenUtil.generateAccessToken(anyString(), any(Role.class), anyString()))
           .thenReturn("access-token");
@@ -548,7 +548,7 @@ class LoginServiceImplTest {
       when(tokenUtil.isValid("refresh-token")).thenReturn(true);
       when(tokenUtil.extractUserId("refresh-token")).thenReturn("user-id-123");
       when(tokenUtil.extractDeviceId("refresh-token")).thenReturn(deviceId);
-      when(authRepository.findById("user-id-123")).thenReturn(Optional.of(auth));
+      when(authRepository.findByIdWithLoginStatus("user-id-123")).thenReturn(Optional.of(auth));
       when(tokenUtil.generateAccessToken(anyString(), any(Role.class), anyString()))
           .thenReturn("new-access-token");
       when(tokenUtil.generateRefreshToken(anyString(), any(Role.class), anyString()))
@@ -580,7 +580,7 @@ class LoginServiceImplTest {
               .build();
 
       when(emailCipher.encrypt(email)).thenReturn(encryptedEmail);
-      when(authRepository.findByEmail(encryptedEmail)).thenReturn(Optional.of(adminAuth));
+      when(authRepository.findByEmailWithLoginStatus(encryptedEmail)).thenReturn(Optional.of(adminAuth));
       when(passwordEncoder.matches(password, "hashedPassword")).thenReturn(true);
       when(tokenUtil.generateAccessToken(eq("admin-id"), eq(Role.ADMIN), anyString()))
           .thenReturn("admin-access-token");
@@ -621,7 +621,7 @@ class LoginServiceImplTest {
               .build();
 
       when(emailCipher.encrypt(email)).thenReturn(encryptedEmail);
-      when(authRepository.findByEmail(encryptedEmail)).thenReturn(Optional.of(auth));
+      when(authRepository.findByEmailWithLoginStatus(encryptedEmail)).thenReturn(Optional.of(auth));
       when(passwordEncoder.matches(password, hashedPassword)).thenReturn(true);
       when(tokenUtil.generateAccessToken(anyString(), any(Role.class), anyString()))
           .thenReturn("access-token");
@@ -654,7 +654,7 @@ class LoginServiceImplTest {
               .build();
 
       when(emailCipher.encrypt(email)).thenReturn(encryptedEmail);
-      when(authRepository.findByEmail(encryptedEmail)).thenReturn(Optional.of(auth));
+      when(authRepository.findByEmailWithLoginStatus(encryptedEmail)).thenReturn(Optional.of(auth));
       when(passwordEncoder.matches(password, "hashedPassword")).thenReturn(true);
       when(tokenUtil.generateAccessToken(anyString(), any(Role.class), anyString()))
           .thenReturn("access-token");
@@ -667,7 +667,7 @@ class LoginServiceImplTest {
 
       // then
       verify(emailCipher).encrypt(email);
-      verify(authRepository).findByEmail(encryptedEmail);
+      verify(authRepository).findByEmailWithLoginStatus(encryptedEmail);
     }
   }
 }
