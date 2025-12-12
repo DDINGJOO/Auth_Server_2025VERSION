@@ -6,12 +6,15 @@ import com.teambiund.bander.auth_server.auth.dto.request.ConsentRequest;
 import com.teambiund.bander.auth_server.auth.entity.Auth;
 import com.teambiund.bander.auth_server.auth.entity.Consent;
 import com.teambiund.bander.auth_server.auth.entity.consentsname.ConsentsTable;
+import com.teambiund.bander.auth_server.auth.event.events.UserConsentChangedEvent;
+import com.teambiund.bander.auth_server.auth.event.publish.UserConsentChangedEventPub;
 import com.teambiund.bander.auth_server.auth.exception.CustomException;
 import com.teambiund.bander.auth_server.auth.exception.ErrorCode.AuthErrorCode;
 import com.teambiund.bander.auth_server.auth.repository.AuthRepository;
 import com.teambiund.bander.auth_server.auth.service.consent.ConsentManagementService;
 import com.teambiund.bander.auth_server.auth.util.generator.key.KeyProvider;
 import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -21,8 +24,11 @@ import org.springframework.transaction.annotation.Transactional;
 @RequiredArgsConstructor
 @Transactional
 public class ConsentManagementServiceImpl implements ConsentManagementService {
+  private static final String MARKETING_CONSENT_ID = "MARKETING_CONSENT";
+
   private final AuthRepository authRepository;
   private final KeyProvider keyProvider;
+  private final UserConsentChangedEventPub userConsentChangedEventPub;
 
   /**
    * 회원가입 시 동의 정보 저장 - consentId로 ConsentsTable 조회 - Auth 엔티티의 편의 메서드를 사용하여 양방향 연관관계 설정 - Cascade
@@ -45,6 +51,9 @@ public class ConsentManagementServiceImpl implements ConsentManagementService {
 
     // CascadeType.ALL과 dirty checking으로 인해 auth의 consent 컬렉션 자동 저장됨
     // authRepository.save(auth) 호출 시 중복 merge로 인한 NonUniqueObjectException 발생 방지
+
+    // 마케팅 동의 이벤트 발행
+    publishMarketingConsentEvent(auth.getId(), requests);
   }
 
   /**
@@ -94,5 +103,24 @@ public class ConsentManagementServiceImpl implements ConsentManagementService {
     // orphanRemoval=true로 인해 컬렉션에서 제거된 Consent는 자동 삭제됨
     // CascadeType.ALL로 인해 새로 추가된 Consent는 자동 저장됨
     authRepository.save(auth);
+
+    // 마케팅 동의 이벤트 발행
+    publishMarketingConsentEvent(userId, req);
+  }
+
+  private void publishMarketingConsentEvent(String userId, List<ConsentRequest> requests) {
+    requests.stream()
+        .filter(request -> MARKETING_CONSENT_ID.equals(request.getConsentId()))
+        .findFirst()
+        .ifPresent(
+            marketingConsent -> {
+              UserConsentChangedEvent event =
+                  new UserConsentChangedEvent(
+                      userId,
+                      MARKETING_CONSENT_ID,
+                      marketingConsent.isConsented(),
+                      LocalDateTime.now().format(DateTimeFormatter.ISO_DATE_TIME));
+              userConsentChangedEventPub.publish(event);
+            });
   }
 }
