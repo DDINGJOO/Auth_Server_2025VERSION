@@ -109,18 +109,19 @@ public class ConsentManagementServiceImpl implements ConsentManagementService {
   }
 
   private void publishMarketingConsentEvent(String userId, List<ConsentRequest> requests) {
-    requests.stream()
-        .filter(request -> MARKETING_CONSENT_ID.equals(request.getConsentId()))
-        .findFirst()
-        .ifPresent(
-            marketingConsent -> {
-              UserConsentChangedEvent event =
-                  new UserConsentChangedEvent(
-                      userId,
-                      MARKETING_CONSENT_ID,
-                      marketingConsent.isConsented(),
-                      LocalDateTime.now().format(DateTimeFormatter.ISO_DATE_TIME));
-              userConsentChangedEventPub.publish(event);
-            });
+    boolean consented =
+        requests.stream()
+            .filter(request -> MARKETING_CONSENT_ID.equals(request.getConsentId()))
+            .findFirst()
+            .map(ConsentRequest::isConsented)
+            .orElse(false);
+
+    UserConsentChangedEvent event =
+        new UserConsentChangedEvent(
+            userId,
+            MARKETING_CONSENT_ID,
+            consented,
+            LocalDateTime.now().format(DateTimeFormatter.ISO_DATE_TIME));
+    userConsentChangedEventPub.publish(event);
   }
 }
