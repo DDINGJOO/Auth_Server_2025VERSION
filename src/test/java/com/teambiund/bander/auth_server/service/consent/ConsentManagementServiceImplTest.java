@@ -11,6 +11,7 @@ import com.teambiund.bander.auth_server.auth.entity.Auth;
 import com.teambiund.bander.auth_server.auth.entity.Consent;
 import com.teambiund.bander.auth_server.auth.entity.consentsname.ConsentsTable;
 import com.teambiund.bander.auth_server.auth.enums.Status;
+import com.teambiund.bander.auth_server.auth.event.publish.UserConsentChangedEventPub;
 import com.teambiund.bander.auth_server.auth.exception.CustomException;
 import com.teambiund.bander.auth_server.auth.exception.ErrorCode.AuthErrorCode;
 import com.teambiund.bander.auth_server.auth.repository.AuthRepository;
@@ -35,6 +36,8 @@ class ConsentManagementServiceImplTest {
   @Mock private AuthRepository authRepository;
 
   @Mock private KeyProvider keyProvider;
+
+  @Mock private UserConsentChangedEventPub userConsentChangedEventPub;
 
   @InjectMocks private ConsentManagementServiceImpl consentService;
 
