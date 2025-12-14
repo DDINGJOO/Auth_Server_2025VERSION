@@ -1,14 +1,16 @@
 package com.teambiund.bander.auth_server.auth.controller;
 
+import com.teambiund.bander.auth_server.auth.dto.request.SmsCodeRequest;
+import com.teambiund.bander.auth_server.auth.dto.request.SmsVerifyRequest;
 import com.teambiund.bander.auth_server.auth.service.update.SmsConfirmService;
 import io.swagger.v3.oas.annotations.Operation;
-import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.media.ExampleObject;
 import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.tags.Tag;
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.*;
 
@@ -26,18 +28,22 @@ public class SmsConfirmController {
         @ApiResponse(responseCode = "200", description = "인증 코드 발급 성공"),
         @ApiResponse(
             responseCode = "400",
-            description = "이미 발급된 인증 코드가 있음",
+            description = "이미 발급된 인증 코드가 있음 또는 잘못된 요청",
             content = @Content(mediaType = "application/json"))
       })
-  @PostMapping("/{userId}/{phoneNumber}")
-  public void generateCode(
-      @Parameter(description = "사용자 ID", required = true, example = "user-id-123")
-          @PathVariable(name = "userId")
-          String userId,
-      @Parameter(description = "전화번호", required = true, example = "01012345678")
-          @PathVariable(name = "phoneNumber")
-          String phoneNumber) {
-    smsConfirmService.generateCode(userId, phoneNumber);
+  @io.swagger.v3.oas.annotations.parameters.RequestBody(
+      description = "SMS 인증 코드 발급 요청",
+      required = true,
+      content =
+          @Content(
+              mediaType = "application/json",
+              schema = @Schema(implementation = SmsCodeRequest.class),
+              examples =
+                  @ExampleObject(
+                      value = "{\"userId\": \"user-id-123\", \"phoneNumber\": \"01012345678\"}")))
+  @PostMapping("/request")
+  public void generateCode(@Valid @RequestBody SmsCodeRequest request) {
+    smsConfirmService.generateCode(request.getUserId(), request.getPhoneNumber());
   }
 
   @Operation(
@@ -55,20 +61,24 @@ public class SmsConfirmController {
                     examples = @ExampleObject(value = "true"))),
         @ApiResponse(
             responseCode = "400",
-            description = "잘못된 인증 코드",
+            description = "잘못된 인증 코드 또는 잘못된 요청",
             content = @Content(mediaType = "application/json"))
       })
-  @GetMapping("/{userId}/{phoneNumber}")
-  public boolean confirmSms(
-      @Parameter(description = "인증 코드", required = true, example = "123456") @RequestParam
-          String code,
-      @Parameter(description = "사용자 ID", required = true, example = "user-id-123")
-          @PathVariable(name = "userId")
-          String userId,
-      @Parameter(description = "전화번호", required = true, example = "01012345678")
-          @PathVariable(name = "phoneNumber")
-          String phoneNumber) {
-    return smsConfirmService.confirmSms(userId, phoneNumber, code);
+  @io.swagger.v3.oas.annotations.parameters.RequestBody(
+      description = "SMS 인증 확인 요청",
+      required = true,
+      content =
+          @Content(
+              mediaType = "application/json",
+              schema = @Schema(implementation = SmsVerifyRequest.class),
+              examples =
+                  @ExampleObject(
+                      value =
+                          "{\"userId\": \"user-id-123\", \"phoneNumber\": \"01012345678\", \"code\": \"123456\"}")))
+  @PostMapping("/verify")
+  public boolean confirmSms(@Valid @RequestBody SmsVerifyRequest request) {
+    return smsConfirmService.confirmSms(
+        request.getUserId(), request.getPhoneNumber(), request.getCode());
   }
 
   @Operation(summary = "SMS 인증 코드 재발신", description = "SMS 인증 코드를 재발신합니다.")
@@ -81,16 +91,24 @@ public class SmsConfirmController {
                 @Content(
                     mediaType = "application/json",
                     schema = @Schema(implementation = Boolean.class),
-                    examples = @ExampleObject(value = "true")))
+                    examples = @ExampleObject(value = "true"))),
+        @ApiResponse(
+            responseCode = "400",
+            description = "잘못된 요청",
+            content = @Content(mediaType = "application/json"))
       })
-  @PutMapping("/{userId}/{phoneNumber}")
-  public boolean resendSms(
-      @Parameter(description = "사용자 ID", required = true, example = "user-id-123")
-          @PathVariable(name = "userId")
-          String userId,
-      @Parameter(description = "전화번호", required = true, example = "01012345678")
-          @PathVariable(name = "phoneNumber")
-          String phoneNumber) {
-    return smsConfirmService.resendSms(userId, phoneNumber);
+  @io.swagger.v3.oas.annotations.parameters.RequestBody(
+      description = "SMS 인증 코드 재발신 요청",
+      required = true,
+      content =
+          @Content(
+              mediaType = "application/json",
+              schema = @Schema(implementation = SmsCodeRequest.class),
+              examples =
+                  @ExampleObject(
+                      value = "{\"userId\": \"user-id-123\", \"phoneNumber\": \"01012345678\"}")))
+  @PostMapping("/resend")
+  public boolean resendSms(@Valid @RequestBody SmsCodeRequest request) {
+    return smsConfirmService.resendSms(request.getUserId(), request.getPhoneNumber());
   }
 }
