@@ -23,4 +23,12 @@ public class AuthService {
         .map(SimpleAuthResponse::from)
         .orElseThrow(() -> new CustomException(AuthErrorCode.USER_NOT_FOUND));
   }
+
+  @Transactional(readOnly = true)
+  public boolean hasPhoneNumber(String userId) {
+    return authRepository
+        .findById(userId)
+        .map(auth -> auth.getPhoneNumber() != null && !auth.getPhoneNumber().isBlank())
+        .orElse(false);
+  }
 }
