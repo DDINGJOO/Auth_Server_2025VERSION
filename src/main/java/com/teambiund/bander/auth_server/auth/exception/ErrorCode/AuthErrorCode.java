@@ -52,6 +52,10 @@ public enum AuthErrorCode implements ErrorCodeType {
   INVALID_EMAIL("INVALID_EMAIL", "Invalid email", HttpStatus.BAD_REQUEST),
   INVALID_PASSWORD("INVALID_PASSWORD", "Invalid password", HttpStatus.BAD_REQUEST),
   SOCIAL_LOGIN_FAILED("SOCIAL_LOGIN_FAILED", "Social login failed", HttpStatus.UNAUTHORIZED),
+  UNAUTHORIZED_APP_ACCESS(
+      "UNAUTHORIZED_APP_ACCESS",
+      "This account is not authorized to access this app",
+      HttpStatus.FORBIDDEN),
   ;
 
   private final String errCode;

@@ -3,6 +3,8 @@ package com.teambiund.bander.auth_server.auth.service.login;
 import com.teambiund.bander.auth_server.auth.dto.response.LoginResponse;
 import com.teambiund.bander.auth_server.auth.entity.Auth;
 import com.teambiund.bander.auth_server.auth.entity.LoginStatus;
+import com.teambiund.bander.auth_server.auth.enums.AppType;
+import com.teambiund.bander.auth_server.auth.enums.Role;
 import com.teambiund.bander.auth_server.auth.enums.Status;
 import com.teambiund.bander.auth_server.auth.exception.CustomException;
 import com.teambiund.bander.auth_server.auth.exception.ErrorCode.AuthErrorCode;
@@ -41,7 +43,7 @@ public class LoginServiceImpl implements LoginService {
   }
 
   @Override
-  public LoginResponse login(String email, String password) {
+  public LoginResponse login(String email, String password, AppType appType) {
     String encryptedEmail = emailCipher.encrypt(email);
     Auth auth =
         authRepository
@@ -54,11 +56,15 @@ public class LoginServiceImpl implements LoginService {
     if (!passwordEncoder.matches(password, auth.getPassword())) {
       throw new CustomException(AuthErrorCode.PASSWORD_MISMATCH);
     }
+
+    // AppType에 따른 접근 권한 검증
+    validateAppTypeAccess(auth.getUserRole(), appType);
+
     return generateResponse(auth);
   }
 
   @Override
-  public LoginResponse refreshToken(String refreshToken, String deviceId) {
+  public LoginResponse refreshToken(String refreshToken, String deviceId, AppType appType) {
     if (!tokenUtil.isValid(refreshToken)) {
       throw new CustomException(AuthErrorCode.EXPIRED_TOKEN);
     }
@@ -76,7 +82,21 @@ public class LoginServiceImpl implements LoginService {
         authRepository
             .findByIdWithLoginStatus(userId)
             .orElseThrow(() -> new CustomException(AuthErrorCode.USER_NOT_FOUND));
+
+    // AppType에 따른 접근 권한 검증
+    validateAppTypeAccess(auth.getUserRole(), appType);
+
     return generateResponse(auth);
+  }
+
+  private void validateAppTypeAccess(Role userRole, AppType appType) {
+    if (appType == AppType.PLACE_MANAGER) {
+      // 공간관리자 앱: PLACE_OWNER만 허용
+      if (userRole != Role.PLACE_OWNER) {
+        throw new CustomException(AuthErrorCode.UNAUTHORIZED_APP_ACCESS);
+      }
+    }
+    // GENERAL 앱: USER, GUEST, PLACE_OWNER 모두 허용 (별도 검증 불필요)
   }
 
   private LoginResponse generateResponse(Auth auth) {

@@ -8,6 +8,7 @@ import static org.mockito.Mockito.when;
 import com.teambiund.bander.auth_server.AuthServerApplication;
 import com.teambiund.bander.auth_server.auth.dto.response.LoginResponse;
 import com.teambiund.bander.auth_server.auth.entity.Auth;
+import com.teambiund.bander.auth_server.auth.enums.AppType;
 import com.teambiund.bander.auth_server.auth.enums.Provider;
 import com.teambiund.bander.auth_server.auth.enums.Role;
 import com.teambiund.bander.auth_server.auth.enums.Status;
@@ -146,7 +147,7 @@ public class EmailEncryptionAtRestIntegrationTest {
         .thenReturn("mock-refresh-token");
 
     // when: 평문 이메일과 비밀번호로 로그인 시도
-    LoginResponse response = loginService.login(plainEmail, plainPassword);
+    LoginResponse response = loginService.login(plainEmail, plainPassword, AppType.GENERAL);
 
     // then: 로그인 성공
     assertThat(response).isNotNull();
@@ -187,7 +188,7 @@ public class EmailEncryptionAtRestIntegrationTest {
 
     // when: 로그인 수행 시간 측정
     long startTime = System.currentTimeMillis();
-    LoginResponse response = loginService.login(targetPlainEmail, plainPassword);
+    LoginResponse response = loginService.login(targetPlainEmail, plainPassword, AppType.GENERAL);
     long endTime = System.currentTimeMillis();
     long duration = endTime - startTime;
 
@@ -232,7 +233,7 @@ public class EmailEncryptionAtRestIntegrationTest {
 
     // when: 로그인 수행 시간 측정
     long startTime = System.currentTimeMillis();
-    LoginResponse response = loginService.login(targetPlainEmail, plainPassword);
+    LoginResponse response = loginService.login(targetPlainEmail, plainPassword, AppType.GENERAL);
     long endTime = System.currentTimeMillis();
     long duration = endTime - startTime;
 

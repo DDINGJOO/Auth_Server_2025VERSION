@@ -7,6 +7,7 @@ import static org.mockito.Mockito.*;
 
 import com.teambiund.bander.auth_server.auth.dto.response.LoginResponse;
 import com.teambiund.bander.auth_server.auth.entity.Auth;
+import com.teambiund.bander.auth_server.auth.enums.AppType;
 import com.teambiund.bander.auth_server.auth.enums.Provider;
 import com.teambiund.bander.auth_server.auth.enums.Role;
 import com.teambiund.bander.auth_server.auth.enums.Status;
@@ -91,7 +92,7 @@ class LoginServiceImplTest {
       when(authRepository.save(any(Auth.class))).thenReturn(auth);
 
       // when
-      LoginResponse response = loginService.login(email, password);
+      LoginResponse response = loginService.login(email, password, AppType.GENERAL);
 
       // then
       assertThat(response).isNotNull();
@@ -136,7 +137,7 @@ class LoginServiceImplTest {
       when(authRepository.save(any(Auth.class))).thenReturn(auth);
 
       // when
-      LoginResponse response = loginService.login(email, password);
+      LoginResponse response = loginService.login(email, password, AppType.GENERAL);
 
       // then
       assertThat(response).isNotNull();
@@ -157,7 +158,7 @@ class LoginServiceImplTest {
       when(authRepository.findByEmailWithLoginStatus(email)).thenReturn(Optional.empty());
 
       // when & then
-      assertThatThrownBy(() -> loginService.login(email, password))
+      assertThatThrownBy(() -> loginService.login(email, password, AppType.GENERAL))
           .isInstanceOf(CustomException.class)
           .hasFieldOrPropertyWithValue("errorcode", AuthErrorCode.USER_NOT_FOUND);
 
@@ -187,7 +188,7 @@ class LoginServiceImplTest {
       when(passwordEncoder.matches(password, hashedPassword)).thenReturn(false);
 
       // when & then
-      assertThatThrownBy(() -> loginService.login(email, password))
+      assertThatThrownBy(() -> loginService.login(email, password, AppType.GENERAL))
           .isInstanceOf(CustomException.class)
           .hasFieldOrPropertyWithValue("errorcode", AuthErrorCode.PASSWORD_MISMATCH);
 
@@ -222,7 +223,7 @@ class LoginServiceImplTest {
           .thenAnswer(invocation -> invocation.getArgument(0));
 
       // when
-      loginService.login(email, password);
+      loginService.login(email, password, AppType.GENERAL);
 
       // then
       ArgumentCaptor<Auth> authCaptor = ArgumentCaptor.forClass(Auth.class);
@@ -259,7 +260,7 @@ class LoginServiceImplTest {
       when(passwordEncoder.matches(password, "hashedPassword")).thenReturn(true);
 
       // when & then
-      assertThatThrownBy(() -> loginService.login(email, password))
+      assertThatThrownBy(() -> loginService.login(email, password, AppType.GENERAL))
           .isInstanceOf(CustomException.class)
           .hasFieldOrPropertyWithValue("errorcode", AuthErrorCode.USER_IS_SLEEPING);
 
@@ -288,7 +289,7 @@ class LoginServiceImplTest {
       when(passwordEncoder.matches(password, "hashedPassword")).thenReturn(true);
 
       // when & then
-      assertThatThrownBy(() -> loginService.login(email, password))
+      assertThatThrownBy(() -> loginService.login(email, password, AppType.GENERAL))
           .isInstanceOf(CustomException.class);
     }
 
@@ -314,7 +315,7 @@ class LoginServiceImplTest {
       when(passwordEncoder.matches(password, "hashedPassword")).thenReturn(true);
 
       // when & then
-      assertThatThrownBy(() -> loginService.login(email, password))
+      assertThatThrownBy(() -> loginService.login(email, password, AppType.GENERAL))
           .isInstanceOf(CustomException.class);
     }
 
@@ -340,7 +341,7 @@ class LoginServiceImplTest {
       when(passwordEncoder.matches(password, "hashedPassword")).thenReturn(true);
 
       // when & then
-      assertThatThrownBy(() -> loginService.login(email, password))
+      assertThatThrownBy(() -> loginService.login(email, password, AppType.GENERAL))
           .isInstanceOf(CustomException.class);
     }
   }
@@ -376,7 +377,7 @@ class LoginServiceImplTest {
       when(authRepository.save(any(Auth.class))).thenReturn(auth);
 
       // when
-      LoginResponse response = loginService.refreshToken(refreshToken, deviceId);
+      LoginResponse response = loginService.refreshToken(refreshToken, deviceId, AppType.GENERAL);
 
       // then
       assertThat(response).isNotNull();
@@ -400,7 +401,7 @@ class LoginServiceImplTest {
       when(tokenUtil.isValid(refreshToken)).thenReturn(false);
 
       // when & then
-      assertThatThrownBy(() -> loginService.refreshToken(refreshToken, deviceId))
+      assertThatThrownBy(() -> loginService.refreshToken(refreshToken, deviceId, AppType.GENERAL))
           .isInstanceOf(CustomException.class)
           .hasFieldOrPropertyWithValue("errorcode", AuthErrorCode.EXPIRED_TOKEN);
 
@@ -420,7 +421,7 @@ class LoginServiceImplTest {
       when(tokenUtil.extractDeviceId(refreshToken)).thenReturn(deviceId);
 
       // when & then
-      assertThatThrownBy(() -> loginService.refreshToken(refreshToken, deviceId))
+      assertThatThrownBy(() -> loginService.refreshToken(refreshToken, deviceId, AppType.GENERAL))
           .isInstanceOf(CustomException.class)
           .hasFieldOrPropertyWithValue("errorcode", AuthErrorCode.INVALID_TOKEN);
 
@@ -440,7 +441,7 @@ class LoginServiceImplTest {
       when(tokenUtil.extractDeviceId(refreshToken)).thenReturn(tokenDeviceId);
 
       // when & then
-      assertThatThrownBy(() -> loginService.refreshToken(refreshToken, deviceId))
+      assertThatThrownBy(() -> loginService.refreshToken(refreshToken, deviceId, AppType.GENERAL))
           .isInstanceOf(CustomException.class)
           .hasFieldOrPropertyWithValue("errorcode", AuthErrorCode.INVALID_DEVICE_ID);
 
@@ -461,7 +462,7 @@ class LoginServiceImplTest {
       when(authRepository.findByIdWithLoginStatus(userId)).thenReturn(Optional.empty());
 
       // when & then
-      assertThatThrownBy(() -> loginService.refreshToken(refreshToken, deviceId))
+      assertThatThrownBy(() -> loginService.refreshToken(refreshToken, deviceId, AppType.GENERAL))
           .isInstanceOf(CustomException.class)
           .hasFieldOrPropertyWithValue("errorcode", AuthErrorCode.USER_NOT_FOUND);
 
@@ -496,7 +497,7 @@ class LoginServiceImplTest {
           .thenAnswer(invocation -> invocation.getArgument(0));
 
       // when
-      loginService.refreshToken(refreshToken, deviceId);
+      loginService.refreshToken(refreshToken, deviceId, AppType.GENERAL);
 
       // then
       ArgumentCaptor<Auth> authCaptor = ArgumentCaptor.forClass(Auth.class);
@@ -537,7 +538,7 @@ class LoginServiceImplTest {
       when(authRepository.save(any(Auth.class))).thenReturn(auth);
 
       // when - 로그인
-      LoginResponse loginResponse = loginService.login(email, password);
+      LoginResponse loginResponse = loginService.login(email, password, AppType.GENERAL);
 
       // then
       assertThat(loginResponse.getAccessToken()).isEqualTo("access-token");
@@ -555,7 +556,7 @@ class LoginServiceImplTest {
           .thenReturn("new-refresh-token");
 
       // when - 리프레시
-      LoginResponse refreshResponse = loginService.refreshToken("refresh-token", deviceId);
+      LoginResponse refreshResponse = loginService.refreshToken("refresh-token", deviceId, AppType.GENERAL);
 
       // then
       assertThat(refreshResponse.getAccessToken()).isEqualTo("new-access-token");
@@ -589,7 +590,7 @@ class LoginServiceImplTest {
       when(authRepository.save(any(Auth.class))).thenReturn(adminAuth);
 
       // when
-      LoginResponse response = loginService.login(email, password);
+      LoginResponse response = loginService.login(email, password, AppType.GENERAL);
 
       // then
       assertThat(response).isNotNull();
@@ -630,7 +631,7 @@ class LoginServiceImplTest {
       when(authRepository.save(any(Auth.class))).thenReturn(auth);
 
       // when
-      loginService.login(email, password);
+      loginService.login(email, password, AppType.GENERAL);
 
       // then - passwordEncoder.matches가 호출되었는지 확인 (평문 비교가 아님)
       verify(passwordEncoder).matches(password, hashedPassword);
@@ -663,7 +664,7 @@ class LoginServiceImplTest {
       when(authRepository.save(any(Auth.class))).thenReturn(auth);
 
       // when
-      loginService.login(email, password);
+      loginService.login(email, password, AppType.GENERAL);
 
       // then
       verify(emailCipher).encrypt(email);
