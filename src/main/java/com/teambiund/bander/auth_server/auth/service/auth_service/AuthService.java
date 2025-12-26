@@ -1,20 +1,29 @@
 package com.teambiund.bander.auth_server.auth.service.auth_service;
 
 import com.teambiund.bander.auth_server.auth.dto.response.SimpleAuthResponse;
+import com.teambiund.bander.auth_server.auth.enums.Role;
 import com.teambiund.bander.auth_server.auth.exception.CustomException;
 import com.teambiund.bander.auth_server.auth.exception.ErrorCode.AuthErrorCode;
 import com.teambiund.bander.auth_server.auth.repository.AuthRepository;
-import lombok.RequiredArgsConstructor;
+import com.teambiund.bander.auth_server.auth.util.cipher.CipherStrategy;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-@RequiredArgsConstructor
 @Service
 @Slf4j
 public class AuthService {
 
   private final AuthRepository authRepository;
+  private final CipherStrategy emailCipher;
+
+  public AuthService(
+      AuthRepository authRepository,
+      @Qualifier("aesCipherStrategy") CipherStrategy emailCipher) {
+    this.authRepository = authRepository;
+    this.emailCipher = emailCipher;
+  }
 
   @Transactional(readOnly = true)
   public SimpleAuthResponse getAuth(String userId) throws CustomException {
@@ -30,5 +39,21 @@ public class AuthService {
         .findById(userId)
         .map(auth -> auth.getPhoneNumber() != null && !auth.getPhoneNumber().isBlank())
         .orElse(false);
+  }
+
+  @Transactional
+  public void changeRole(String email, Role newRole) {
+    String encryptedEmail = emailCipher.encrypt(email);
+
+    var auth =
+        authRepository
+            .findByEmail(encryptedEmail)
+            .or(() -> authRepository.findByEmail(email)) // 하위 호환성
+            .orElseThrow(() -> new CustomException(AuthErrorCode.USER_NOT_FOUND));
+
+    auth.setUserRole(newRole);
+    authRepository.save(auth);
+
+    log.info("Role changed for user: {} -> {}", email, newRole);
   }
 }
