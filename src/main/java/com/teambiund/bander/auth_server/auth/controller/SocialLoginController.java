@@ -20,7 +20,7 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
-@Tag(name = "소셜 로그인", description = "카카오, 애플 소셜 로그인 API")
+@Tag(name = "소셜 로그인", description = "카카오, 애플, 구글 소셜 로그인 API")
 @Slf4j
 @RestController
 @RequestMapping("/api/v1/auth/social")
@@ -109,6 +109,47 @@ public class SocialLoginController {
           SocialLoginRequest request) {
     log.info("애플 로그인 요청");
     LoginResponse response = socialLoginService.appleLogin(request.getAccessToken());
+    return new ResponseEntity<>(response, HttpStatus.OK);
+  }
+
+  @Operation(
+      summary = "구글 로그인",
+      description = "Google Sign In ID Token으로 로그인하여 JWT 토큰을 발급받습니다. " + "신규 사용자인 경우 자동으로 회원가입됩니다.")
+  @ApiResponses(
+      value = {
+        @ApiResponse(
+            responseCode = "200",
+            description = "소셜 로그인 성공",
+            content =
+                @Content(
+                    mediaType = "application/json",
+                    schema = @Schema(implementation = LoginResponse.class))),
+        @ApiResponse(
+            responseCode = "401",
+            description = "유효하지 않은 Google ID Token",
+            content = @Content(mediaType = "application/json"))
+      })
+  @PostMapping("/google")
+  public ResponseEntity<LoginResponse> googleLogin(
+      @io.swagger.v3.oas.annotations.parameters.RequestBody(
+              description = "Google Sign In ID Token",
+              required = true,
+              content =
+                  @Content(
+                      schema = @Schema(implementation = SocialLoginRequest.class),
+                      examples =
+                          @ExampleObject(
+                              value =
+                                  """
+                      {
+                        "accessToken": "google_id_token_here"
+                      }
+                      """)))
+          @Valid
+          @RequestBody
+          SocialLoginRequest request) {
+    log.info("구글 로그인 요청");
+    LoginResponse response = socialLoginService.googleLogin(request.getAccessToken());
     return new ResponseEntity<>(response, HttpStatus.OK);
   }
 }

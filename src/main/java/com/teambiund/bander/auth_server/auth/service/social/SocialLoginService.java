@@ -1,6 +1,7 @@
 package com.teambiund.bander.auth_server.auth.service.social;
 
 import com.teambiund.bander.auth_server.auth.dto.response.AppleUserInfo;
+import com.teambiund.bander.auth_server.auth.dto.response.GoogleUserInfo;
 import com.teambiund.bander.auth_server.auth.dto.response.KakaoUserInfo;
 import com.teambiund.bander.auth_server.auth.dto.response.LoginResponse;
 import com.teambiund.bander.auth_server.auth.entity.Auth;
@@ -8,6 +9,7 @@ import com.teambiund.bander.auth_server.auth.enums.Provider;
 import com.teambiund.bander.auth_server.auth.exception.CustomException;
 import com.teambiund.bander.auth_server.auth.exception.ErrorCode.AuthErrorCode;
 import com.teambiund.bander.auth_server.auth.oauth.AppleOAuthClient;
+import com.teambiund.bander.auth_server.auth.oauth.GoogleOAuthClient;
 import com.teambiund.bander.auth_server.auth.oauth.KakaoOAuthClient;
 import com.teambiund.bander.auth_server.auth.repository.AuthRepository;
 import com.teambiund.bander.auth_server.auth.service.login.LoginService;
@@ -25,6 +27,7 @@ public class SocialLoginService {
 
   private final KakaoOAuthClient kakaoOAuthClient;
   private final AppleOAuthClient appleOAuthClient;
+  private final GoogleOAuthClient googleOAuthClient;
   private final AuthRepository authRepository;
   private final SignupService signupService;
   private final LoginService loginService;
@@ -41,6 +44,13 @@ public class SocialLoginService {
     String email = userInfo.getEmail();
 
     return processLogin(email, Provider.APPLE);
+  }
+
+  public LoginResponse googleLogin(String idToken) {
+    GoogleUserInfo userInfo = googleOAuthClient.getUserInfo(idToken);
+    String email = userInfo.getEmail();
+
+    return processLogin(email, Provider.GOOGLE);
   }
 
   private LoginResponse processLogin(String email, Provider provider) {
