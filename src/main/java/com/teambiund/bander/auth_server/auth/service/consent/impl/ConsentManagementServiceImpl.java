@@ -78,7 +78,11 @@ public class ConsentManagementServiceImpl implements ConsentManagementService {
       }
 
       if (!request.isConsented()) {
-        // 동의 철회
+        // 필수 약관은 철회 불가
+        if (consentTable.isRequired()) {
+          throw new CustomException(AuthErrorCode.REQUIRED_CONSENT_CANNOT_BE_REVOKED);
+        }
+        // 선택 약관 동의 철회
         auth.removeConsentByTable(consentTable);
       } else {
         if (!auth.hasConsentForTable(consentTable.getId())) {

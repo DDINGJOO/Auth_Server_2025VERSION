@@ -45,10 +45,10 @@ public class ConsentController {
             description = "사용자를 찾을 수 없음",
             content = @Content(mediaType = "application/json"))
       })
-  @PutMapping("/{userId}")
+  @PatchMapping("/{userId}")
   public ResponseEntity<Boolean> consent(
       @Parameter(description = "사용자 ID", required = true, example = "12345")
-          @RequestParam(name = "userId")
+          @PathVariable(name = "userId")
           String userId,
       @io.swagger.v3.oas.annotations.parameters.RequestBody(
               description = "변경할 동의 정보 목록",

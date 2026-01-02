@@ -56,6 +56,10 @@ public enum AuthErrorCode implements ErrorCodeType {
       "UNAUTHORIZED_APP_ACCESS",
       "This account is not authorized to access this app",
       HttpStatus.FORBIDDEN),
+  REQUIRED_CONSENT_CANNOT_BE_REVOKED(
+      "REQUIRED_CONSENT_CANNOT_BE_REVOKED",
+      "Required consent cannot be revoked",
+      HttpStatus.BAD_REQUEST),
   ;
 
   private final String errCode;
