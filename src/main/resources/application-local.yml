@@ -1,0 +1,87 @@
+# ============================================
+# 로컬 개발 환경 설정 (Master/Slave + MaxScale)
+# ============================================
+# 실행 방법:
+#   1. docker-compose up -d mariadb-master mariadb-slave maxscale
+#   2. ./gradlew bootRun --args='--spring.profiles.active=local'
+#
+# 또는 IntelliJ에서:
+#   Run Configuration > Environment variables:
+#   SPRING_PROFILES_ACTIVE=local
+
+spring:
+  main:
+    allow-bean-definition-overriding: true
+
+  # ─────────────────────────────────────────────
+  # DataSource (MaxScale 연결)
+  # ─────────────────────────────────────────────
+  datasource:
+    url: jdbc:mariadb://localhost:4006/auth_db
+    username: app_user
+    password: apppass
+    driver-class-name: org.mariadb.jdbc.Driver
+
+    # HikariCP 설정
+    hikari:
+      pool-name: AuthHikariPool
+      maximum-pool-size: 10
+      minimum-idle: 5
+      connection-timeout: 30000
+      idle-timeout: 600000
+      max-lifetime: 1800000
+      keepalive-time: 30000
+      validation-timeout: 5000
+      connection-test-query: SELECT 1
+
+  # ─────────────────────────────────────────────
+  # JPA 설정
+  # ─────────────────────────────────────────────
+  jpa:
+    hibernate:
+      ddl-auto: update
+    show-sql: true
+    properties:
+      hibernate:
+        format_sql: true
+        dialect: org.hibernate.dialect.MariaDBDialect
+
+  # ─────────────────────────────────────────────
+  # Redis 설정
+  # ─────────────────────────────────────────────
+  data:
+    redis:
+      host: localhost
+      port: 6379
+
+# ─────────────────────────────────────────────
+# Security JWT 설정
+# ─────────────────────────────────────────────
+security:
+  jwt:
+    secret: local-jwt-secret-key-for-development-purpose-only-min-256-bits-required
+    access-token-expire-time: 3600000
+    refresh-token-expire-time: 86400000
+
+# ─────────────────────────────────────────────
+# Regex 설정
+# ─────────────────────────────────────────────
+regex:
+  email: '^[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\.[A-Za-z]{2,}$'
+  password: '^(?=.*[A-Za-z])(?=.*\d).{8,}$'
+
+# ─────────────────────────────────────────────
+# Email 설정
+# ─────────────────────────────────────────────
+email:
+  code:
+    prefix: 'email'
+    length: 6
+    expire:
+      time: 290
+
+# ─────────────────────────────────────────────
+# 환경 변수
+# ─────────────────────────────────────────────
+REDIS_HOST: localhost
+REDIS_PORT: 6379
