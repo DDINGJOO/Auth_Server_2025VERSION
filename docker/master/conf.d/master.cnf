@@ -1,0 +1,19 @@
+[mysqld]
+# Server identification
+server-id = 1
+
+# Binary logging (required for replication)
+log-bin = mysql-bin
+binlog-format = ROW
+
+# GTID (Global Transaction ID)
+gtid_strict_mode = ON
+log-slave-updates = ON
+
+# Performance tuning
+innodb_flush_log_at_trx_commit = 1
+sync_binlog = 1
+
+# Character set
+character-set-server = utf8mb4
+collation-server = utf8mb4_unicode_ci

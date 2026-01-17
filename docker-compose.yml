@@ -1,7 +1,132 @@
-# docker-compose.yml — Compose 방식(비-Swarm)으로 다중 auth-server 인스턴스 정의
-version: "3.7"
+# docker-compose.yml — Auth Server + Master/Slave DB + MaxScale
+#
+# 사용법:
+#   전체 실행:     docker-compose up -d
+#   DB만 실행:     docker-compose up -d mariadb-master mariadb-slave maxscale
+#   앱만 실행:     docker-compose up -d nginx auth-server-1 auth-server-2 auth-server-3
+#
+version: "3.8"
 
 services:
+  # ═══════════════════════════════════════════════════════════════
+  # DATABASE LAYER (Master/Slave + MaxScale)
+  # ═══════════════════════════════════════════════════════════════
+
+  # ─────────────────────────────────────────────────────────────
+  # MariaDB Master (Primary)
+  # ─────────────────────────────────────────────────────────────
+  mariadb-master:
+    image: mariadb:11.4
+    container_name: mariadb-master
+    environment:
+      MYSQL_ROOT_PASSWORD: ${DB_ROOT_PASSWORD:-rootpass}
+      MYSQL_DATABASE: ${DB_NAME:-auth_db}
+      MYSQL_USER: ${DB_USER:-app_user}
+      MYSQL_PASSWORD: ${DB_PASSWORD:-apppass}
+    ports:
+      - "3306:3306"
+    volumes:
+      - ./docker/master/conf.d:/etc/mysql/conf.d:ro
+      - ./docker/master/init:/docker-entrypoint-initdb.d:ro
+      - mariadb-master-data:/var/lib/mysql
+    command:
+      - --server-id=1
+      - --log-bin=mysql-bin
+      - --binlog-format=ROW
+      - --gtid_strict_mode=ON
+      - --log-slave-updates=ON
+    networks:
+      - db-network
+    healthcheck:
+      test: ["CMD", "healthcheck.sh", "--connect", "--innodb_initialized"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+      start_period: 30s
+    logging:
+      driver: "json-file"
+      options:
+        max-size: "50m"
+        max-file: "3"
+
+  # ─────────────────────────────────────────────────────────────
+  # MariaDB Slave (Replica)
+  # ─────────────────────────────────────────────────────────────
+  mariadb-slave:
+    image: mariadb:11.4
+    container_name: mariadb-slave
+    environment:
+      MYSQL_ROOT_PASSWORD: ${DB_ROOT_PASSWORD:-rootpass}
+      MYSQL_DATABASE: ${DB_NAME:-auth_db}
+      MYSQL_USER: ${DB_USER:-app_user}
+      MYSQL_PASSWORD: ${DB_PASSWORD:-apppass}
+    ports:
+      - "3307:3306"
+    volumes:
+      - ./docker/slave/conf.d:/etc/mysql/conf.d:ro
+      - ./docker/slave/init:/docker-entrypoint-initdb.d:ro
+      - mariadb-slave-data:/var/lib/mysql
+    command:
+      - --server-id=2
+      - --log-bin=mysql-bin
+      - --binlog-format=ROW
+      - --gtid_strict_mode=ON
+      - --log-slave-updates=ON
+      - --read-only=ON
+    depends_on:
+      mariadb-master:
+        condition: service_healthy
+    networks:
+      - db-network
+    healthcheck:
+      test: ["CMD", "healthcheck.sh", "--connect", "--innodb_initialized"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+      start_period: 30s
+    logging:
+      driver: "json-file"
+      options:
+        max-size: "50m"
+        max-file: "3"
+
+  # ─────────────────────────────────────────────────────────────
+  # MaxScale (Proxy + Read/Write Split + Auto Failover)
+  # ─────────────────────────────────────────────────────────────
+  maxscale:
+    image: mariadb/maxscale:latest
+    container_name: maxscale
+    ports:
+      - "4006:4006"   # Read/Write Split (애플리케이션 연결 포트)
+      - "8989:8989"   # REST API (모니터링/관리)
+    volumes:
+      - ./docker/maxscale/maxscale.cnf:/etc/maxscale.cnf:ro
+    depends_on:
+      mariadb-master:
+        condition: service_healthy
+      mariadb-slave:
+        condition: service_healthy
+    networks:
+      - db-network
+    healthcheck:
+      test: ["CMD", "maxctrl", "list", "servers"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+      start_period: 20s
+    logging:
+      driver: "json-file"
+      options:
+        max-size: "50m"
+        max-file: "3"
+
+  # ═══════════════════════════════════════════════════════════════
+  # APPLICATION LAYER
+  # ═══════════════════════════════════════════════════════════════
+
+  # ─────────────────────────────────────────────────────────────
+  # Nginx Load Balancer
+  # ─────────────────────────────────────────────────────────────
   nginx:
     image: nginx:alpine
     container_name: nginx-auth
@@ -17,10 +142,15 @@ services:
       - auth-server-3
     networks:
       - auth-network
+    logging:
+      driver: "json-file"
+      options:
+        max-size: "50m"
+        max-file: "3"
 
-
-
-  # auth-server 인스턴스들을 개별 서비스로 정의 (Compose는 deploy.replicas를 적용하지 않으므로 이렇게 복수 서비스로 표현)
+  # ─────────────────────────────────────────────────────────────
+  # Auth Server Instances
+  # ─────────────────────────────────────────────────────────────
   auth-server-1:
     image: ddingsh9/auth-server:1.4
     build:
@@ -28,12 +158,19 @@ services:
       dockerfile: Dockerfile
     env_file:
       - .env.prod
+    environment:
+      # MaxScale 연결 설정 (기존 DB 설정 오버라이드)
+      SPRING_DATASOURCE_URL: jdbc:mariadb://maxscale:4006/${DB_NAME:-auth_db}
+      SPRING_DATASOURCE_USERNAME: ${DB_USER:-app_user}
+      SPRING_DATASOURCE_PASSWORD: ${DB_PASSWORD:-apppass}
     container_name: auth-server-1
     networks:
       - auth-network
+      - db-network
       - infra-network
-
-
+    depends_on:
+      maxscale:
+        condition: service_healthy
     healthcheck:
       test: [ "CMD", "curl", "-f", "http://localhost:8080/health" ]
       interval: 15s
@@ -52,12 +189,18 @@ services:
       dockerfile: Dockerfile
     env_file:
       - .env.prod
+    environment:
+      SPRING_DATASOURCE_URL: jdbc:mariadb://maxscale:4006/${DB_NAME:-auth_db}
+      SPRING_DATASOURCE_USERNAME: ${DB_USER:-app_user}
+      SPRING_DATASOURCE_PASSWORD: ${DB_PASSWORD:-apppass}
     container_name: auth-server-2
     networks:
       - auth-network
+      - db-network
       - infra-network
-
-
+    depends_on:
+      maxscale:
+        condition: service_healthy
     healthcheck:
       test: [ "CMD", "curl", "-f", "http://localhost:8080/health" ]
       interval: 15s
@@ -76,23 +219,32 @@ services:
       dockerfile: Dockerfile
     env_file:
       - .env.prod
+    environment:
+      SPRING_DATASOURCE_URL: jdbc:mariadb://maxscale:4006/${DB_NAME:-auth_db}
+      SPRING_DATASOURCE_USERNAME: ${DB_USER:-app_user}
+      SPRING_DATASOURCE_PASSWORD: ${DB_PASSWORD:-apppass}
     container_name: auth-server-3
     networks:
       - auth-network
+      - db-network
       - infra-network
+    depends_on:
+      maxscale:
+        condition: service_healthy
+    healthcheck:
+      test: [ "CMD", "curl", "-f", "http://localhost:8080/health" ]
+      interval: 15s
+      timeout: 5s
+      retries: 3
     logging:
       driver: "json-file"
       options:
         max-size: "50m"
         max-file: "3"
 
-
-    healthcheck:
-      test: [ "CMD", "curl", "-f", "http://localhost:8080/health" ]
-      interval: 15s
-      timeout: 5s
-      retries: 3
-
+  # ─────────────────────────────────────────────────────────────
+  # Log Cleaner
+  # ─────────────────────────────────────────────────────────────
   log-cleaner:
     image: alpine:3.19
     container_name: log-cleaner
@@ -102,11 +254,26 @@ services:
         find /host/logs -type f -name '*.log' -mtime +1 -delete || true;
         sleep 3600;
       done"
+
+# ═══════════════════════════════════════════════════════════════
+# NETWORKS
+# ═══════════════════════════════════════════════════════════════
 networks:
   auth-network:
     driver: bridge
     name: auth-network
+  db-network:
+    driver: bridge
+    name: db-network
   infra-network:
     external: true
     name: infra-network
 
+# ═══════════════════════════════════════════════════════════════
+# VOLUMES
+# ═══════════════════════════════════════════════════════════════
+volumes:
+  mariadb-master-data:
+    name: mariadb-master-data
+  mariadb-slave-data:
+    name: mariadb-slave-data
