@@ -152,7 +152,8 @@ services:
   # Auth Server Instances
   # ─────────────────────────────────────────────────────────────
   auth-server-1:
-    image: ddingsh9/auth-server:1.4
+    image:  ddingsh9/auth-server:latest
+
     build:
       context: .
       dockerfile: Dockerfile
@@ -183,7 +184,8 @@ services:
         max-file: "3"
 
   auth-server-2:
-    image: ddingsh9/auth-server:1.4
+    image:  ddingsh9/auth-server:latest
+
     build:
       context: .
       dockerfile: Dockerfile
@@ -213,7 +215,8 @@ services:
         max-file: "3"
 
   auth-server-3:
-    image: ddingsh9/auth-server:1.4
+    image:  ddingsh9/auth-server:latest
+
     build:
       context: .
       dockerfile: Dockerfile

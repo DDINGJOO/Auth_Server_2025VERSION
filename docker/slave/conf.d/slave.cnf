@@ -20,3 +20,6 @@ sync_binlog = 1
 # Character set
 character-set-server = utf8mb4
 collation-server = utf8mb4_unicode_ci
+
+# 초기 복제 시 중복 에러 무시 (1062: duplicate key, 1396: operation failed for user)
+slave-skip-errors = 1062,1396
