@@ -1,0 +1,31 @@
+[mysqld]
+# Server identification
+server-id = 1
+
+# Binary logging (복제 필수)
+log-bin = mysql-bin
+binlog-format = ROW
+
+# GTID (Global Transaction ID)
+gtid_strict_mode = ON
+log-slave-updates = ON
+
+# Performance tuning
+innodb_flush_log_at_trx_commit = 1
+sync_binlog = 1
+innodb_buffer_pool_size = 512M
+innodb_log_file_size = 128M
+
+# Connection settings
+max_connections = 200
+wait_timeout = 28800
+interactive_timeout = 28800
+
+# Character set
+character-set-server = utf8mb4
+collation-server = utf8mb4_unicode_ci
+
+# Slow query log
+slow_query_log = 1
+slow_query_log_file = /var/lib/mysql/slow-query.log
+long_query_time = 2

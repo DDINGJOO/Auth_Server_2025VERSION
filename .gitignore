@@ -43,3 +43,18 @@ out/
 
 ### Claude Code ###
 .claude/
+
+### Production Secrets ###
+prod/.env.prod
+prod/nginx/logs/
+prod/docker/master/init/01-create-users.sql
+prod/docker/slave/init/00-create-users.sql
+prod/docker/slave/init/01-start-replication.sql
+prod/docker/maxscale/maxscale.cnf
+
+# Keep example files
+!prod/.env.prod.example
+!prod/docker/master/init/01-create-users.sql.example
+!prod/docker/slave/init/00-create-users.sql.example
+!prod/docker/slave/init/01-start-replication.sql.example
+!prod/docker/maxscale/maxscale.cnf.example

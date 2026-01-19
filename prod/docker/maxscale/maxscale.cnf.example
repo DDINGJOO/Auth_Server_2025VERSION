@@ -1,0 +1,76 @@
+# MaxScale Configuration
+# Read/Write Split + Auto Failover
+
+[maxscale]
+threads = auto
+log_info = true
+
+# ─────────────────────────────────────────────
+# Server Definitions
+# ─────────────────────────────────────────────
+[master]
+type = server
+address = mariadb-master
+port = 3306
+protocol = MariaDBBackend
+
+[slave]
+type = server
+address = mariadb-slave
+port = 3306
+protocol = MariaDBBackend
+
+# ─────────────────────────────────────────────
+# Monitor (상태 감시 + 자동 Failover)
+# ─────────────────────────────────────────────
+[MariaDB-Monitor]
+type = monitor
+module = mariadbmon
+servers = master, slave
+user = maxscale_monitor
+password = CHANGE_THIS_MONITOR_PASSWORD
+
+# 모니터링 주기
+monitor_interval = 2000ms
+
+# 자동 Failover 설정
+auto_failover = true
+auto_rejoin = true
+failover_timeout = 30s
+switchover_timeout = 30s
+
+# Master 다운 감지 설정
+failcount = 3
+backend_connect_timeout = 5s
+backend_read_timeout = 5s
+backend_write_timeout = 5s
+
+# ─────────────────────────────────────────────
+# Read/Write Split Service
+# ─────────────────────────────────────────────
+[Read-Write-Service]
+type = service
+router = readwritesplit
+servers = master, slave
+user = maxscale_router
+password = CHANGE_THIS_ROUTER_PASSWORD
+
+# Read/Write 분리 설정
+master_accept_reads = true
+slave_selection_criteria = LEAST_CURRENT_OPERATIONS
+
+# 트랜잭션 라우팅
+transaction_replay = true
+transaction_replay_timeout = 30s
+
+# 연결 유지
+connection_keepalive = 60s
+
+# ─────────────────────────────────────────────
+# Listener (클라이언트 연결점)
+# ─────────────────────────────────────────────
+[Read-Write-Listener]
+type = listener
+service = Read-Write-Service
+protocol = MariaDBClient
+port = 4006
