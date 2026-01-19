@@ -1,6 +1,5 @@
 package com.teambiund.bander.auth_server.auth.config;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
 import com.teambiund.bander.auth_server.auth.event.publish.EmailConfirmRequestEventPub;
 import com.teambiund.bander.auth_server.auth.event.publish.EventPublisher;
 import com.teambiund.bander.auth_server.auth.repository.AuthRepository;
@@ -28,11 +27,10 @@ public class GenerateKeyConfig {
   public EmailConfirm emailConfirm(
       StringRedisTemplate stringRedisTemplate,
       KafkaTemplate<String, Object> kafkaTemplate,
-      ObjectMapper objectMapper,
       AuthRepository authRepository,
       @Qualifier("aesCipherStrategy") CipherStrategy emailCipher) {
     return new EmailConfirmImpl(
         new EmailCodeGenerator(authRepository, stringRedisTemplate, emailCipher),
-        new EmailConfirmRequestEventPub(new EventPublisher(kafkaTemplate, objectMapper)));
+        new EmailConfirmRequestEventPub(new EventPublisher(kafkaTemplate)));
   }
 }

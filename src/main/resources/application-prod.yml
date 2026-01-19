@@ -1,13 +1,9 @@
 # ============================================
-# 로컬 개발 환경 설정 (Master/Slave + MaxScale + Kafka + Redis)
+# 프로덕션 환경 설정 (Master/Slave + MaxScale + Kafka + Redis)
 # ============================================
 # 실행 방법:
-#   1. docker-compose --env-file .env.local up -d
-#   2. ./gradlew bootRun --args='--spring.profiles.active=local'
-#
-# 또는 IntelliJ에서:
-#   Run Configuration > Environment variables:
-#   SPRING_PROFILES_ACTIVE=local
+#   docker-compose up -d
+#   환경변수 SPRING_PROFILES_ACTIVE=prod 로 실행
 
 spring:
   application:
@@ -19,16 +15,16 @@ spring:
   # DataSource (MaxScale 연결)
   # ─────────────────────────────────────────────
   datasource:
-    url: jdbc:mariadb://localhost:4006/auth_db
-    username: app_user
-    password: apppass
+    url: jdbc:mariadb://${DATABASE_HOST:maxscale}:${DATABASE_PORT:4006}/${DATABASE_NAME:auth_db}
+    username: ${DATABASE_USER_NAME}
+    password: ${DATABASE_PASSWORD}
     driver-class-name: org.mariadb.jdbc.Driver
 
-    # HikariCP 설정
+    # HikariCP 설정 (프로덕션 최적화)
     hikari:
       pool-name: AuthHikariPool
-      maximum-pool-size: 10
-      minimum-idle: 5
+      maximum-pool-size: 20
+      minimum-idle: 10
       connection-timeout: 30000
       idle-timeout: 600000
       max-lifetime: 1800000
@@ -41,33 +37,43 @@ spring:
   # ─────────────────────────────────────────────
   jpa:
     hibernate:
-      ddl-auto: update
-    show-sql: true
+      ddl-auto: validate  # 프로덕션에서는 validate 사용
+    show-sql: false
     properties:
       hibernate:
-        format_sql: true
+        format_sql: false
         dialect: org.hibernate.dialect.MariaDBDialect
+    open-in-view: false
 
   # ─────────────────────────────────────────────
   # Redis 설정
   # ─────────────────────────────────────────────
   data:
     redis:
-      host: localhost
-      port: 6379
+      host: ${REDIS_HOST:redis}
+      port: ${REDIS_PORT:6379}
+      timeout: 3000ms
+      lettuce:
+        pool:
+          max-active: 16
+          max-idle: 8
+          min-idle: 4
 
   # ─────────────────────────────────────────────
   # Kafka 설정
   # ─────────────────────────────────────────────
   kafka:
-    bootstrap-servers: localhost:29092
+    bootstrap-servers: ${KAFKA_URL1:kafka1:9091},${KAFKA_URL2:kafka2:9092},${KAFKA_URL3:kafka3:9093}
     producer:
       key-serializer: org.apache.kafka.common.serialization.StringSerializer
       value-serializer: org.springframework.kafka.support.serializer.JsonSerializer
       acks: all
       retries: 3
+      properties:
+        enable.idempotence: true
+        max.in.flight.requests.per.connection: 5
     consumer:
-      group-id: auth-server-local
+      group-id: auth-server-prod
       auto-offset-reset: earliest
       key-deserializer: org.apache.kafka.common.serialization.StringDeserializer
       value-deserializer: org.springframework.kafka.support.serializer.JsonDeserializer
@@ -79,9 +85,11 @@ spring:
 # ─────────────────────────────────────────────
 security:
   jwt:
-    secret: local-jwt-secret-key-for-development-purpose-only-min-256-bits-required
-    access-token-expire-time: 3600000
-    refresh-token-expire-time: 86400000
+    secret: ${JWT_SECRET}
+    access-token-expire-time: ${JWT_ACCESS_TOKEN_EXPIRE_TIME:3600000}
+    refresh-token-expire-time: ${JWT_REFRESH_TOKEN_EXPIRE_TIME:86400000}
+  aes:
+    encryption-key: ${AES_ENCRYPTION_KEY}
 
 # ─────────────────────────────────────────────
 # Regex 설정
@@ -101,24 +109,32 @@ email:
       time: 290
 
 # ─────────────────────────────────────────────
-# Actuator & Distributed Tracing (Zipkin)
+# Actuator 설정
 # ─────────────────────────────────────────────
 management:
   endpoints:
     web:
       exposure:
         include: health,info,metrics
+  endpoint:
+    health:
+      show-details: when-authorized
+  # Distributed Tracing (Zipkin)
   tracing:
     sampling:
-      probability: 1.0  # 로컬: 100% 샘플링
+      probability: ${TRACING_SAMPLING_PROBABILITY:0.1}  # 프로덕션: 10% 샘플링
     propagation:
       type: b3
   zipkin:
     tracing:
-      endpoint: http://localhost:9411/api/v2/spans
+      endpoint: ${ZIPKIN_ENDPOINT:http://zipkin:9411/api/v2/spans}
 
 # ─────────────────────────────────────────────
-# 환경 변수
+# 로깅 설정
 # ─────────────────────────────────────────────
-REDIS_HOST: localhost
-REDIS_PORT: 6379
+logging:
+  level:
+    root: INFO
+    com.teambiund.bander: INFO
+    org.springframework.kafka: WARN
+    org.hibernate.SQL: WARN

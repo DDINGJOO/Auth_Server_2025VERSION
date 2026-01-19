@@ -1,0 +1,16 @@
+# Production Secrets - 절대 커밋하지 않음
+.env.prod
+nginx/logs/
+
+# 실제 비밀번호가 포함된 설정 파일
+docker/master/init/01-create-users.sql
+docker/slave/init/00-create-users.sql
+docker/slave/init/01-start-replication.sql
+docker/maxscale/maxscale.cnf
+
+# Example 파일은 커밋 (템플릿)
+!.env.prod.example
+!docker/master/init/01-create-users.sql.example
+!docker/slave/init/00-create-users.sql.example
+!docker/slave/init/01-start-replication.sql.example
+!docker/maxscale/maxscale.cnf.example

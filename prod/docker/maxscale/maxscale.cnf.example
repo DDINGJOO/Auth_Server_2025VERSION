@@ -1,15 +1,12 @@
-# ============================================
-# MaxScale 설정 파일
-# ============================================
+# MaxScale Configuration
+# Read/Write Split + Auto Failover
 
 [maxscale]
 threads = auto
-admin_host = 0.0.0.0
-admin_port = 8989
-admin_secure_gui = false
+log_info = true
 
 # ─────────────────────────────────────────────
-# 서버 정의
+# Server Definitions
 # ─────────────────────────────────────────────
 [master]
 type = server
@@ -24,46 +21,53 @@ port = 3306
 protocol = MariaDBBackend
 
 # ─────────────────────────────────────────────
-# 모니터 (상태 감시 + 자동 Failover)
+# Monitor (상태 감시 + 자동 Failover)
 # ─────────────────────────────────────────────
 [MariaDB-Monitor]
 type = monitor
 module = mariadbmon
-servers = master,slave
+servers = master, slave
 user = maxscale_monitor
-password = monitorpass
+password = CHANGE_THIS_MONITOR_PASSWORD
+
+# 모니터링 주기
 monitor_interval = 2000ms
 
-# Failover 설정
+# 자동 Failover 설정
 auto_failover = true
 auto_rejoin = true
-enforce_read_only_slaves = true
+failover_timeout = 30s
+switchover_timeout = 30s
 
-# Failover 조건
+# Master 다운 감지 설정
 failcount = 3
-failover_timeout = 90s
-switchover_timeout = 90s
+backend_connect_timeout = 5s
+backend_read_timeout = 5s
+backend_write_timeout = 5s
 
 # ─────────────────────────────────────────────
-# Read/Write Split 서비스
+# Read/Write Split Service
 # ─────────────────────────────────────────────
 [Read-Write-Service]
 type = service
 router = readwritesplit
-servers = master,slave
-user = maxscale_user
-password = maxscalepass
+servers = master, slave
+user = maxscale_router
+password = CHANGE_THIS_ROUTER_PASSWORD
 
-# 라우팅 옵션
-master_failure_mode = fail_on_write
+# Read/Write 분리 설정
 master_accept_reads = true
+slave_selection_criteria = LEAST_CURRENT_OPERATIONS
 
-# 트랜잭션 기반 라우팅
+# 트랜잭션 라우팅
 transaction_replay = true
-transaction_replay_max_size = 1Mi
+transaction_replay_timeout = 30s
+
+# 연결 유지
+connection_keepalive = 60s
 
 # ─────────────────────────────────────────────
-# 리스너 (클라이언트 연결 포트)
+# Listener (클라이언트 연결점)
 # ─────────────────────────────────────────────
 [Read-Write-Listener]
 type = listener
